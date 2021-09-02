@@ -1,0 +1,12 @@
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    height: 20%;
+}
+
+.button-group-button {
+    margin-top: 6px;
+    /* width: max-content; */
+    height: min-content;
+}
