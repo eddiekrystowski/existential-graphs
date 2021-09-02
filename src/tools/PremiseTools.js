@@ -1,8 +1,6 @@
 import * as joint from "jointjs"
 import { paper } from "../index.js"
 
-export let selected_element;
-
 export function addRectTools(element) {
     //element view is in charge of rendering the elements on the paper
     let elementView = element.findView(paper);

@@ -2,7 +2,6 @@ import ReactDOM from 'react-dom';
 import * as joint from 'jointjs';
 import App from './App';
 import { Premise } from './Premise';
-import { selected_element } from './tools/PremiseTools';
 
 console.log("Starting...");
 
