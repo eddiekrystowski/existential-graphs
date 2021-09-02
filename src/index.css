@@ -1,0 +1,11 @@
+
+html, body, #root, .app {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+}
+
+.app {
+    display: flex;
+    flex-direction: row;
+}
