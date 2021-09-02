@@ -1,7 +1,8 @@
 import ReactDOM from 'react-dom';
 import * as joint from 'jointjs';
-
 import App from './App';
+import { Premise } from './Premise';
+import { selected_element } from './tools/PremiseTools';
 
 console.log("Starting...");
 
@@ -25,3 +26,27 @@ export let paper = new joint.dia.Paper({
     preventContextMenu: false,
     clickThreshold: 1,
 });
+
+let rect = new Premise().create()
+console.log(rect)
+rect.position(100, 30);
+rect.resize(100, 40);
+
+document.addEventListener('keyup', function(event){
+    console.log(event)
+    if (event.key === "Enter") {
+        let new_rect = new Premise().create()
+        console.log(new_rect)
+    }
+  });
+
+// paper events
+paper.on("element:mouseenter", function( cellView, evt){
+    let model = cellView.model
+    model.attr("text/fill", "red")
+})
+
+paper.on("element:mouseleave", function( cellView, evt){
+    let model = cellView.model
+    model.attr("text/fill", "black")
+})
