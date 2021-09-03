@@ -64,11 +64,14 @@ document.addEventListener('keyup', function(event){
         }
         if (selected_premise) {
             console.log("premise selected for cut")
-            return;
+            config["child"] = selected_premise
+            let new_cut = new Cut().create(config)
+            new_cut.toBack()
         } else {
             console.log("creating empty cut")
             let new_cut = new Cut().create(config)
             new_cut.toBack()
+            console.log("cut", new_cut)
             event.preventDefault();
         }
     }

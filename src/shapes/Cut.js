@@ -9,7 +9,7 @@ export class Cut extends joint.dia.Element {
             ...super.defaults,
             type: "dia.Element.Cut",
             attrs: {
-                rect: { class:"cut", width: 40, height: 40, fill: "white", stroke: "black", strokeWidth: 1},//, width: 100, height: 100 },
+                rect: { class:"cut", width: 0, height: 0, fill: "white", stroke: "black", strokeWidth: 1},//, width: 100, height: 100 },
                 text: { class:"cut",
                   "font-size": 30,
                   "ref-x": 0.5,
@@ -40,8 +40,10 @@ export class Cut extends joint.dia.Element {
         let y = (config && config.y) || 10
 
         //initial size
-        let width = (config && config.width) || 50
-        let height = (config && config.height) || 50
+        let width = (config && config.width) || 80
+        console.log(width)
+        let height = (config && config.height) || 80
+        console.log(height)
 
         //set initial rect values
         let rect_class = (config && config.shape_class) || type + "_rect"
@@ -65,12 +67,10 @@ export class Cut extends joint.dia.Element {
                 x: x,
                 y: y,
               },
-              size: {
-                width: width,
-                height: height,
-              },
               attrs: {
                 rect: {
+                    width: width,
+                    height: height,
                     class: rect_class,
                     fill: rect_fill,
                     stroke: rect_stroke,
@@ -91,11 +91,20 @@ export class Cut extends joint.dia.Element {
               },
               // set custom attributes here:
         })
-        cut.addTo(graph)
+        cut.addTo(graph);
+        //add tools (some events events also)
         addCutTools(cut);
 
-        //add tools (some events events also)
-        //addRectTools(premise)
+        //check for children
+        if (config && config.child) {
+            let child = config.child
+            cut.embed(child)
+            console.log(cut)
+            cut.set("position", {
+                x: child.attributes.position.x - (cut.attributes.attrs.rect.width - child.attributes.attrs.rect.width) / 2,
+                y: child.attributes.position.y - (cut.attributes.attrs.rect.height - child.attributes.attrs.rect.height) / 2,
+            })
+;        }
 
         return cut;
         
