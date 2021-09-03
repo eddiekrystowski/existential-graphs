@@ -1,7 +1,7 @@
 import ReactDOM from 'react-dom';
 import * as joint from 'jointjs';
 import App from './App';
-import { Premise } from './Premise';
+import { Premise } from './shapes/Premise';
 
 console.log("Starting...");
 
@@ -31,12 +31,37 @@ console.log(rect)
 rect.position(100, 30);
 rect.resize(100, 40);
 
-document.addEventListener('keyup', function(event){
-    console.log(event)
-    if (event.key === "Enter") {
-        let new_rect = new Premise().create()
-        console.log(new_rect)
+let mousePosition = {
+    x: 0,
+    y: 0
+}
+
+const paperContainer = document.getElementById('paper-container');
+
+
+document.addEventListener("mousemove", function(evt){
+    mousePosition = {
+        x: evt.clientX,
+        y: evt.clientY
     }
+})
+
+document.addEventListener('keyup', function(event){
+    console.log("lolccopter")
+    let key = event.key
+    if (event.keyCode >= 65 && event.keyCode <= 90) {
+        console.log("hi how are ya")
+        let config = {
+            text: key,
+            x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
+            y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+        }
+        let new_rect = new Premise().create(config)
+    }
+    if (event.keycode === "32") {
+        return;
+    }
+    event.preventDefault()
   });
 
 // paper events

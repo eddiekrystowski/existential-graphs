@@ -1,7 +1,7 @@
 import * as joint from 'jointjs'
-import { graph } from './index.js'
-import { addRectTools } from './tools/PremiseTools.js'
-import './css/Premise.css'
+import { graph } from '../index.js'
+import { addRectTools } from '../tools/PremiseTools.js'
+import '../css/Premise.css'
 // class for premises (letters)
 
 export class Premise extends joint.dia.Element {
