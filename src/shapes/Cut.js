@@ -40,9 +40,9 @@ export class Cut extends joint.dia.Element {
         let y = (config && config.y) || 10
 
         //initial size
-        let width = (config && config.width) || 80
+        let width = (config && config.width) || 40 
         console.log(width)
-        let height = (config && config.height) || 80
+        let height = (config && config.height) || 40
         console.log(height)
 
         //set initial rect values
@@ -100,6 +100,8 @@ export class Cut extends joint.dia.Element {
             let child = config.child
             cut.embed(child)
             console.log(cut)
+            cut.attr("rect/width", child.attributes.attrs.rect.width + cut.attributes.attrs.rect.width)
+            cut.attr("rect/height", child.attributes.attrs.rect.height + cut.attributes.attrs.rect.height)
             cut.set("position", {
                 x: child.attributes.position.x - (cut.attributes.attrs.rect.width - child.attributes.attrs.rect.width) / 2,
                 y: child.attributes.position.y - (cut.attributes.attrs.rect.height - child.attributes.attrs.rect.height) / 2,
