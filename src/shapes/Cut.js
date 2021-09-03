@@ -49,7 +49,7 @@ export class Cut extends joint.dia.Element {
         let rect_class = (config && config.shape_class) || type + "_rect"
         let rect_stroke = (config && config.stroke) || "black"
         let strokeWidth = (config && config.strokeWidth) || 2
-        let rect_fill = (config && config.rect_fill) || "#ffffff00"
+        let rect_fill = (config && config.rect_fill) || "#ffffff99"
 
         //set intial text values
         let text_class = (config && config.text) || type + "_text"
