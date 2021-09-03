@@ -1,7 +1,7 @@
 import * as joint from "jointjs"
 import { paper } from "../index.js"
 
-export function addPremiseTools(element) {
+export function addCutTools(element) {
     //element view is in charge of rendering the elements on the paper
     let elementView = element.findView(paper);
     //clear any old tools
@@ -23,4 +23,3 @@ export function addPremiseTools(element) {
     // });
     // --- end of paper events -----
 }
-

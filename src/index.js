@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom';
 import * as joint from 'jointjs';
 import App from './App';
 import { Premise } from './shapes/Premise';
+import { Cut } from './shapes/Cut.js'
 
 console.log("Starting...");
 
@@ -10,6 +11,8 @@ ReactDOM.render(
     <App/>,
     document.getElementById('root')
 );
+
+let selected_premise = undefined;
 
 export let graph = new joint.dia.Graph();
 
@@ -20,8 +23,6 @@ export let paper = new joint.dia.Paper({
     model: graph,
     height: PAPER_SIZE.height,
     width: PAPER_SIZE.width,
-    gridSize: 10,
-    drawGrid: true,
     preventContextMenu: false,
     clickThreshold: 1,
 });
@@ -47,10 +48,8 @@ document.addEventListener("mousemove", function(evt){
 })
 
 document.addEventListener('keyup', function(event){
-    console.log("lolccopter")
     let key = event.key
     if (event.keyCode >= 65 && event.keyCode <= 90) {
-        console.log("hi how are ya")
         let config = {
             text: key,
             x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
@@ -58,8 +57,20 @@ document.addEventListener('keyup', function(event){
         }
         let new_rect = new Premise().create(config)
     }
-    if (event.keycode === "32") {
-        return;
+    if (event.keyCode === 13) {
+        let config = {
+            x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
+            y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+        }
+        if (selected_premise) {
+            console.log("premise selected for cut")
+            return;
+        } else {
+            console.log("creating empty cut")
+            let new_cut = new Cut().create(config)
+            new_cut.toBack()
+            event.preventDefault();
+        }
     }
     event.preventDefault()
   });
@@ -67,10 +78,18 @@ document.addEventListener('keyup', function(event){
 // paper events
 paper.on("element:mouseenter", function( cellView, evt){
     let model = cellView.model
+    let modelView = model.findView(paper);
+    modelView.showTools()
+    model.attr("rect/stroke", "red")
     model.attr("text/fill", "red")
+    selected_premise = model
 })
 
 paper.on("element:mouseleave", function( cellView, evt){
     let model = cellView.model
+    let modelView = model.findView(paper);
+    modelView.hideTools()
+    model.attr("rect/stroke", "black")
     model.attr("text/fill", "black")
+    selected_premise = undefined;
 })

@@ -1,6 +1,6 @@
 import * as joint from 'jointjs'
 import { graph } from '../index.js'
-import { addRectTools } from '../tools/PremiseTools.js'
+import { addPremiseTools } from '../tools/PremiseTools.js'
 import '../css/Premise.css'
 // class for premises (letters)
 
@@ -48,7 +48,7 @@ export class Premise extends joint.dia.Element {
         let rect_class = (config && config.shape_class) || type + "_rect"
         let rect_stroke = (config && config.stroke) || "black"
         let strokeWidth = (config && config.strokeWidth) || 0
-        let rect_fill = (config && config.rect_fill) || "white"
+        let rect_fill = (config && config.rect_fill) || "#ffffff00"
 
         //set intial text values
         let text_class = (config && config.text) || type + "_text"
@@ -94,7 +94,7 @@ export class Premise extends joint.dia.Element {
         })
         premise.addTo(graph)
         //add tools (some events events also)
-        addRectTools(premise)
+        addPremiseTools(premise)
 
         return premise;
         
