@@ -1,11 +1,15 @@
 :root {
-    --menu-bg: #a9a9a9;
+    --menu-bg: #83c5be;
 }
 
 .menu-bar {
     background-color: var(--menu-bg);
     display: flex;
     flex-direction: column;
-    width: 20%;
-    padding: 5px;
+    width: 100%;
+    grid-area: side;
+}
+
+#side-wrapper {
+    margin: 5px;
 }
