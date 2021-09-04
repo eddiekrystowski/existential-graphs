@@ -5,19 +5,19 @@ import logoIcon from './MenuIcons/logo.png';
 const MenuItems = [
   {
     text: '',
-    img_path: logoIcon,
+    img: logoIcon,
     onClick: function(){
       return;
     }
   },
   {
     text: 'Import',
-    img_path: importIcon,
+    img: importIcon,
     onClick: importEG,
   },
   {
     text: 'Export',
-    img_path: exportIcon,
+    img: exportIcon,
     onClick: exportEG,
   },
 ]

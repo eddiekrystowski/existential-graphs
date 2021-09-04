@@ -1,7 +1,19 @@
 .header-bar {
   display: flex;
   flex-direction: row;
-  height: 10vh;
-  width: 100vw;
-  background-color: red;
+  background-color: #006d77;
+  grid-area: header;
+  padding: 0px;
+}
+
+.menu-item {
+  padding-right: 10vw;
+}
+
+img {
+  margin: 0;
+}
+
+h3 {
+  margin: 0;
 }

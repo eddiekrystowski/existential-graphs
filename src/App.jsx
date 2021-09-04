@@ -23,7 +23,7 @@ export default class App extends React.Component {
     render() {
         return (
             <div className="app">
-                <MenuBar/>
+                <MenuBar id="header"/>
                 <SideBar mode={this.state.mode} onStateSwitch={() => { this.handleStateSwitch(); }}></SideBar>
                 <div id="paper-container"></div>
             </div>
