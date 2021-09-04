@@ -12,7 +12,7 @@ html, body, #root, .app {
         'side   paper  paper'
         'side   paper  paper';
     grid-template-rows: 10vh auto auto;
-    grid-template-columns: 10vw auto auto;
+    grid-template-columns: 15vw auto auto;
 }
 
 #paper-container {

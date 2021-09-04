@@ -8,5 +8,8 @@
     flex-direction: column;
     width: 100%;
     grid-area: side;
-    padding: 5px;
+}
+
+#side-wrapper {
+    margin: 5px;
 }
