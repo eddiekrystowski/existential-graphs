@@ -55,6 +55,7 @@ function exportEG() {
 
 function importEG() {
   console.log('Importing...');
+  
 }
 
 export default MenuItems;
