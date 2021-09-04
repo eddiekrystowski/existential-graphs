@@ -48,6 +48,9 @@ let initial_cut_pos = {}
 
 $(document).on('keydown', function(event) {
     keys[event.which] = true;
+    if (keys[16]) {
+        paper.setInteractivity(false);
+    }
 });
 
 document.addEventListener("mousemove", function(evt){
@@ -107,6 +110,7 @@ $(document).on('mouseup', function(event) {
         temp_cut.remove();
     }
 
+    paper.setInteractivity(true);
     temp_cut = undefined;
 });
 
