@@ -1,7 +1,7 @@
 import React from 'react';
 
 import './index.css'; 
-import SideBar from './MenuBar';
+import SideBar from './SideBar';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -22,7 +22,7 @@ export default class App extends React.Component {
     render() {
         return (
             <div className="app">
-                <SideBar mode={this.state.mode} onStateSwitch={() => { this.handleStateSwitch(); }}></Bar>
+                <SideBar mode={this.state.mode} onStateSwitch={() => { this.handleStateSwitch(); }}></SideBar>
                 <div id="paper-container"></div>
             </div>
         );
