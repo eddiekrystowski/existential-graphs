@@ -8,17 +8,28 @@ const MenuItems = [
     img: logoIcon,
     onClick: function(){
       return;
-    }
+    },
+    margin_left: '0vw',
+  },
+  {
+    text: 'Bram Hub',
+    img: '',
+    onClick: function(){
+      return;
+    },
+    margin_left: '1vw',
   },
   {
     text: 'Import',
     img: importIcon,
     onClick: importEG,
+    margin_left: '7vw',
   },
   {
     text: 'Export',
     img: exportIcon,
     onClick: exportEG,
+    margin_left: '3vw',
   },
 ]
 

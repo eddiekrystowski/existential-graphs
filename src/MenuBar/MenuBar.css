@@ -3,17 +3,14 @@
   flex-direction: row;
   background-color: #006d77;
   grid-area: header;
-  padding: 0px;
-}
-
-.menu-item {
-  padding-right: 10vw;
+  padding: 10px;
+  text-align: center;
 }
 
 img {
   margin: 0;
 }
 
-h3 {
+h4 {
   margin: 0;
 }
