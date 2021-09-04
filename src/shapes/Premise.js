@@ -68,10 +68,12 @@ export class Premise extends joint.dia.Element {
               },
               size: {
                 width: width,
-                height: height,
+                height: height
               },
               attrs: {
                 rect: {
+                    width: width,
+                    height: height,
                     class: rect_class,
                     fill: rect_fill,
                     stroke: rect_stroke,
