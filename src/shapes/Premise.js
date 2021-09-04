@@ -19,7 +19,7 @@ const PREMISE_DEFAULTS = {
       class: 'premise_rect',
       width: 40, 
       height: 40, 
-      fill: 'white', 
+      fill: '#ffffff00', 
       stroke: 'black', 
       strokeWidth: 0
     },
