@@ -1,9 +1,9 @@
 import React from 'react';
 
-import './MenuBar.css';
+import './SideBar.css';
 import './ButtonGroup.css';
 
-export default class MenuBar extends React.Component {
+export default class SideBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -66,9 +66,11 @@ export default class MenuBar extends React.Component {
     render() {
         return (
             <div className="menu-bar">
-                <h2>{this.props.mode} mode</h2>
-                <Button text="Switch Mode" onClick={this.props.onStateSwitch}></Button>
-                <ButtonGroup buttons={this.state.buttons[this.props.mode]} mode={this.props.mode}/>
+                <div id="side-wrapper">
+                    <h2>{this.props.mode} mode</h2>
+                    <Button text="Switch Mode" onClick={this.props.onStateSwitch}></Button>
+                    <ButtonGroup buttons={this.state.buttons[this.props.mode]} mode={this.props.mode}/>
+                </div>
             </div>
         ); 
     }

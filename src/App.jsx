@@ -1,7 +1,8 @@
 import React from 'react';
-import MenuBar from './MenuBar';
 
 import './index.css'; 
+import SideBar from './SideBar';
+import MenuBar from './MenuBar/MenuBar.jsx';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -22,7 +23,8 @@ export default class App extends React.Component {
     render() {
         return (
             <div className="app">
-                <MenuBar mode={this.state.mode} onStateSwitch={() => { this.handleStateSwitch(); }}></MenuBar>
+                <MenuBar id="header"/>
+                <SideBar mode={this.state.mode} onStateSwitch={() => { this.handleStateSwitch(); }}></SideBar>
                 <div id="paper-container"></div>
             </div>
         );

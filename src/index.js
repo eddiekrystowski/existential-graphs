@@ -51,16 +51,25 @@ document.addEventListener('keyup', function(event){
     let key = event.key
     if (event.keyCode >= 65 && event.keyCode <= 90) {
         let config = {
-            text: key,
-            x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
-            y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+            //use capital letters by default, can press shift to make lowercase
+            attrs:{
+                text: {
+                    text:event.shiftKey ? key.toLocaleLowerCase() : key.toLocaleUpperCase()
+                }
+            },
+            position: {
+                x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
+                y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+            }
         }
         let new_rect = new Premise().create(config)
     }
     if (event.keyCode === 13) {
         let config = {
-            x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
-            y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+            position: {
+                x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
+                y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+            }
         }
         if (selected_premise) {
             console.log("premise selected for cut")
