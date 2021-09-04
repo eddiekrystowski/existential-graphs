@@ -1,9 +1,9 @@
 import React from 'react';
 
-import './MenuBar.css';
+import './SideBar.css';
 import './ButtonGroup.css';
 
-export default class MenuBar extends React.Component {
+export default class SideBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
