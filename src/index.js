@@ -43,7 +43,7 @@ const paperContainer = document.getElementById('paper-container');
 
 const keys = [];
 let mouse_down = false;
-let temp_cut;
+let temp_cut = undefined;
 let initial_cut_pos = {}
 
 $(document).on('keydown', function(event) {
@@ -56,8 +56,17 @@ document.addEventListener("mousemove", function(evt){
         y: evt.clientY
     }
 
-    if (mouse_down && keys[16]) {
-
+    if (mouse_down && keys[16] && temp_cut) {
+        const mouse_adjusted = {
+            x: mousePosition.x - paperContainer.getBoundingClientRect().left,
+            y: mousePosition.y - paperContainer.getBoundingClientRect().top
+        };
+        temp_cut.set('position', {
+            x: Math.min(mouse_adjusted.x, initial_cut_pos.x),
+            y: Math.min(mouse_adjusted.y, initial_cut_pos.y)
+        })
+        temp_cut.attr('rect/width', Math.abs(mouse_adjusted.x - initial_cut_pos.x));
+        temp_cut.attr('rect/height', Math.abs(mouse_adjusted.y - initial_cut_pos.y));
     }
 })
 
@@ -65,15 +74,40 @@ $(document).on('mousedown', function(event) {
     mouse_down = true;
     if (keys[16]) {
 
+        initial_cut_pos = Object.assign({}, mousePosition);
+        console.log(initial_cut_pos);
+        initial_cut_pos.x -= paperContainer.getBoundingClientRect().left;
+        initial_cut_pos.y -= paperContainer.getBoundingClientRect().top;
         let config  = {
-            position: Object.assign({}, mousePosition),
+            position: Object.assign({}, initial_cut_pos),
             size: {width: 0, height: 0}
         }
+        temp_cut = new Cut().create(config);
+        event.preventDefault();
     }
 });
 
 $(document).on('mouseup', function(event) {
     mouse_down = false;
+    if (temp_cut) {
+        const position = _.clone(temp_cut.get('position'));
+        console.log(position);
+        const size = _.clone({width: temp_cut.attr('rect/width'), height: temp_cut.attr('rect/height')});
+        console.log(size);
+        const config = {
+            position: position,
+            attrs:{
+                rect: {
+                    ...size
+                }
+            }
+        }
+        //eslint-disable-next-line
+        let new_rect = new Cut().create(config);
+        temp_cut.remove();
+    }
+
+    temp_cut = undefined;
 });
 
 $(document).on('keyup', function(event){
@@ -93,6 +127,7 @@ $(document).on('keyup', function(event){
                 y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
             }
         }
+        //eslint-disable-next-line
         let new_rect = new Premise().create(config)
     }
     //ENTER
