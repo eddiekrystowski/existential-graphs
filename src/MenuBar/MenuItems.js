@@ -55,7 +55,30 @@ function exportEG() {
 
 function importEG() {
   console.log('Importing...');
-  
+  const input = document.createElement("input");
+    input.type = "file";
+    // choosing the file
+    input.onchange = function (ev) {
+        const file = ev.target.files[0];
+        if (file.type !== "application/json") {
+            alert("File must be of .JSON type");
+            return;
+        }
+        // read the file
+        const reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        reader.onload = function (readerEvent) {
+            const content = readerEvent.target.result;
+            const erase = window.confirm("Erase your current workspace and import graph?");
+            if (erase) {
+                graph.clear();
+                const dataObj = JSON.parse(content);
+                graph.fromJSON(dataObj);
+                
+            }
+        };
+    };
+    input.click();
 }
 
 export default MenuItems;
