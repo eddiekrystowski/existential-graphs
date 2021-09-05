@@ -3,96 +3,99 @@ import { graph } from './index.js'
 // element below.
 export function handleCollisions(cell) {
 
-    console.log(cell)
-    let cellsBelow = findModelsBelow(cell)
-    console.log("cellsBelow", cellsBelow)
+    let cellbbox = {
+        width: cell.attributes.attrs.rect.width,
+        height: cell.attributes.attrs.rect.height,
+        x: cell.attributes.position.x,
+        y: cell.attributes.position.y
+    }
 
-    //filter out collisions of shapes who already have parents
-    cellsBelow = filterCollisions(cellsBelow);
+    let potential_parents = findPotentialParents(cellbbox);
+    console.log("potential_parents", potential_parents)
+    let parent = findSmallestCell(potential_parents);
 
-    if (cellsBelow.length) {
-        let cellbbox = {
+    console.log("parent",parent)
+
+    if (parent) {
+        let children = filterChildren(parent, cellbbox)
+        //embed cell into parent
+        parent.embed(cell);
+
+        //reroot children
+        for (const child of children) {
+            parent.unembed(child);
+            cell.embed(child)
+        }
+        treeToFront(parent)
+    } else {
+        let elements_inside = findElementsInside(cellbbox)
+        for (const element of elements_inside) {
+            if (element.get("parent") || element.id === cell.id) {
+                continue;
+            }
+            cell.embed(element)
+        }
+        treeToFront(cell)
+    }
+}
+
+function findElementsInside(bbox, cells=graph.getCells()) {
+    let elements = []
+    for (const cell of cells) {
+        let otherbbox = {
             width: cell.attributes.attrs.rect.width,
             height: cell.attributes.attrs.rect.height,
             x: cell.attributes.position.x,
             y: cell.attributes.position.y
         }
-        for (const cellBelow of cellsBelow) {
-            let belowbbox = {
-                width: cellBelow.attributes.attrs.rect.width,
-                height: cellBelow.attributes.attrs.rect.height,
-                x: cellBelow.attributes.position.x,
-                y: cellBelow.attributes.position.y
-            }
-            if (cell.attributes.type === "dia.Element.Premise") {
-                //need to check if cellsBelow CONTAIN cell
-                //also, there should only be one cell below, and do not count other premise
-                if (cellBelow.type === "dia.Element.Premise") {
-                    continue;
-                }
-                if (contains(belowbbox, cellbbox)) {
-                    console.log("cell is premise", cell)
-                    cellBelow.embed(cell);
-                    treeToFront(cellBelow)
-                }
-
-            } else if (cell.attributes.type === "dia.Element.Cut") {
-                //check if CUT contains cellsbelow AND if cellbelow contains cut (can be either one)
-                //sanity checking
-                if (cellBelow.get("parent")) {
-                    console.error("Error! invalid collision with parent found!", cellBelow)
-                    continue;
-                }
-                //check if cut contains other things
-                if (contains(cellbbox, belowbbox)) {
-                    console.log("cell is cut", cell);
-                    console.log("hi")
-                    cell.embed(cellBelow)
-                    treeToFront(cell)
-                    continue;
-                }
-
-                //check if other cells contain this cut
-                if (contains(belowbbox, cellbbox)) {
-                    //if premise somehow contains a cut
-                    if (cellBelow.attributes.type === "premise") { continue; }
-                    cellBelow.embed(cell);
-                    treeToFront(cellBelow)
-                    continue;
-                }
-
-            } else {
-                console.error("invalid element type !", cell.attributes.type)
-            }
+        if (contains(bbox, otherbbox)) {
+            elements.push(cell)
         }
     }
+    return elements
 }
 
-function findModelsBelow(element) {
-    //let elementbbox = element.getBBox()
+function findPotentialParents(targetbbox) {
     let cells = graph.getCells()
-    let collisions = []
-    console.log("cells", cells)
+    let potential_parents = []
     for (const cell of cells) {
-        if (cell.id === element.id){
-            continue
+        let otherbbox = {
+            width: cell.attributes.attrs.rect.width,
+            height: cell.attributes.attrs.rect.height,
+            x: cell.attributes.position.x,
+            y: cell.attributes.position.y
         }
-        //let otherbbox = cell.getBBox()
-        collisions.push(cell)
+        //find cells who contain target cell
+        if (contains(otherbbox, targetbbox)) {
+            console.log("potential parent found")
+            potential_parents.push(cell)
+        }
     }
-    console.log("colisions", collisions)
-    return collisions
+
+    return potential_parents
 }
 
-function filterCollisions(collisions) {
-    let new_collisions = []
-    for (const collision of collisions) {
-        if (!(collision.get("parent"))) {
-            //does not have parent
-            new_collisions.push(collision)
-        } 
+function findSmallestCell(cells) {
+    if (cells.length === 0) { return undefined }
+    let smallest_area = cells[0].attributes.attrs.rect.width * cells[0].attributes.attrs.rect.height;
+    let smallest_cell = cells[0];
+    for (const cell of cells) {
+        let width = cell.attributes.attrs.rect.width;
+        let height = cell.attributes.attrs.rect.height;
+        let area = width * height;
+        if (area < smallest_area) {
+            smallest_area = area;
+            smallest_cell = cell;
+        }
     }
-    return new_collisions
+    return smallest_cell
+}
+
+function filterChildren(parent, new_child_bbox) {
+    //function returns array of children who fit inside new child
+    let potential_children = parent.getEmbeddedCells()
+    let children = findElementsInside(new_child_bbox, potential_children)
+    return children;
 }
 
 function contains(bbox, otherbbox) {
@@ -108,7 +111,6 @@ function contains(bbox, otherbbox) {
         top_y: otherbbox.y,
         bottom_y: otherbbox.y + otherbbox.height
     }
-    console.log(bbox_info, otherbbox_info)
     if (bbox_info.left_x < otherbbox_info.left_x && bbox_info.right_x > otherbbox_info.right_x && bbox_info.top_y < otherbbox_info.top_y && bbox_info.bottom_y > otherbbox_info.bottom_y) {
         console.log("bbox contains otherbbox", bbox, otherbbox);
         return true;
