@@ -3,6 +3,7 @@ import * as joint from 'jointjs';
 import App from './App';
 import { Premise } from './shapes/Premise';
 import { Cut } from './shapes/Cut.js'
+import $ from 'jquery'
 import  _  from 'lodash'
 import  { handleCollisions } from './collisions.js'
 
@@ -41,27 +42,67 @@ let mousePosition = {
 const paperContainer = document.getElementById('paper-container');
 
 
+const keys = [];
+let mouse_down = false;
+let temp_cut;
+let initial_cut_pos = {}
+
+$(document).on('keydown', function(event) {
+    keys[event.which] = true;
+});
+
 document.addEventListener("mousemove", function(evt){
     mousePosition = {
         x: evt.clientX,
         y: evt.clientY
     }
+
+    if (mouse_down && keys[16]) {
+
+    }
 })
 
-document.addEventListener('keyup', function(event){
+$(document).on('mousedown', function(event) {
+    mouse_down = true;
+    if (keys[16]) {
+
+        let config  = {
+            position: Object.assign({}, mousePosition),
+            size: {width: 0, height: 0}
+        }
+    }
+});
+
+$(document).on('mouseup', function(event) {
+    mouse_down = false;
+});
+
+$(document).on('keyup', function(event){
+    console.log(event.which);
+    keys[event.which] = false;
     let key = event.key
     if (event.keyCode >= 65 && event.keyCode <= 90) {
         let config = {
-            text: key,
-            x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
-            y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+            //use capital letters by default, can press shift to make lowercase
+            attrs:{
+                text: {
+                    text:event.shiftKey ? key.toLocaleLowerCase() : key.toLocaleUpperCase()
+                }
+            },
+            position: {
+                x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
+                y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+            }
         }
         let new_rect = new Premise().create(config)
     }
+    //ENTER
     if (event.keyCode === 13) {
         let config = {
-            x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
-            y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+            position: {
+                x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
+                y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+            }
         }
         if (selected_premise) {
             console.log("premise selected for cut")
@@ -72,11 +113,13 @@ document.addEventListener('keyup', function(event){
             console.log("creating empty cut")
             let new_cut = new Cut().create(config)
             new_cut.toBack()
-            event.preventDefault();
+            console.log("cut", new_cut)
         }
     }
     event.preventDefault()
-  });
+});
+
+
 
 // paper events
 paper.on("element:mouseenter", function( cellView, evt){

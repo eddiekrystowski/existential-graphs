@@ -6,6 +6,16 @@ html, body, #root, .app {
 }
 
 .app {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-areas: 
+        'header header header'
+        'side   paper  paper'
+        'side   paper  paper';
+    grid-template-rows: 10vh auto auto;
+    grid-template-columns: 15vw auto auto;
+}
+
+#paper-container {
+    grid-area: paper;
+    background-color: #edf6f9;
 }
