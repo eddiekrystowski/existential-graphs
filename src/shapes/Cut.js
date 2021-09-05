@@ -2,6 +2,7 @@
 import * as joint from 'jointjs'
 import { graph } from '../index.js'
 import { addCutTools } from '../tools/CutTools.js'
+import { handleCollisions } from '../collisions.js'
 import _ from 'lodash';
 
 
@@ -102,6 +103,7 @@ export class Cut extends joint.dia.Element {
             })
         }
         console.log(cut)
+        handleCollisions(cut)
         return cut;
     }
 }

@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { graph } from '../index.js'
 import { addPremiseTools } from '../tools/PremiseTools.js'
 import '../css/Premise.css'
+import { handleCollisions } from '../collisions.js'
 // class for premises (letters)
 
 const PREMISE_DEFAULTS = {
@@ -73,7 +74,7 @@ export class Premise extends joint.dia.Element {
         premise.addTo(graph)
         //add tools (some events events also)
         addPremiseTools(premise)
-
+        handleCollisions(premise)
         return premise;
     }
 }
