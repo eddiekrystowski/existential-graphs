@@ -71,6 +71,7 @@ export class Cut extends joint.dia.Element {
 
         
         let cut = new Cut({
+            markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
             position: {
                 ...options.position
             },
@@ -108,7 +109,7 @@ export class Cut extends joint.dia.Element {
     }
 }
 
-Object.assign(joint.shapes, {
+Object.assign(joint, {
     "dia.Element": {
         Cut
     }

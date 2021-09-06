@@ -6,7 +6,7 @@ import './MenuBar.css';
 export default function MenuBar() {
   return (
     <div className="header-bar">
-      {MenuItems.map(menu_item => <MenuItem text={menu_item.text} img={menu_item.img} onClick={menu_item.onClick} margin_left={menu_item.margin_left}/>)}
+      {MenuItems.map(menu_item => <MenuItem text={menu_item.text} img={menu_item.img} onClick={menu_item.onClick} margin_left={menu_item.margin_left} key={menu_item.text}/>)}
     </div>
   )
 }

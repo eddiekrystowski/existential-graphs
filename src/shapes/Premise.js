@@ -69,7 +69,24 @@ export class Premise extends joint.dia.Element {
           options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
 
-        let premise = new Premise(_.cloneDeep(options));
+        let premise = new Premise({
+          markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
+          position: {
+              ...options.position
+          },
+          size: {
+              ...options.size
+          },
+          attrs: {
+              rect: {
+                  ...options.attrs.rect
+              },
+              text: {
+                  ...options.attrs.text
+              },
+          },
+          // set custom attributes here:
+        });
         console.log(premise);
         premise.addTo(graph)
         //add tools (some events events also)
