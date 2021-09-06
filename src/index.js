@@ -7,7 +7,10 @@ import $ from 'jquery'
 import  _  from 'lodash'
 
 console.log("Starting...");
+window.joint = joint
 
+const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
+const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
 
 ReactDOM.render(
     <App/>,
@@ -16,7 +19,12 @@ ReactDOM.render(
 
 let selected_premise = undefined;
 
-export let graph = new joint.dia.Graph();
+export let graph = new joint.dia.Graph({},{cellNamespace: 
+    {
+    nameSpace: { Premise: NSPremise,
+                 Cut: NSCut }
+  }
+});
 
 const PAPER_SIZE = { width: 4000, height: 4000 };
 
@@ -27,8 +35,14 @@ export let paper = new joint.dia.Paper({
     width: PAPER_SIZE.width,
     preventContextMenu: false,
     clickThreshold: 1,
-});
+},
+{cellViewNamespace: 
+    {
+    nameSpace: { Premise: NSPremise,
+                 Cut: NSCut }
+  }});
 
+console.log(joint)
 let rect = new Premise().create()
 console.log(rect)
 rect.position(100, 30);
