@@ -1,7 +1,7 @@
 import importIcon from './MenuIcons/import.png';
 import exportIcon from './MenuIcons/export.png';
 import logoIcon from './MenuIcons/logo.png';
-
+import fileSystem from '../../util/fileSystem';
 import { graph } from '../../index.js';
 
 const MenuItems = [
@@ -38,19 +38,8 @@ const MenuItems = [
 
   //Funtions for the above MenuItems
 function exportEG() {
-  console.log('Exporting...');
-  let graphJSON = graph.toJSON();
-  const file = new Blob([JSON.stringify(graphJSON)], { type: 'application/json'});
-    const a = document.createElement("a");
-    let url = URL.createObjectURL(file);
-    a.href = url;
-    a.download = 'graph.json';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function () {
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-    }, 0);
+  let graphJSON = graph.toJSON()
+  fileSystem.download([JSON.stringify(graphJSON)],'graph.json','application/json')
 }
 
 function importEG() {
