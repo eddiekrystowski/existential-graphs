@@ -2,7 +2,7 @@ import importIcon from './MenuIcons/import.png';
 import exportIcon from './MenuIcons/export.png';
 import logoIcon from './MenuIcons/logo.png';
 
-import { graph } from '../index.js';
+import { graph } from '../../index.js';
 
 const MenuItems = [
   {

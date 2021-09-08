@@ -1,7 +1,9 @@
 import React from 'react';
 
+import ButtonGroup from '../ButtonGroup/ButtonGroup';
+import Button from '../Button/Button';
+
 import './SideBar.css';
-import './ButtonGroup.css';
 
 export default class SideBar extends React.Component {
     constructor(props) {
@@ -76,20 +78,3 @@ export default class SideBar extends React.Component {
     }
 }
 
-class ButtonGroup extends React.Component {
-    render() {
-        return (
-            <div className="button-group">
-                {this.props.buttons.map(button => <Button key={button.text} text={button.text} onClick={button.onClick}/>)}
-            </div>
-        );
-    }
-}
-
-class Button extends React.Component {
-    render() {
-        return (
-            <button className='button-group-button' onClick={this.props.onClick}>{this.props.text}</button>
-        );
-    }
-}

@@ -1,8 +1,8 @@
 // class for cuts
 import * as joint from 'jointjs'
-import { graph } from '../index.js'
-import { addCutTools } from '../tools/CutTools.js'
-import { handleCollisions } from '../collisions.js'
+import { graph } from '../../index.js'
+import { addCutTools } from '../../tools/CutTools.js'
+import { handleCollisions } from '../../util/collisions.js'
 import _ from 'lodash';
 
 

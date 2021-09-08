@@ -1,8 +1,8 @@
 import React from 'react';
 
-import './index.css'; 
-import SideBar from './SideBar';
-import MenuBar from './MenuBar/MenuBar.jsx';
+import '../../index.css'; 
+import SideBar from '../SideBar/SideBar.jsx';
+import MenuBar from '../MenuBar/MenuBar.jsx';
 
 export default class App extends React.Component {
     constructor(props) {

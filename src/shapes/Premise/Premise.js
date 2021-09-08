@@ -1,9 +1,9 @@
 import * as joint from 'jointjs'
 import _ from 'lodash'
-import { graph } from '../index.js'
-import { addPremiseTools } from '../tools/PremiseTools.js'
-import '../css/Premise.css'
-import { handleCollisions } from '../collisions.js'
+import { graph } from '../../index.js'
+import { addPremiseTools } from '../../tools/PremiseTools.js'
+import './Premise.css'
+import { handleCollisions } from '../../util/collisions.js'
 // class for premises (letters)
 
 const PREMISE_DEFAULTS = {

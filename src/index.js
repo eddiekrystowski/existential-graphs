@@ -1,11 +1,11 @@
 import ReactDOM from 'react-dom';
 import * as joint from 'jointjs';
-import App from './App';
-import { Premise } from './shapes/Premise';
-import { Cut } from './shapes/Cut.js'
+import App from './components/App/App';
+import { Premise } from './shapes/Premise/Premise';
+import { Cut } from './shapes/Cut/Cut.js'
 import $ from 'jquery'
 import  _  from 'lodash'
-import  { handleCollisions } from './collisions.js'
+import  { handleCollisions } from './util/collisions.js'
 
 console.log("Starting...");
 window.joint = joint
