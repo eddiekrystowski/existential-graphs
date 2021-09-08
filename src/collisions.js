@@ -1,8 +1,23 @@
 import { graph } from './index.js'
-// When the dragged cell is dropped over another cell, let it become a child of the
-// element below.
-export function handleCollisions(cell) {
 
+//      CELL         -- the cell in question that we are checking
+//                      collisions for (premise OR cut).
+// POTENTIAL PARENTS -- potential parents are only the cells that 
+//                      contain (completely) the CELL.
+//   ACTUAL PARENT   -- the smallest cell (if there are any) that
+//                      is a member of potential parents.
+//   CHILDREN        -- If ACTUAL PARENT exists, POTENTIAL CHILDREN
+//                          are cells that are contained (completely)
+//                          by the CELL, AND are also currently
+//                          children of ACTUAL PARENT.   
+//                      Otherwise: CHILDREN are any cells that are
+//                          contained (completely) inside the CELL
+//                          that have NO parents.
+export function handleCollisions(cell) {
+    //This function takes a Cell as input and, using its position
+    // makes any necessary changes to the internal representation of
+    // the diagram (parent / child structure (embedding)) to reflect what the user
+    // sees on the paper
     let cellbbox = {
         width: cell.attributes.attrs.rect.width,
         height: cell.attributes.attrs.rect.height,
@@ -40,6 +55,14 @@ export function handleCollisions(cell) {
 }
 
 function findElementsInside(bbox, cells=graph.getCells()) {
+    //takes two bbox objects as input
+    //bbox objects should have the structure:
+    // {
+    //      width: int,
+    //      height: int,
+    //      x: int,
+    //      y: int
+    // }
     let elements = []
     for (const cell of cells) {
         let otherbbox = {
@@ -56,6 +79,8 @@ function findElementsInside(bbox, cells=graph.getCells()) {
 }
 
 function findPotentialParents(targetbbox) {
+    // POTENTIAL PARENTS -- potential parents are only the cells that 
+    //                      contain (completely) the CELL.
     let cells = graph.getCells()
     let potential_parents = []
     for (const cell of cells) {
@@ -76,6 +101,7 @@ function findPotentialParents(targetbbox) {
 }
 
 function findSmallestCell(cells) {
+    // returns the smallest cell (by area) of an array of joint.dia.Cell objects
     if (cells.length === 0) { return undefined }
     let smallest_area = cells[0].attributes.attrs.rect.width * cells[0].attributes.attrs.rect.height;
     let smallest_cell = cells[0];
@@ -99,6 +125,7 @@ function filterChildren(parent, new_child_bbox) {
 }
 
 function contains(bbox, otherbbox) {
+    // returns true of otherbbox fits completely inside of bbox
     let bbox_info = {
         left_x: bbox.x,
         right_x: bbox.x + bbox.width,
@@ -121,6 +148,8 @@ function contains(bbox, otherbbox) {
 }
 
 function treeToFront(root) {
+    //recursively loops through a tree from its root to the leaves
+    //to ensure correct z order
     let current = [root]
     let next = []
     while (current.length > 0) {
