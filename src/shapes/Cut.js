@@ -71,7 +71,7 @@ export class Cut extends joint.dia.Element {
 
         
         let cut = new Cut({
-            markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
+            markup: '<rect/><text/>',
             position: {
                 ...options.position
             },
