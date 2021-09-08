@@ -1,4 +1,4 @@
-import { graph } from './index.js'
+import { graph } from '../index.js'
 
 //      CELL         -- the cell in question that we are checking
 //                      collisions for (premise OR cut).
