@@ -133,6 +133,22 @@ $(document).on('keyup', function(event){
     console.log(event.which);
     keys[event.which] = false;
     let key = event.key
+    //backspace (delete premise or cut)
+    if (event.keyCode === 8 ) {
+        if (selected_premise) {
+            console.log("removing shape")
+            if (selected_premise.attributes.type === "dia.Element.Premise") {
+                console.log("destroying premise")
+                selected_premise.destroy()
+            } else if (selected_premise.attributes.type === "dia.Element.Cut") {
+                console.log("destroying cut")
+                selected_premise.destroy();
+            } else {
+                console.error("attempted to delete shape of unknown type: " + selected_premise.attributes.type)
+            }
+        }
+    }
+    //a-z for creating premise
     if (event.keyCode >= 65 && event.keyCode <= 90) {
         let config = {
             //use capital letters by default, can press shift to make lowercase
@@ -150,6 +166,7 @@ $(document).on('keyup', function(event){
         let new_rect = new Premise().create(config)
     }
     //ENTER
+    // new cut
     if (event.keyCode === 13) {
         let config = {
             position: {
