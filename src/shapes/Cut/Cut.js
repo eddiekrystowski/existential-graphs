@@ -2,8 +2,9 @@
 import * as joint from 'jointjs'
 import { graph } from '../../index.js'
 import { addCutTools } from '../../tools/CutTools.js'
-import { handleCollisions } from '../../util/collisions.js'
+import { handleCollisions, treeToFront } from '../../util/collisions.js'
 import _ from 'lodash';
+import { treeResize, findRoot } from '../../util/treeUtil.js';
 
 
 const CUT_DEFAULTS = {
@@ -94,7 +95,15 @@ export class Cut extends joint.dia.Element {
 
         //check for children
         if (config && config.child) {
-            let child = config.child
+            let child = config.child;
+            let hasparent = false;
+            if (child.get("parent")) {
+                let parent = graph.getCell(child.get("parent"));
+                parent.unembed(child);
+                parent.embed(cut)
+                parent.toBack()
+                hasparent = true;
+            }
             cut.embed(child)
             cut.attr("rect/width", child.attributes.attrs.rect.width + cut.attributes.attrs.rect.width)
             cut.attr("rect/height", child.attributes.attrs.rect.height + cut.attributes.attrs.rect.height)
@@ -102,9 +111,12 @@ export class Cut extends joint.dia.Element {
                 x: child.attributes.position.x - (cut.attributes.attrs.rect.width - child.attributes.attrs.rect.width) / 2,
                 y: child.attributes.position.y - (cut.attributes.attrs.rect.height - child.attributes.attrs.rect.height) / 2,
             })
+            if (hasparent) {
+                treeResize(cut, cut.attributes.attrs.rect.width / 2);
+            }
         }
-        console.log(cut)
-        handleCollisions(cut)
+        console.log(cut);
+        handleCollisions(cut);
         return cut;
     }
 }
