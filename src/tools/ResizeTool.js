@@ -16,7 +16,7 @@ export function createResizeTool(config) {
                 'r': r,
                 'fill': fill,
                 'cursor': cursor,
-                'class': cursor
+                'data-direction': cursor.substring(0,2)
             }
         }],
         x: x,
