@@ -94,6 +94,10 @@ export class Premise extends joint.dia.Element {
         handleCollisions(premise)
         return premise;
     }
+
+    destroy() {
+      this.remove();
+    }
 }
 
 Object.assign(joint.shapes, {

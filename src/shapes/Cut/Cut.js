@@ -119,6 +119,19 @@ export class Cut extends joint.dia.Element {
         handleCollisions(cut);
         return cut;
     }
+
+    destroy() {
+        //check if cut has parents or children, if so children become new children of parent;
+        let parent = this.getParentCell();
+        let children = this.getEmbeddedCells()
+        for (const child of children) {
+            this.unembed(child)
+        }
+        this.remove();
+        if (parent) {
+            handleCollisions(parent);
+        }
+    }
 }
 
 Object.assign(joint, {
