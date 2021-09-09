@@ -147,6 +147,7 @@ $(document).on('keyup', function(event){
                 console.error("attempted to delete shape of unknown type: " + selected_premise.attributes.type)
             }
         }
+        selected_premise = undefined;
     }
     //a-z for creating premise
     if (event.keyCode >= 65 && event.keyCode <= 90) {
