@@ -147,8 +147,8 @@ function contains(bbox, otherbbox) {
     }
 }
 
-function treeToFront(root) {
-    //recursively loops through a tree from its root to the leaves
+export function treeToFront(root) {
+    //loops through a tree from its root to the leaves
     //to ensure correct z order
     let current = [root]
     let next = []
