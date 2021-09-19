@@ -4,7 +4,8 @@ import { graph } from '../../index.js'
 import { addCutTools } from '../../tools/CutTools.js'
 import { handleCollisions, treeToFront } from '../../util/collisions.js'
 import _ from 'lodash';
-import { treeResize, findRoot } from '../../util/treeUtil.js';
+import { treeResize, findRoot, findLevel, colorByLevel } from '../../util/treeUtil.js';
+import { color } from '../../util/color.js';
 
 
 const CUT_DEFAULTS = {
@@ -86,6 +87,7 @@ export class Cut extends joint.dia.Element {
                 text: {
                     ...options.attrs.text
                 },
+                level: 0
             },
             // set custom attributes here:
         })
@@ -116,7 +118,7 @@ export class Cut extends joint.dia.Element {
             }
         }
         console.log(cut);
-        handleCollisions(cut);
+        handleCollisions(cut);            
         return cut;
     }
 
@@ -131,6 +133,16 @@ export class Cut extends joint.dia.Element {
         if (parent) {
             handleCollisions(parent);
         }
+    }
+
+    active() {
+        //cut is being interacted with (ie grabbing, dragging or moving etc)
+        colorByLevel(this, {even:color.shapes.background.even.active, odd:color.shapes.background.odd.active, premise: color.shapes.background.default.color});
+    }
+
+    inactive() {
+        //cut is not being interacted with (ie grabbing, dragging or moving etc)
+        colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
     }
 }
 

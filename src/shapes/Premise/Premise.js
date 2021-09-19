@@ -4,6 +4,7 @@ import { graph } from '../../index.js'
 import { addPremiseTools } from '../../tools/PremiseTools.js'
 import './Premise.css'
 import { handleCollisions } from '../../util/collisions.js'
+import { color } from '../../util/color.js'
 // class for premises (letters)
 
 const PREMISE_DEFAULTS = {
@@ -84,6 +85,7 @@ export class Premise extends joint.dia.Element {
               text: {
                   ...options.attrs.text
               },
+              level: 0
           },
           // set custom attributes here:
         });
@@ -98,6 +100,15 @@ export class Premise extends joint.dia.Element {
     destroy() {
       this.remove();
     }
+  
+    active() {
+      return;
+    }
+
+    inactive(){
+      return;
+    }
+
 }
 
 Object.assign(joint.shapes, {
