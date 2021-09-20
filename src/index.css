@@ -17,5 +17,5 @@ html, body, #root, .app {
 
 #paper-container {
     grid-area: paper;
-    background-color: #edf6f9;
+    background-color: white;
 }
