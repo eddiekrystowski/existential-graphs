@@ -10,10 +10,14 @@
 .menu-item {
   height: 100%;
   padding: 0;
-  color: #E0FBFC
+  color: #E0FBFC;
+  line-height: 100%;
+  width: fit-content;
 }
 img {
   margin: 0;
+  width: auto;
+  padding-bottom: 5px;
 }
 
 h4 {

@@ -6,7 +6,10 @@ import { Cut } from './shapes/Cut/Cut.js'
 import $ from 'jquery'
 import  _  from 'lodash'
 import  { handleCollisions } from './util/collisions.js'
+import Delete from './sounds/delete.wav';
 
+
+console.log = function(){}
 console.log("Starting...");
 window.joint = joint
 
@@ -137,12 +140,15 @@ $(document).on('keyup', function(event){
     if (event.keyCode === 8 ) {
         if (selected_premise) {
             console.log("removing shape")
+            let delete_noise = new Audio(Delete); 
             if (selected_premise.attributes.type === "dia.Element.Premise") {
                 console.log("destroying premise")
                 selected_premise.destroy()
+                delete_noise.play();
             } else if (selected_premise.attributes.type === "dia.Element.Cut") {
                 console.log("destroying cut")
-                selected_premise.destroy();
+                selected_premise.destroy();        // Play pop sound
+                delete_noise.play();
             } else {
                 console.error("attempted to delete shape of unknown type: " + selected_premise.attributes.type)
             }

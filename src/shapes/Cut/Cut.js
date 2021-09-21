@@ -5,6 +5,7 @@ import { addCutTools } from '../../tools/CutTools.js'
 import { handleCollisions, treeToFront } from '../../util/collisions.js'
 import _ from 'lodash';
 import { treeResize, findRoot } from '../../util/treeUtil.js';
+import Snip from '../../sounds/snip.wav'
 
 
 const CUT_DEFAULTS = {
@@ -117,6 +118,11 @@ export class Cut extends joint.dia.Element {
         }
         console.log(cut);
         handleCollisions(cut);
+
+        // Play snip sound
+        let snip = new Audio(Snip); 
+        snip.play();
+
         return cut;
     }
 
