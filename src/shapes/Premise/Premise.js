@@ -92,6 +92,10 @@ export class Premise extends joint.dia.Element {
         //add tools (some events events also)
         addPremiseTools(premise)
         handleCollisions(premise)
+
+        // Play pop sound
+        let pop = new Audio("src/sounds/pop.wav"); // buffers automatically when created
+        pop.play();
         return premise;
     }
 
