@@ -1,4 +1,5 @@
 import { color } from "./color.js"
+import { graph } from "../index.js"
 
 export function treeResize(root, resize_value = 20, center_nodes = true) {
     console.log("resize_value",resize_value)
@@ -87,6 +88,26 @@ export function colorByLevel(node, color_config = default_background_colors) {
             next_children.push(...child.getEmbeddedCells());
         }
         children = next_children;
+    }
+
+}
+
+export function treeMove(root, position) {
+    let offset = {
+        x: position.x - root.attributes.position.x,
+        y: position.y - root.attributes.position.y
+    }
+    console.log(offset);
+    let current = [];
+    let next = [root];
+    while (next.length > 0) {
+        current = next;
+        next = [];
+        console.log(current);
+        for (const node of current) {
+            next.push(...node.getEmbeddedCells());
+            node.position(node.attributes.position.x + offset.x, node.attributes.position.y + offset.y);
+        }
     }
 
 }
