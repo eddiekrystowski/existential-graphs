@@ -4,6 +4,7 @@ import { graph } from '../../index.js'
 import { addPremiseTools } from '../../tools/PremiseTools.js'
 import './Premise.css'
 import { handleCollisions } from '../../util/collisions.js'
+import Pop from '../../sounds/pop.wav'
 import { color } from '../../util/color.js'
 // class for premises (letters)
 
@@ -94,6 +95,10 @@ export class Premise extends joint.dia.Element {
         //add tools (some events events also)
         addPremiseTools(premise)
         handleCollisions(premise)
+
+        // Play pop sound
+        let pop = new Audio(Pop); 
+        pop.play();
         return premise;
     }
 

@@ -5,7 +5,7 @@ import './MenuBar.css'
 export default function MenuItem(props) {
 
   let size = props.text==='' ? '100%' : '70%';
-  let text = props.img==='' ? "150%" : "70%";
+  let text = props.img==='' ? "200%" : "70%";
   let img_vis = props.img==='' ? "hidden" : "visable";
 
   return (
