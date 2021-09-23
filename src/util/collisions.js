@@ -1,4 +1,5 @@
 import { graph } from '../index.js'
+import { colorByLevel } from './treeUtil.js';
 
 //      CELL         -- the cell in question that we are checking
 //                      collisions for (premise OR cut).
@@ -26,10 +27,7 @@ export function handleCollisions(cell) {
     }
 
     let potential_parents = findPotentialParents(cellbbox);
-    console.log("potential_parents", potential_parents)
     let parent = findSmallestCell(potential_parents);
-
-    console.log("parent",parent)
 
     if (parent) {
         let children = filterChildren(parent, cellbbox)
@@ -38,8 +36,10 @@ export function handleCollisions(cell) {
 
         //reroot children
         for (const child of children) {
-            parent.unembed(child);
-            cell.embed(child)
+            if (child.get("parent")) {
+                parent.unembed(child);
+                cell.embed(child)
+            }
         }
         treeToFront(parent)
     } else {
@@ -52,6 +52,8 @@ export function handleCollisions(cell) {
         }
         treeToFront(cell)
     }
+    //recolor trees to reflect new level structure
+    colorByLevel(cell);
 }
 
 function findElementsInside(bbox, cells=graph.getCells()) {
@@ -92,7 +94,7 @@ function findPotentialParents(targetbbox) {
         }
         //find cells who contain target cell
         if (contains(otherbbox, targetbbox)) {
-            console.log("potential parent found")
+            //console.log("potential parent found")
             potential_parents.push(cell)
         }
     }
@@ -119,7 +121,13 @@ function findSmallestCell(cells) {
 
 function filterChildren(parent, new_child_bbox) {
     //function returns array of children who fit inside new child
-    let potential_children = parent.getEmbeddedCells()
+    let cells = graph.getCells();
+    let potential_children = [];
+    for (const cell of cells) {
+        if (!(cell.get("parent")) || cell.get("parent") === parent.id){
+            potential_children.push(cell)
+        }
+    }
     let children = findElementsInside(new_child_bbox, potential_children)
     return children;
 }
@@ -139,10 +147,9 @@ function contains(bbox, otherbbox) {
         bottom_y: otherbbox.y + otherbbox.height
     }
     if (bbox_info.left_x < otherbbox_info.left_x && bbox_info.right_x > otherbbox_info.right_x && bbox_info.top_y < otherbbox_info.top_y && bbox_info.bottom_y > otherbbox_info.bottom_y) {
-        console.log("bbox contains otherbbox", bbox, otherbbox);
+        //console.log("bbox contains otherbbox", bbox, otherbbox);
         return true;
     } else {
-        console.log("nop")
         return false;
     }
 }

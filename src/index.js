@@ -5,8 +5,8 @@ import { Premise } from './shapes/Premise/Premise';
 import { Cut } from './shapes/Cut/Cut.js'
 import $ from 'jquery'
 import  _  from 'lodash'
-import  { handleCollisions } from './util/collisions.js'
-import Delete from './sounds/delete.wav';
+import  { handleCollisions, treeToFront } from './util/collisions.js'
+import { findRoot } from './util/treeUtil.js'
 
 
 console.log = function(){}
@@ -104,6 +104,7 @@ $(document).on('mousedown', function(event) {
             size: {width: 0, height: 0}
         }
         temp_cut = new Cut().create(config);
+        temp_cut.active()
         event.preventDefault();
     }
 });
@@ -229,6 +230,9 @@ paper.on('cell:pointerdown', function(cellView, evt, x, y) {
     if (cell.get('parent')) {
         graph.getCell(cell.get('parent')).unembed(cell);
     }
+
+    cell.active();
+    treeToFront(findRoot(cell));
 });
 
 // When the dragged cell is dropped over another cell, let it become a child of the
@@ -238,5 +242,6 @@ paper.on('cell:pointerup', function(cellView, evt, x, y) {
     let cell = cellView.model;
     
     handleCollisions(cell)
-
+    cell.inactive();
+    console.log("inactive")
 });
