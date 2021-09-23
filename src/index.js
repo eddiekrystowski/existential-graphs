@@ -7,6 +7,7 @@ import $ from 'jquery'
 import  _  from 'lodash'
 import  { handleCollisions, treeToFront } from './util/collisions.js'
 import { findRoot } from './util/treeUtil.js'
+import Delete from './sounds/delete.wav'
 
 
 console.log = function(){}
