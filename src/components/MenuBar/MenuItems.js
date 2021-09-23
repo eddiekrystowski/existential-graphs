@@ -14,7 +14,7 @@ const MenuItems = [
     margin_left: '0vw',
   },
   {
-    text: 'Bram Hub',
+    text: 'Existential Graphs',
     img: '',
     onClick: function(){
       return;
@@ -25,13 +25,13 @@ const MenuItems = [
     text: 'Import',
     img: importIcon,
     onClick: importEG,
-    margin_left: '7vw',
+    margin_left: '10vw',
   },
   {
     text: 'Export',
     img: exportIcon,
     onClick: exportEG,
-    margin_left: '3vw',
+    margin_left: '5vw',
   },
 ]
 

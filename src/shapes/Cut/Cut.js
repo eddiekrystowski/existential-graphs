@@ -4,6 +4,7 @@ import { graph } from '../../index.js'
 import { addCutTools } from '../../tools/CutTools.js'
 import { handleCollisions, treeToFront } from '../../util/collisions.js'
 import _ from 'lodash';
+import Snip from '../../sounds/snip.wav'
 import { treeResize, findRoot, findLevel, colorByLevel } from '../../util/treeUtil.js';
 import { color } from '../../util/color.js';
 
@@ -118,7 +119,11 @@ export class Cut extends joint.dia.Element {
             }
         }
         console.log(cut);
-        handleCollisions(cut);            
+        handleCollisions(cut);
+
+        // Play snip sound
+        let snip = new Audio(Snip); 
+        snip.play();
         return cut;
     }
 
