@@ -70,8 +70,8 @@ let current_pos = {
 //TODO: THIS NEEDS TO CHANGE BASED ON HOW MANY THINGS ARE IN THE
 //CUT AND WHERE THEY ARE
 const MIN_SIZE = {
-    width: 80,
-    height: 80
+    width: 40,
+    height: 40
 }
 
 /**

@@ -54,6 +54,8 @@ export function handleCollisions(cell) {
     }
     //recolor trees to reflect new level structure
     colorByLevel(cell);
+
+    //check 
 }
 
 function findElementsInside(bbox, cells=graph.getCells()) {

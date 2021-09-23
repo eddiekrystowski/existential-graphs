@@ -50,8 +50,8 @@ export let paper = new joint.dia.Paper({
                  Cut: NSCut }
   }});
 
-// let rect = new Premise().create()
-// rect.position(100, 30);
+let rect = new Premise().create()
+rect.position(100, 30);
 
 let mousePosition = {
     x: 0,
@@ -68,8 +68,10 @@ let initial_cut_pos = {}
 
 $(document).on('keydown', function(event) {
     keys[event.which] = true;
-    if (keys[16]) {
-        paper.setInteractivity(false);
+    if(window.mode === 'create'){
+        if (keys[16]) {
+            paper.setInteractivity(false);
+        }
     }
 });
 
@@ -79,23 +81,25 @@ document.addEventListener("mousemove", function(evt){
         y: evt.clientY
     }
 
-    if (mouse_down && keys[16] && temp_cut) {
-        const mouse_adjusted = {
-            x: mousePosition.x - paperContainer.getBoundingClientRect().left,
-            y: mousePosition.y - paperContainer.getBoundingClientRect().top
-        };
-        temp_cut.set('position', {
-            x: Math.min(mouse_adjusted.x, initial_cut_pos.x),
-            y: Math.min(mouse_adjusted.y, initial_cut_pos.y)
-        })
-        temp_cut.attr('rect/width', Math.abs(mouse_adjusted.x - initial_cut_pos.x));
-        temp_cut.attr('rect/height', Math.abs(mouse_adjusted.y - initial_cut_pos.y));
+    if(window.mode === 'create'){
+        if (mouse_down && keys[16] && temp_cut) {
+            const mouse_adjusted = {
+                x: mousePosition.x - paperContainer.getBoundingClientRect().left,
+                y: mousePosition.y - paperContainer.getBoundingClientRect().top
+            };
+            temp_cut.set('position', {
+                x: Math.min(mouse_adjusted.x, initial_cut_pos.x),
+                y: Math.min(mouse_adjusted.y, initial_cut_pos.y)
+            })
+            temp_cut.attr('rect/width', Math.abs(mouse_adjusted.x - initial_cut_pos.x));
+            temp_cut.attr('rect/height', Math.abs(mouse_adjusted.y - initial_cut_pos.y));
+        }
     }
 })
 
 $(document).on('mousedown', function(event) {
     mouse_down = true;
-    if (keys[16]) {
+    if (keys[16] && window.mode === 'create') {
 
         initial_cut_pos = Object.assign({}, mousePosition);
         initial_cut_pos.x -= paperContainer.getBoundingClientRect().left;
@@ -112,7 +116,17 @@ $(document).on('mousedown', function(event) {
 
 $(document).on('mouseup', function(event) {
     mouse_down = false;
-    if (temp_cut) {
+    if (window.mode === 'proof') {
+        if (!selected_premise && window.action && window.action.name === 'insertDoubleCut') {
+            const mouse_adjusted = {
+                x: mousePosition.x - paperContainer.getBoundingClientRect().left,
+                y: mousePosition.y - paperContainer.getBoundingClientRect().top
+            };
+            window.action(null, mouse_adjusted);
+            window.action = null;
+        }
+    }
+    if (temp_cut && window.mode === 'create') {
         const position = _.clone(temp_cut.get('position'));
         const size = _.clone({width: temp_cut.attr('rect/width'), height: temp_cut.attr('rect/height')});
         const config = {
@@ -133,7 +147,30 @@ $(document).on('mouseup', function(event) {
 });
 
 $(document).on('keyup', function(event){
-    if(window.mode != 'create') return;
+    if(window.mode === 'proof'){
+        if(window.action && window.action.name === 'inferenceInsertion') {
+            if (!selected_premise) return;
+            if (selected_premise.attributes.attrs.level % 2 === 1) return;
+            if (event.keyCode >= 65 && event.keyCode <= 90) {
+                let config = {
+                    //use capital letters by default, can press shift to make lowercase
+                    attrs:{
+                        text: {
+                            text:event.shiftKey ? event.key.toLocaleLowerCase() : event.key.toLocaleUpperCase()
+                        }
+                    },
+                    position: {
+                        x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
+                        y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+                    }
+                }
+                //eslint-disable-next-line
+                let new_rect = new Premise().create(config)
+            }
+            window.action = null;
+        }
+        return;
+    }
     console.log(event.which);
     keys[event.which] = false;
     let key = event.key
