@@ -90,6 +90,10 @@ function resize_mousedown(event) {
     $(document).on('mouseup', { target }, resize_mouseup);
     $(document).on('mousemove', { target, direction: event.target.getAttribute('data-direction') },  resize_mousemove);
     event.stopPropagation();
+
+    if (target.get('parent')) {
+        graph.getCell(target.get('parent')).unembed(target);
+    }
 }
 
 /**

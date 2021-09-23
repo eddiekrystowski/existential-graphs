@@ -62,14 +62,24 @@ export default class SideBar extends React.Component {
                         }
                     }
                 ]
+            },
+            color : {
+                text : {
+                    create : "#E0FBFC",
+                    proof : "#293241"
+                },
+                background : {
+                    create : "#3D5A80",
+                    proof : "#98C1D9"
+                }
             }
         }
     }
     render() {
         return (
-            <div className="menu-bar">
-                <div id="side-wrapper">
-                    <h2>{this.props.mode} mode</h2>
+            <div className="menu-bar" style={{backgroundColor: this.state.color.background[this.props.mode] , color: this.state.color.text[this.props.mode]}}>
+                <div id="side-wrapper" >
+                    <h2 >{this.props.mode.charAt(0).toUpperCase() + this.props.mode.slice(1)} Mode</h2>
                     <Button text="Switch Mode" onClick={this.props.onStateSwitch}></Button>
                     <ButtonGroup buttons={this.state.buttons[this.props.mode]} mode={this.props.mode}/>
                 </div>
