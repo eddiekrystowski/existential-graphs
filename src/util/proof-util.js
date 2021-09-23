@@ -19,6 +19,6 @@ export const iteration = function(model) {
     console.log('ITERATING');
 }
 
-export const deiterating = function(model) {
+export const deiteration = function(model) {
     console.log('DEITERATING');
 }

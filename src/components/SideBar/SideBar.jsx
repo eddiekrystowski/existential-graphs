@@ -4,7 +4,7 @@ import ButtonGroup from '../ButtonGroup/ButtonGroup';
 import Button from '../Button/Button';
 
 import './SideBar.css';
-import { insertDoubleCut } from '../../util/proof-util';
+import { deiterating, deiteration, deleteDoubleCut, inferenceErasure, inferenceInsertion, insertDoubleCut, iteration } from '../../util/proof-util';
 
 export default class SideBar extends React.Component {
     constructor(props) {
@@ -29,12 +29,14 @@ export default class SideBar extends React.Component {
                     {
                         text: 'Insertion',
                         onClick: function() {
+                            window.action = inferenceInsertion;
                             console.log('Performing insertion...');
                         }
                     },
                     {
                         text: 'Erasure',
                         onClick: function() {
+                            window.action = inferenceErasure;
                             console.log('Performing erasure...');
                         }
                     },
@@ -48,18 +50,21 @@ export default class SideBar extends React.Component {
                     {
                         text: 'Delete Double Cut',
                         onClick: function() {
+                            window.action = deleteDoubleCut;
                             console.log('Deleting double cut...');
                         }
                     },
                     {
                         text: 'Iteration',
                         onClick: function() {
+                            window.action = iteration;
                             console.log('Performing iteration...');
                         }
                     },
                     {
                         text: 'Deiteration',
                         onClick: function() {
+                            window.action = deiteration;
                             console.log('Performing deiteration...');
                         }
                     }
