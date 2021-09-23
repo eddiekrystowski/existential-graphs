@@ -13,12 +13,14 @@
   color: #E0FBFC;
   line-height: 100%;
   width: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
 }
-img {
-  margin: 0;
-  width: auto;
-  padding-bottom: 5px;
-}
+
+
 
 h4 {
   margin: 0;

@@ -15,6 +15,7 @@ console.log("Starting...");
 window.joint = joint;
 
 window.action = null; 
+window.mode = 'create';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -49,10 +50,8 @@ export let paper = new joint.dia.Paper({
                  Cut: NSCut }
   }});
 
-console.log(joint)
-let rect = new Premise().create()
-console.log(rect)
-rect.position(100, 30);
+// let rect = new Premise().create()
+// rect.position(100, 30);
 
 let mousePosition = {
     x: 0,
@@ -99,7 +98,6 @@ $(document).on('mousedown', function(event) {
     if (keys[16]) {
 
         initial_cut_pos = Object.assign({}, mousePosition);
-        console.log(initial_cut_pos);
         initial_cut_pos.x -= paperContainer.getBoundingClientRect().left;
         initial_cut_pos.y -= paperContainer.getBoundingClientRect().top;
         let config  = {
@@ -116,9 +114,7 @@ $(document).on('mouseup', function(event) {
     mouse_down = false;
     if (temp_cut) {
         const position = _.clone(temp_cut.get('position'));
-        console.log(position);
         const size = _.clone({width: temp_cut.attr('rect/width'), height: temp_cut.attr('rect/height')});
-        console.log(size);
         const config = {
             position: position,
             attrs:{
@@ -137,20 +133,18 @@ $(document).on('mouseup', function(event) {
 });
 
 $(document).on('keyup', function(event){
+    if(window.mode != 'create') return;
     console.log(event.which);
     keys[event.which] = false;
     let key = event.key
     //backspace (delete premise or cut)
     if (event.keyCode === 8 ) {
         if (selected_premise) {
-            console.log("removing shape")
             let delete_noise = new Audio(Delete); 
             if (selected_premise.attributes.type === "dia.Element.Premise") {
-                console.log("destroying premise")
                 selected_premise.destroy()
                 delete_noise.play();
             } else if (selected_premise.attributes.type === "dia.Element.Cut") {
-                console.log("destroying cut")
                 selected_premise.destroy();        // Play pop sound
                 delete_noise.play();
             } else {
@@ -186,7 +180,6 @@ $(document).on('keyup', function(event){
             }
         }
         if (selected_premise) {
-            console.log("premise selected for cut")
             config["child"] = selected_premise
             let new_cut = new Cut().create(config)
         } else {
@@ -213,6 +206,7 @@ paper.on("element:mouseenter", function( cellView, evt){
 paper.on("element:mouseleave", function( cellView, evt){
     let model = cellView.model
     let modelView = model.findView(paper);
+    if(!modelView) return;
     modelView.hideTools()
     model.attr("rect/stroke", "black")
     model.attr("text/fill", "black")
@@ -246,7 +240,7 @@ paper.on('cell:pointerup', function(cellView, evt, x, y) {
     
     handleCollisions(cell)
     cell.inactive();
-    console.log("inactive")
 
-    if (window.action) window.action();
+    if (window.action) window.action(cell);
+    window.action = null;
 });
