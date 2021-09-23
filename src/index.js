@@ -7,6 +7,7 @@ import $ from 'jquery'
 import  _  from 'lodash'
 import  { handleCollisions, treeToFront } from './util/collisions.js'
 import { findRoot } from './util/treeUtil.js'
+import { addSubgraph } from './util/otherUtil.js'
 
 console.log("Starting...");
 window.joint = joint
@@ -20,6 +21,7 @@ ReactDOM.render(
 );
 
 let selected_premise = undefined;
+let saved_template = undefined;
 
 export let graph = new joint.dia.Graph({},{cellNamespace: 
     {
@@ -185,6 +187,24 @@ $(document).on('keyup', function(event){
             console.log("creating empty cut")
             let new_cut = new Cut().create(config)
             console.log("cut", new_cut)
+        }
+    }
+
+    if (event.keyCode === 49) {
+        //save template
+        if (selected_premise) {
+            saved_template = graph.cloneSubgraph([selected_premise], {deep: true});
+        }
+    }
+
+    if (event.keyCode === 50) {
+        let position = {
+            x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
+            y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
+        }
+        console.log("position", position)
+        if (saved_template) {
+            addSubgraph(saved_template, position);
         }
     }
     event.preventDefault()
