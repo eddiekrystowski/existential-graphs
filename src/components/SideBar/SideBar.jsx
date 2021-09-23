@@ -4,6 +4,7 @@ import ButtonGroup from '../ButtonGroup/ButtonGroup';
 import Button from '../Button/Button';
 
 import './SideBar.css';
+import { insertDoubleCut } from '../../util/proof-util';
 
 export default class SideBar extends React.Component {
     constructor(props) {
@@ -40,6 +41,7 @@ export default class SideBar extends React.Component {
                     {
                         text: 'Insert Double Cut',
                         onClick: function() {
+                            window.action = insertDoubleCut;
                             console.log('Inserting double cut...');
                         }
                     },

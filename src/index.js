@@ -8,11 +8,13 @@ import  _  from 'lodash'
 import  { handleCollisions, treeToFront } from './util/collisions.js'
 import { findRoot } from './util/treeUtil.js'
 import Delete from './sounds/delete.wav'
+import { insertDoubleCut } from './util/proof-util';
 
 
-console.log = function(){}
 console.log("Starting...");
-window.joint = joint
+window.joint = joint;
+
+window.action = null; 
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -245,4 +247,6 @@ paper.on('cell:pointerup', function(cellView, evt, x, y) {
     handleCollisions(cell)
     cell.inactive();
     console.log("inactive")
+
+    if (window.action) window.action();
 });
