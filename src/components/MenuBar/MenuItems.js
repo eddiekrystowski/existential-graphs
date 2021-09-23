@@ -7,9 +7,9 @@ import { graph } from '../../index.js';
 const MenuItems = [
   {
     text: '',
-    img: logoIcon,
+    img: './MenuIcons/logo.png',
     onClick: function(){
-      return;
+      window.open('https://github.com/eddiekrystowski/existential-graphs')
     },
     margin_left: '0vw',
   },
@@ -23,13 +23,13 @@ const MenuItems = [
   },
   {
     text: 'Import',
-    img: importIcon,
+    img: './MenuIcons/import.png',
     onClick: importEG,
     margin_left: '10vw',
   },
   {
     text: 'Export',
-    img: exportIcon,
+    img: './MenuIcons/export.png',
     onClick: exportEG,
     margin_left: '5vw',
   },

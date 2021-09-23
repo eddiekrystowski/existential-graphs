@@ -69,6 +69,7 @@ export function colorByLevel(node, color_config = default_background_colors) {
         let next_children = []
         for (const child of children) {
             console.log("child", child)
+            child.attr("level", level);
             if (child.attributes.type === "dia.Element.Premise") {
                 console.log("is premise")
                 child.attr("rect/fill", color_config.premise)

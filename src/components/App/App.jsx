@@ -18,6 +18,7 @@ export default class App extends React.Component {
         this.setState({
             mode: this.state.mode === 'create' ? 'proof' : 'create'
         });
+        window.mode = this.state.mode === 'create' ? 'proof' : 'create';
     }
 
     render() {
@@ -25,7 +26,10 @@ export default class App extends React.Component {
             <div className="app">
                 <MenuBar id="header"/>
                 <SideBar mode={this.state.mode} onStateSwitch={() => { this.handleStateSwitch(); }}></SideBar>
-                <div id="paper-container"></div>
+                
+                <div id="paper-wrapper">
+                    <div id="paper-container"></div>
+                </div>
             </div>
         );
     }
