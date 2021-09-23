@@ -1,20 +1,20 @@
 import { graph } from '../index.js'
 import { treeMove } from './treeUtil.js';
 import { handleCollisions } from './collisions.js';
+import _ from 'lodash'
 
 export function addSubgraph(subgraph, position) {
 
     let root = subgraph[Object.keys(subgraph)[0]];
-
-    let new_root = subgraphToGraph(root, root.clone(), subgraph)
-    console.log("new root", new_root);
-    handleCollisions(new_root);
+    let root_clone = root.clone();
+    let new_root = subgraphToGraph(root, root_clone, subgraph)
     treeMove(new_root, position);
+    handleCollisions(new_root);
 }
 
 export function subgraphToGraph(node, clone, subgraph, parent=null) {
     clone.addTo(graph);
-    if (parent) {
+    if (parent != null) {
         parent.embed(clone);
     }
     let embeds = node.get('embeds');
