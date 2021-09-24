@@ -172,3 +172,27 @@ export function treeToFront(root) {
         next = []
     }
 }
+
+export function pack(cut) {
+    let children = cut.getEmbeddedCells();
+    let current_bbox = graph.getCellsBBox(children);
+    for (let i = 0; i < children.length; i++) {
+        for (let j = 0; j < children.length; j++) {
+            if (i === j) {
+                continue;
+            }
+            if (intersects(children[i], children[j])) {
+                alert("Shape intersection of children !!")
+            }
+        }
+    }
+}
+
+export function intersects(shape, other_shape) {
+    let bbox = {
+        x: shape.attributes.position.x
+        y: shape.attributes.
+    }
+}
+
+export function getbbox(shape)
