@@ -195,4 +195,8 @@ export function intersects(shape, other_shape) {
     }
 }
 
-export function getbbox(shape)
+export function getbbox(shape) {
+    let bbox = {
+        x: shape.attributes.position.x
+    }
+}
