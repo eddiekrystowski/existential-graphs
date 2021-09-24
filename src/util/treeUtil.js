@@ -2,7 +2,6 @@ import { color } from "./color.js"
 import { graph } from "../index.js"
 
 export function treeResize(root, resize_value = 20, center_nodes = true) {
-    console.log("resize_value",resize_value)
     //resizes all the children of a root, not including the root
     let current = root.getParentCell();
     while (current) {
@@ -35,7 +34,6 @@ export function findLevel(node) {
         level++;
         parent = parent.getParentCell();
     }
-    console.log("level:", level)
     return level;
 }
 
@@ -46,13 +44,10 @@ let default_background_colors = {
 }
 
 export function colorByLevel(node, color_config = default_background_colors) {
-    console.log("RECOLOR START =====");
-
     //find root of node's tree
     let root = findRoot(node);
 
     if (root.attributes.type === "dia.Element.Premise") {
-        console.log("premise root");
         root.attr('rect/fill', color_config.premise);
         return;
     }
@@ -66,23 +61,18 @@ export function colorByLevel(node, color_config = default_background_colors) {
         level++
         //the color applies to the level contained within the cut, not the level the cut is on
         let parity = (level+1) % 2;
-        console.log("level: parity", level, parity)
         let next_children = []
         for (const child of children) {
-            console.log("child", child)
             child.attr("level", level);
             if (child.attributes.type === "dia.Element.Premise") {
-                console.log("is premise")
                 child.attr("rect/fill", color_config.premise)
                 continue;
             }
             //coloring cut
             child.attributes.attrs.level = level;
             if (parity === 0) {
-                console.log("even!!")
                 child.attr("rect/fill", color_config.even) 
             } else {
-                console.log("odd!!");
                 child.attr("rect/fill", color_config.odd);   
             }                                 
             next_children.push(...child.getEmbeddedCells());
