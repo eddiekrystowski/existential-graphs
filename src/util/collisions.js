@@ -33,13 +33,14 @@ export function handleCollisions(cell) {
         let children = filterChildren(parent, cellbbox)
         //embed cell into parent
         parent.embed(cell);
+        console.log("childrenPPPPPPPPPP==========", children);
 
         //reroot children
         for (const child of children) {
             if (child.get("parent")) {
                 parent.unembed(child);
-                cell.embed(child)
             }
+            cell.embed(child)
         }
         treeToFront(parent)
     } else {
