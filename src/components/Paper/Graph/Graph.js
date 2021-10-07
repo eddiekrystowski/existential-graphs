@@ -195,6 +195,7 @@ export default class Graph {
         let next = []
         while (current.length > 0) {
             for (const node of current) {
+                console.log(node);
                 node.toFront();
                 let children = node.getEmbeddedCells();
                 next.push(...children);

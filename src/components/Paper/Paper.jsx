@@ -22,7 +22,7 @@ export default class Paper extends React.Component {
         super(props);
         this.state = {}
         this.graph = new Graph(this);
-        this.paper = null;
+        this.jpaper = null;
         this.paper_element = null;
     
         this.selected_premise = null;
@@ -39,9 +39,9 @@ export default class Paper extends React.Component {
     }
 
     componentDidMount() {
-        this.paper = new joint.dia.Paper({
+        this.jpaper = new joint.dia.Paper({
             el: document.getElementById(this.props.id),
-            model: this.graph,
+            model: this.graph.jgraph,
             width: PAPER_SIZE.width,
             height: PAPER_SIZE.height,
             preventContextMenu: false,
@@ -56,18 +56,19 @@ export default class Paper extends React.Component {
 
     setPaperEvents(){
         // paper events
-        this.paper.on("element:mouseenter", function( cellView, evt){
+        //arrow functions are required to keep proper this context binding
+        this.jpaper.on("element:mouseenter", ( cellView, evt) =>{
             let model = cellView.model
-            let modelView = model.findView(this.paper);
+            let modelView = model.findView(this.jpaper);
             modelView.showTools()
             model.attr("rect/stroke", "red")
             model.attr("text/fill", "red")
             this.selected_premise = model
         })
 
-        this.paper.on("element:mouseleave", function( cellView, evt){
+        this.jpaper.on("element:mouseleave", ( cellView, evt) =>{
             let model = cellView.model
-            let modelView = model.findView(this.paper);
+            let modelView = model.findView(this.jpaper);
             if(!modelView) return;
             modelView.hideTools()
             model.attr("rect/stroke", "black")
@@ -76,7 +77,7 @@ export default class Paper extends React.Component {
         })
 
         // First, unembed the cell that has just been grabbed by the user.
-        this.paper.on('cell:pointerdown', function(cellView, evt, x, y) {
+        this.jpaper.on('cell:pointerdown', (cellView, evt, x, y) => {
             
             let cell = cellView.model;
 
@@ -96,7 +97,7 @@ export default class Paper extends React.Component {
 
         // When the dragged cell is dropped over another cell, let it become a child of the
         // element below.
-        this.paper.on('cell:pointerup', function(cellView, evt, x, y) {
+        this.jpaper.on('cell:pointerup', (cellView, evt, x, y) => {
 
             let cell = cellView.model;
             
@@ -115,7 +116,7 @@ export default class Paper extends React.Component {
     handleKeyDown() {
         if(window.mode === 'create'){
             if (E.keys[16]) {
-                this.paper.setInteractivity(false);
+                this.jpaper.setInteractivity(false);
             }
         }
     }
@@ -253,7 +254,7 @@ export default class Paper extends React.Component {
             this.temp_cut.remove();
         }
     
-        this.paper.setInteractivity(true);
+        this.jpaper.setInteractivity(true);
         this.temp_cut = null;
     }
 
