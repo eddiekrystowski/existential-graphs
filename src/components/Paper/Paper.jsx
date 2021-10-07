@@ -10,7 +10,7 @@ import { addSubgraph } from '../../util/otherUtil.js';
 import Delete from '../../sounds/delete.wav';
 import { Cut } from '../../shapes/Cut/Cut.js';
 import { Premise } from '../../shapes/Premise/Premise.js';
-import Graph from './Graph/Graph.js';
+import Sheet from './Graph/Sheet.js';
 
 const PAPER_SIZE = { width: 4000, height: 4000 };
 
@@ -21,7 +21,7 @@ export default class Paper extends React.Component {
     constructor(props) {
         super(props);
         this.state = {}
-        this.cgraph = new Graph(this);
+        this.sheet = new Sheet(this);
         this.jpaper = null;
         this.paper_element = null;
     
@@ -42,10 +42,10 @@ export default class Paper extends React.Component {
     componentDidMount() {
         this.jpaper = new joint.dia.Paper({
             el: document.getElementById(this.props.id),
-            model: this.cgraph.jgraph,
+            model: this.sheet.graph,
             width: PAPER_SIZE.width,
             height: PAPER_SIZE.height,
-            preventContextMenu: false,
+            pontextMenu: false,
             clickThreshold: 1
         });
 
@@ -94,11 +94,11 @@ export default class Paper extends React.Component {
             }
             
             if (cell.get('parent')) {
-                this.cgraph.jgraph.getCell(cell.get('parent')).unembed(cell);
+                this.sheet.graph.getCell(cell.get('parent')).unembed(cell);
             }
 
             cell.active();
-            this.cgraph.treeToFront(this.cgraph.findRoot(cell));
+            this.sheet.treeToFront(this.sheet.findRoot(cell));
         });
 
         // When the dragged cell is dropped over another cell, let it become a child of the
@@ -107,10 +107,10 @@ export default class Paper extends React.Component {
 
             let cell = cellView.model;
             
-            this.cgraph.handleCollisions(cell)
+            this.sheet.handleCollisions(cell)
             cell.inactive();
 
-            if (this.props.action) this.props.action(this.cgraph, cell);
+            if (this.props.action) this.props.action(this.sheet, cell);
             this.props.handleClearAction();
         });
     }
@@ -147,7 +147,7 @@ export default class Paper extends React.Component {
                         },
                         position: this.getRelativeMousePos()
                     }
-                    this.cgraph.addPremise(config);
+                    this.sheet.addPremise(config);
                 }
                 this.props.handleClearAction();
             }
@@ -183,7 +183,7 @@ export default class Paper extends React.Component {
             }
             //eslint-disable-next-line
             //let new_rect = new Premise().create(config)
-            this.cgraph.addPremise(config);
+            this.sheet.addPremise(config);
         }
         //ENTER
         // new cut
@@ -193,10 +193,10 @@ export default class Paper extends React.Component {
             }
             if (this.selected_premise) {
                 config["child"] = this.selected_premise;
-                this.cgraph.addCut(config);
+                this.sheet.addCut(config);
             } else {
                 console.log("creating empty cut")
-                const new_cut = this.cgraph.addCut(config);
+                const new_cut = this.sheet.addCut(config);
                 console.log("cut", new_cut)
             }
         }
@@ -204,7 +204,7 @@ export default class Paper extends React.Component {
         if (event.keyCode === 49) {
             //save template
             if (this.selected_premise) {
-                this.saved_template = this.cgraph.cloneSubgraph([this.selected_premise], {deep: true});
+                this.saved_template = this.sheet.cloneSubgraph([this.selected_premise], {deep: true});
             }
         }
     
@@ -212,7 +212,7 @@ export default class Paper extends React.Component {
             const mouse_adjusted = this.getRelativeMousePos();
             console.log("position", mouse_adjusted)
             if (this.saved_template) {
-                this.cgraph.addSubgraph(this.saved_template, mouse_adjusted);
+                this.sheet.addSubgraph(this.saved_template, mouse_adjusted);
             }
         }
         event.preventDefault()
@@ -229,7 +229,7 @@ export default class Paper extends React.Component {
                 size: {width: 0, height: 0}
             }
             //this.temp_cut = new Cut().create(config);
-            this.temp_cut = this.cgraph.addCut(config);
+            this.temp_cut = this.sheet.addCut(config);
             this.temp_cut.active();
             event.preventDefault();
             console.log("CREATED TEMP CUT", this.temp_cut);
@@ -242,7 +242,7 @@ export default class Paper extends React.Component {
             console.log('yuh');
             if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
                 const mouse_adjusted = this.getRelativeMousePos();
-                this.props.action(this.cgraph, null, mouse_adjusted);
+                this.props.action(this.sheet, null, mouse_adjusted);
                 this.props.handleClearAction();
             }
         }
@@ -259,7 +259,7 @@ export default class Paper extends React.Component {
             }
             //eslint-disable-next-line
             //let new_rect = new Cut().create(config);
-            this.cgraph.addCut(config);
+            this.sheet.addCut(config);
             this.temp_cut.remove();
             console.log('mouse released, deleting temp cut...');
         }

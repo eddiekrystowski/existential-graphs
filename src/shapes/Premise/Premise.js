@@ -60,8 +60,8 @@ export class Premise extends joint.dia.Element {
     }]
 
     //custom constructor for shape, should more or less always use this over the default constructor
-    create(config, cgraph) {
-        console.log("GRAPH: ", cgraph)
+    create(config, sheet) {
+        console.log("GRAPH: ", sheet)
         const options = _.cloneDeep(PREMISE_DEFAULTS);
 
         if (config) {
@@ -70,7 +70,7 @@ export class Premise extends joint.dia.Element {
           options.attrs.rect = Object.assign(options.attrs.rect, config.attrs && config.attrs.rect);
           options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
-        options.cgraph = cgraph;
+        options.sheet = sheet;
 
         const premise = new Premise({
           markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
@@ -93,10 +93,10 @@ export class Premise extends joint.dia.Element {
         });
 
         //have to set this out here since we actually do want a reference to this object, not a copy
-        premise.cgraph = options.cgraph;
+        premise.sheet = options.sheet;
 
         console.log(premise);
-        premise.addTo(premise.cgraph.jgraph)
+        premise.addTo(premise.sheet.graph)
         //add tools (some events events also)
         this.addTools(premise)
 
@@ -122,7 +122,7 @@ export class Premise extends joint.dia.Element {
     addTools(element) {
       console.log(element)
       //element view is in charge of rendering the elements on the paper
-      let elementView = element.findView(element.cgraph.paper.jpaper);
+      let elementView = element.findView(element.sheet.paper.jpaper);
       //clear any old tools
       elementView.removeTools();
       // boundary tool shows boundaries of element

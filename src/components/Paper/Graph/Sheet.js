@@ -3,6 +3,7 @@ import * as joint from 'jointjs';
 import { Cut } from '../../../shapes/Cut/Cut';
 import { Premise } from '../../../shapes/Premise/Premise';
 import { color } from '../../../util/color';
+import { findSmallestCell } from '../../../util/collisions';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -13,10 +14,10 @@ const DEFAULT_BACKGROUND_COLORS = {
     premise: color.shapes.background.default.color
 }
 
-export default class Graph {
+export default class Sheet {
     constructor(paper) {
         this.paper = paper;
-        this.jgraph = new joint.dia.Graph({}, {
+        this.graph = new joint.dia.Graph({}, {
             cellNamespace: {
                 nameSpace: { 
                     Premise: NSPremise,
@@ -54,13 +55,12 @@ export default class Graph {
         }
     
         let potential_parents = this.findPotentialParents(cellbbox);
-        let parent = this.findSmallestCell(potential_parents);
+        let parent = findSmallestCell(potential_parents);
     
         if (parent) {
             let children = this.filterChildren(parent, cellbbox)
             //embed cell into parent
             parent.embed(cell);
-            console.log("childrenPPPPPPPPPP==========", children);
     
             //reroot children
             for (const child of children) {
@@ -87,7 +87,7 @@ export default class Graph {
     }
 
 
-    findElementsInside(bbox, cells=this.jgraph.getCells()) {
+    findElementsInside(bbox, cells=this.graph.getCells()) {
         //takes two bbox objects as input
         //bbox objects should have the structure:
         // {
@@ -115,7 +115,7 @@ export default class Graph {
     findPotentialParents(targetbbox) {
         // POTENTIAL PARENTS -- potential parents are only the cells that 
         //                      contain (completely) the CELL.
-        let cells = this.jgraph.getCells()
+        let cells = this.graph.getCells()
         let potential_parents = []
         for (const cell of cells) {
             let otherbbox = {
@@ -135,27 +135,9 @@ export default class Graph {
     }
 
 
-    findSmallestCell(cells) {
-        // returns the smallest cell (by area) of an array of joint.dia.Cell objects
-        if (cells.length === 0) { return undefined }
-        let smallest_area = cells[0].attributes.attrs.rect.width * cells[0].attributes.attrs.rect.height;
-        let smallest_cell = cells[0];
-        for (const cell of cells) {
-            let width = cell.attributes.attrs.rect.width;
-            let height = cell.attributes.attrs.rect.height;
-            let area = width * height;
-            if (area < smallest_area) {
-                smallest_area = area;
-                smallest_cell = cell;
-            }
-        }
-        return smallest_cell
-    }
-
-
     filterChildren(parent, new_child_bbox) {
         //function returns array of children who fit inside new child
-        let cells = this.jgraph.getCells();
+        let cells = this.graph.getCells();
         let potential_children = [];
         for (const cell of cells) {
             if (!(cell.get("parent")) || cell.get("parent") === parent.id){
@@ -217,7 +199,7 @@ export default class Graph {
     }
 
     subgraphToGraph(node, clone, subgraph, parent=null) {
-        clone.addTo(this.jgraph);
+        clone.addTo(this.graph);
         if (parent != null) {
             parent.embed(clone);
         }
@@ -246,7 +228,7 @@ export default class Graph {
     //FIXME: these functions don't seem to be related to a specific graph, yet i'm not sure where to put them.
     // I don't think just having them sit out in the open is a great idea either.
     // Possibly we can just have these functions sit at the bottom of this file (outside of the class)
-    // We can't really make a class with these functions since the jgraph itself is the tree and we are just defining operations on it
+    // We can't really make a class with these functions since the graph itself is the tree and we are just defining operations on it
     //      - or maybe we can if we get creative, have to think more about it
     treeResize(root, resize_value = 20, center_nodes = true) {
         //resizes all the children of a root, not including the root

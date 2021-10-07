@@ -59,7 +59,7 @@ export class Cut extends joint.dia.Element {
     }]
 
     //custom constructor for shape, should more or less always use this over the default constructor
-    create(config, cgraph) {
+    create(config, sheet) {
 
         const options = _.cloneDeep(CUT_DEFAULTS);
         if (config) {
@@ -68,7 +68,7 @@ export class Cut extends joint.dia.Element {
             options.attrs.rect = Object.assign(options.attrs.rect, config.attrs && config.attrs.rect);
             options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
-        options.cgraph = cgraph;
+        options.sheet = sheet;
 
         console.log('options', _.cloneDeep(options));
 
@@ -94,9 +94,9 @@ export class Cut extends joint.dia.Element {
         })
 
         //have to set this out here since we actually do want a reference to this object, not a copy
-        cut.cgraph = options.cgraph;
+        cut.sheet = options.sheet;
 
-        cut.addTo(cut.cgraph.jgraph);
+        cut.addTo(cut.sheet.graph);
         //add tools (some events events also)
         this.addTools(cut);
 
@@ -105,7 +105,7 @@ export class Cut extends joint.dia.Element {
             let child = config.child;
             let hasparent = false;
             if (child.get("parent")) {
-                let parent = cut.cgraph.jgraph.getCell(child.get("parent"));
+                let parent = cut.sheet.graph.getCell(child.get("parent"));
                 parent.unembed(child);
                 parent.embed(cut)
                 parent.toBack()
@@ -119,7 +119,7 @@ export class Cut extends joint.dia.Element {
                 y: child.attributes.position.y - (cut.attributes.attrs.rect.height - child.attributes.attrs.rect.height) / 2,
             })
             if (hasparent) {
-                this.cgraph.treeResize(cut, cut.attributes.attrs.rect.width / 2);
+                cut.sheet.treeResize(cut, cut.attributes.attrs.rect.width / 2);
             }
         }
         console.log(cut);
@@ -139,25 +139,25 @@ export class Cut extends joint.dia.Element {
         }
         this.remove();
         if (parent) {
-            this.cgraph.handleCollisions(parent);
+            this.sheet.handleCollisions(parent);
         }
     }
 
     active() {
         //cut is being interacted with (ie grabbing, dragging or moving etc)
-        this.cgraph.colorByLevel(this, {even:color.shapes.background.even.active, odd:color.shapes.background.odd.active, premise: color.shapes.background.default.color});
+        this.sheet.colorByLevel(this, {even:color.shapes.background.even.active, odd:color.shapes.background.odd.active, premise: color.shapes.background.default.color});
     }
 
     inactive() {
         //cut is not being interacted with (ie grabbing, dragging or moving etc)
-        this.cgraph.colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
+        this.sheet.colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
     }
 
     //TODO: refactor function to not take in element. Instead, can we either store model/element in Cut class or access it directly?
     ///     ( i think we can? )
     addTools(element) {
         //element view is in charge of rendering the elements on the paper
-        let elementView = element.findView(element.cgraph.paper.jpaper);
+        let elementView = element.findView(element.sheet.paper.jpaper);
         //clear any old tools
         elementView.removeTools();
         // boundary tool shows boundaries of element
@@ -239,7 +239,7 @@ const MIN_SIZE = {
  * @param {MouseEvent} event
  */
 function resize_mousedown(event) {
-    const target = this.cgraph.jgraph.getCell($(event.target).parent().attr('model-id'));
+    const target = this.sheet.graph.getCell($(event.target).parent().attr('model-id'));
     console.log('target model', target);
     prev_pos = {
         x: event.clientX,
@@ -251,7 +251,7 @@ function resize_mousedown(event) {
     event.stopPropagation();
 
     if (target.get('parent')) {
-        this.cgraph.jgraph.getCell(target.get('parent')).unembed(target);
+        this.sheet.graph.getCell(target.get('parent')).unembed(target);
     }
 }
 
@@ -347,7 +347,7 @@ function resize_mousemove(event) {
 function resize_mouseup (event) {
     $(document).off('mouseup', resize_mouseup);
     $(document).off('mousemove', resize_mousemove);
-    event.data.target.cgraph.handleCollisions(event.data.target);
+    event.data.target.sheet.handleCollisions(event.data.target);
 }
 
 function createResizeTool(config) {

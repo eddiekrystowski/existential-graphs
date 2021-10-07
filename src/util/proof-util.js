@@ -26,25 +26,25 @@ export const inferenceInsertion = function(model) {
     // }
 }
 
-export const inferenceErasure = function(cgraph, model) {
+export const inferenceErasure = function(sheet, model) {
   console.log(model.attributes.attrs.level)
   if(model.attributes.attrs.level%2 === 0) {
     const children = model.attributes.attrs.embeds;
     model.destroy();
     if(model.attributes.parent) {
-      cgraph.handleCollisions(cgraph.jgraph.getCell(model.attributes.parent));
+      sheet.handleCollisions(sheet.graph.getCell(model.attributes.parent));
     }
     else {
       children?.forEach(element => {
-          if(cgraph.jgraph.getCell(element).__proto__.constructor.name == "Cut") {
-            cgraph.handleCollisions(cgraph.jgraph.getCell(element))
+          if(sheet.graph.getCell(element).__proto__.constructor.name == "Cut") {
+            sheet.handleCollisions(sheet.graph.getCell(element))
           }
       });
     }  
   }
 }
 
-export const insertDoubleCut = function(cgraph, model, mousePosition={}) {
+export const insertDoubleCut = function(sheet, model, mousePosition={}) {
     let position = {};
     let size = {}
     if (!model && mousePosition) {
@@ -60,7 +60,7 @@ export const insertDoubleCut = function(cgraph, model, mousePosition={}) {
     }
     const multipliers = [0.5, 0.25];
     for(let i = 0; i < multipliers.length; i++) { 
-        const cut = cgraph.addCut({
+        const cut = sheet.addCut({
             position: position,
             attrs: {
                 rect: {
@@ -73,33 +73,33 @@ export const insertDoubleCut = function(cgraph, model, mousePosition={}) {
             x: cut.get('position').x - (size.width * multipliers[i]/2),
             y: cut.get('position').y - (size.height * multipliers[i]/2)
         });
-        cut.cgraph.handleCollisions(cut);
+        cut.sheet.handleCollisions(cut);
     }  
 }
 
-export const deleteDoubleCut = function(cgraph, model) {
+export const deleteDoubleCut = function(sheet, model) {
     console.log("MODEL: ", model);
-    const jgraph = cgraph.jgraph;
+    const graph = sheet.graph;
     if(model.__proto__.constructor.name == "Cut" && model.attributes.embeds?.length == 1 && 
-        jgraph.getCell(model.attributes.embeds[0]).__proto__.constructor.name == "Cut") {
-          const children = jgraph.getCell(model.attributes.embeds[0]).attributes.embeds;
-          jgraph.getCell(model.attributes.embeds[0]).destroy();
-          model.destroy();
-          if(model.attributes.parent) {
-            cgraph.handleCollisions(jgraph.getCell(model.attributes.parent));
-          }
-          else {
-            children?.forEach(element => {
-                if(jgraph.getCell(element).__proto__.constructor.name == "Cut") {
-                  cgraph.handleCollisions(jgraph.getCell(element))
-                }
-            });
-          }
+        graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name == "Cut") {
+        const children = graph.getCell(model.attributes.embeds[0]).attributes.embeds;
+        graph.getCell(model.attributes.embeds[0]).destroy();
+        model.destroy();
+        if(model.attributes.parent) {
+          sheet.handleCollisions(graph.getCell(model.attributes.parent));
+        }
+        else {
+          children?.forEach(element => {
+              if(graph.getCell(element).__proto__.constructor.name == "Cut") {
+                sheet.handleCollisions(graph.getCell(element))
+              }
+          });
+        }
     }
 }
 
-export const iteration = function(cgraph, model) {
+export const iteration = function(sheet, model) {
 }
 
-export const deiteration = function(cgraph, model) {
+export const deiteration = function(sheet, model) {
 }
