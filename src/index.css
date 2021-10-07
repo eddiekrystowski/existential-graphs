@@ -7,20 +7,12 @@ html, body, #root, .app {
 }
 
 .app {
-    display: grid;
-    grid-template-areas: 
+    display: flex;
+    flex-direction: column;
+    /* grid-template-areas: 
         'header header header'
         'side   paper  paper'
-        'side   paper  paper';
-    grid-template-rows: 10vh auto auto;
-    grid-template-columns: 15vw auto auto;
-}
-
-#paper-container {
-    background-color: white;
-}
-
-#paper-wrapper {
-    grid-area: paper;
-    overflow: hidden;
+        'side   paper  paper'; */
+    /* grid-template-rows: 10vh auto auto;
+    grid-template-columns: 15vw auto auto; */
 }
