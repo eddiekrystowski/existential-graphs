@@ -4,7 +4,7 @@ import ButtonGroup from '../ButtonGroup/ButtonGroup';
 import Button from '../Button/Button';
 
 import './SideBar.css';
-import { deiterating, deiteration, deleteDoubleCut, inferenceErasure, inferenceInsertion, insertDoubleCut, iteration } from '../../util/proof-util';
+import { deiteration, deleteDoubleCut, inferenceErasure, inferenceInsertion, insertDoubleCut, iteration } from '../../util/proof-util';
 
 export default class SideBar extends React.Component {
     constructor(props) {
@@ -14,13 +14,13 @@ export default class SideBar extends React.Component {
                 create: [
                     {
                         text: 'Add Premise',
-                        onClick: function() {
+                        onClick: () => {
                             console.log('Adding premise...')
                         }
                     },
                     {
                         text: 'Cut',
-                        onClick: function() {
+                        onClick: () => {
                             console.log('Cutting...');
                         }
                     }
@@ -28,43 +28,43 @@ export default class SideBar extends React.Component {
                 proof: [
                     {
                         text: 'Insertion',
-                        onClick: function() {
-                            window.action = inferenceInsertion;
+                        onClick: () => {
+                            this.props.handleActionChange(inferenceInsertion);
                             console.log('Performing insertion...');
                         }
                     },
                     {
                         text: 'Erasure',
-                        onClick: function() {
-                            window.action = inferenceErasure;
+                        onClick: () => {
+                            this.props.handleActionChange(inferenceErasure);
                             console.log('Performing erasure...');
                         }
                     },
                     {
                         text: 'Insert Double Cut',
-                        onClick: function() {
-                            window.action = insertDoubleCut;
+                        onClick: () => {
+                            this.props.handleActionChange(insertDoubleCut);
                             console.log('Inserting double cut...');
                         }
                     },
                     {
                         text: 'Delete Double Cut',
-                        onClick: function() {
-                            window.action = deleteDoubleCut;
+                        onClick: () => {
+                            this.props.handleActionChange(deleteDoubleCut);
                             console.log('Deleting double cut...');
                         }
                     },
                     {
                         text: 'Iteration',
-                        onClick: function() {
-                            window.action = iteration;
+                        onClick: () => {
+                            this.props.handleActionChange(iteration);
                             console.log('Performing iteration...');
                         }
                     },
                     {
                         text: 'Deiteration',
-                        onClick: function() {
-                            window.action = deiteration;
+                        onClick: () => {
+                            this.props.handleActionChange(deiteration);
                             console.log('Performing deiteration...');
                         }
                     }

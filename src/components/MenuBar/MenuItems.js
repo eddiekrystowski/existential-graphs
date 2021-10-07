@@ -37,7 +37,10 @@ const MenuItems = [
 
 
   //Funtions for the above MenuItems
-function exportEG() {
+//TODO: MAKE IMPORT/EXPORT WORK FOR NEW MULTI-GRAPH SYSTEM
+//    - have importEG return a new graph?
+//      ex. Paper.graph = importEG();
+function exportEG(graph) {
   console.log('Exporting...');
   let graphJSON = graph.toJSON();
   const file = new Blob([JSON.stringify(graphJSON)], { type: 'application/json'});
@@ -53,7 +56,11 @@ function exportEG() {
     }, 0);
 }
 
-function importEG() {
+// FIXME: graph arg is here just so linter is happy, see above TODO about fixing this
+// for multi graph system
+// We also have to consider... should this function make a paper? or just set graph of of existing paper...
+// return Graph class (components/Paper/Graph/Graph.js)
+function importEG(graph) {
   console.log('Importing...');
   const input = document.createElement("input");
     input.type = "file";

@@ -1,0 +1,13 @@
+
+.paper-wrapper {
+    grid-area: paper;
+    overflow: hidden;
+}
+
+.paper-root {
+    overflow: hidden;
+}
+
+.joint-paper:focus {
+    outline: none;
+}
