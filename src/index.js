@@ -26,6 +26,7 @@ ReactDOM.render(
     document.getElementById('root')
 );
 
+
 // let selected_premise = undefined;
 // let saved_template = undefined;
 

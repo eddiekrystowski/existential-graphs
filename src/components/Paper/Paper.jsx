@@ -179,10 +179,7 @@ export default class Paper extends React.Component {
         // new cut
         if (event.keyCode === 13) {
             let config = {
-                position: {
-                    x: this.mousePosition.x - this.paper_element.getBoundingClientRect().left - 20,
-                    y: this.mousePosition.y - this.paper_element.getBoundingClientRect().top - 20
-                }
+                position: this.getRelativeMousePos()
             }
             if (this.selected_premise) {
                 config["child"] = this.selected_premise;
@@ -225,6 +222,7 @@ export default class Paper extends React.Component {
             this.temp_cut = this.graph.addCut(config);
             this.temp_cut.active();
             event.preventDefault();
+            console.log("CREATED TEMP CUT", this.temp_cut);
         }
     }
 
@@ -252,6 +250,7 @@ export default class Paper extends React.Component {
             //let new_rect = new Cut().create(config);
             this.graph.addCut(config);
             this.temp_cut.remove();
+            console.log('mouse released, deleting temp cut...');
         }
     
         this.jpaper.setInteractivity(true);
@@ -261,6 +260,7 @@ export default class Paper extends React.Component {
     handleMouseMove() {
         //console.log('mousemove', this);
         if(window.mode === 'create'){
+            //console.log(E.isMouseDown);
             if (E.isMouseDown && E.keys[16] && this.temp_cut) {
                 const mouse_adjusted = this.getRelativeMousePos();
                 this.temp_cut.set('position', {

@@ -37,11 +37,11 @@ $(document).on('mousemove', function(event) {
 });
 
 $(document).on('mousedown', function(event) {
-    this.isMouseDown = true;
+    E.isMouseDown = true;
 });
 
 $(document).on('mouseup', function(event) {
-    this.isMouseDown = false;
+    E.isMouseDown = false;
 });
 
 export default E;

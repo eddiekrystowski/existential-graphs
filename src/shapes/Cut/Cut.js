@@ -185,10 +185,10 @@ export class Cut extends joint.dia.Element {
         }));
     
         //add event handlers to tools for resizing
-        $(NWresizeTool.el).on('mousedown', resize_mousedown.bind(this));
-        $(NEresizeTool.el).on('mousedown', resize_mousedown.bind(this));
-        $(SWresizeTool.el).on('mousedown', resize_mousedown.bind(this));
-        $(SEresizeTool.el).on('mousedown', resize_mousedown.bind(this));
+        $(NWresizeTool.el).on('mousedown', resize_mousedown.bind(element));
+        $(NEresizeTool.el).on('mousedown', resize_mousedown.bind(element));
+        $(SWresizeTool.el).on('mousedown', resize_mousedown.bind(element));
+        $(SEresizeTool.el).on('mousedown', resize_mousedown.bind(element));
     
         let rect_tools = [boundaryTool, NWresizeTool, NEresizeTool, SEresizeTool, SWresizeTool];
     
@@ -321,7 +321,7 @@ function resize_mousemove(event) {
             modifiers.pos_y = 0;
             break;
         default:
-            throw new RangeError('Invalid direction value. Expected nw, ne, sw, se. Got ' + event.data.irection);
+            throw new RangeError('Invalid direction value. Expected nw, ne, sw, se. Got ' + event.data.direction);
     }
     
     //if the resize will put us at under MIN_SIZE, then set respective delta to 0 to cancel resize
