@@ -21,7 +21,7 @@ export default class Paper extends React.Component {
     constructor(props) {
         super(props);
         this.state = {}
-        this.graph = new Graph(this);
+        this.cgraph = new Graph(this);
         this.jpaper = null;
         this.paper_element = null;
     
@@ -30,18 +30,19 @@ export default class Paper extends React.Component {
         this.temp_cut = null;
         this.initial_cut_pos = {x: 0, y: 0};
 
-        this.handleClick = this.handleClick.bind(this);
-        this.handleKeyDown = this.handleKeyDown.bind(this);
-        this.handleKeyUp = this.handleKeyUp.bind(this);
-        this.handleMouseMove = this.handleMouseMove.bind(this);
-        this.handleMouseDown = this.handleMouseDown.bind(this);
-        this.handleMouseUp = this.handleMouseUp.bind(this);
+        this.onClick = this.onClick.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.onKeyUp = this.onKeyUp.bind(this);
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
+        this.onMouseEnter = this.onMouseEnter.bind(this);
     }
 
     componentDidMount() {
         this.jpaper = new joint.dia.Paper({
             el: document.getElementById(this.props.id),
-            model: this.graph.jgraph,
+            model: this.cgraph.jgraph,
             width: PAPER_SIZE.width,
             height: PAPER_SIZE.height,
             preventContextMenu: false,
@@ -49,9 +50,14 @@ export default class Paper extends React.Component {
         });
 
         this.paper_element = document.getElementById(this.props.id);
-        this.paper_element.focus();
+        // this.paper_element.focus();
 
         this.setPaperEvents();
+    }
+
+    //assume that if there is no workspace associated then we are in create mode
+    getMode() {
+        return this.props.mode || 'create';
     }
 
     setPaperEvents(){
@@ -88,11 +94,11 @@ export default class Paper extends React.Component {
             }
             
             if (cell.get('parent')) {
-                this.graph.jgraph.getCell(cell.get('parent')).unembed(cell);
+                this.cgraph.jgraph.getCell(cell.get('parent')).unembed(cell);
             }
 
             cell.active();
-            this.graph.treeToFront(this.graph.findRoot(cell));
+            this.cgraph.treeToFront(this.cgraph.findRoot(cell));
         });
 
         // When the dragged cell is dropped over another cell, let it become a child of the
@@ -101,32 +107,36 @@ export default class Paper extends React.Component {
 
             let cell = cellView.model;
             
-            this.graph.handleCollisions(cell)
+            this.cgraph.handleCollisions(cell)
             cell.inactive();
 
-            if (window.action) window.action(cell);
-            window.action = null;
+            if (this.props.action) this.props.action(this.cgraph, cell);
+            this.props.handleClearAction();
         });
     }
 
-    handleClick() {
+    onClick() {
         console.log('clicked', this);
     }
 
-    handleKeyDown() {
-        if(window.mode === 'create'){
+    onKeyDown() {
+        if(this.getMode() === 'create'){
             if (E.keys[16]) {
                 this.jpaper.setInteractivity(false);
             }
         }
     }
 
-    handleKeyUp(event) {
+    onKeyUp(event) {
         console.log('keyup', this);
-        if(window.mode === 'proof'){
-            if(window.action && window.action.name === 'inferenceInsertion') {
+        if(this.getMode() === 'proof'){
+            console.log('here?')
+            //TODO: REPLACE THIS WITH AN INTERFACE TO INSERT ANY SUBGRAPH, currently this only lets you insert a single premise
+            if(this.props.action && this.props.action.name === 'inferenceInsertion') {
+                console.log("HEREEEee");
                 if (!this.selected_premise) return;
                 if (this.selected_premise.attributes.attrs.level % 2 === 1) return;
+                console.log("HERE")
                 if (event.keyCode >= 65 && event.keyCode <= 90) {
                     let config = {
                         //use capital letters by default, can press shift to make lowercase
@@ -137,9 +147,9 @@ export default class Paper extends React.Component {
                         },
                         position: this.getRelativeMousePos()
                     }
-                    this.graph.addPremise(config);
+                    this.cgraph.addPremise(config);
                 }
-                window.action = null;
+                this.props.handleClearAction();
             }
             return;
         }
@@ -173,7 +183,7 @@ export default class Paper extends React.Component {
             }
             //eslint-disable-next-line
             //let new_rect = new Premise().create(config)
-            this.graph.addPremise(config);
+            this.cgraph.addPremise(config);
         }
         //ENTER
         // new cut
@@ -183,10 +193,10 @@ export default class Paper extends React.Component {
             }
             if (this.selected_premise) {
                 config["child"] = this.selected_premise;
-                this.graph.addCut(config);
+                this.cgraph.addCut(config);
             } else {
                 console.log("creating empty cut")
-                const new_cut = this.graph.addCut(config);
+                const new_cut = this.cgraph.addCut(config);
                 console.log("cut", new_cut)
             }
         }
@@ -194,7 +204,7 @@ export default class Paper extends React.Component {
         if (event.keyCode === 49) {
             //save template
             if (this.selected_premise) {
-                this.saved_template = this.graph.cloneSubgraph([this.selected_premise], {deep: true});
+                this.saved_template = this.cgraph.cloneSubgraph([this.selected_premise], {deep: true});
             }
         }
     
@@ -202,15 +212,15 @@ export default class Paper extends React.Component {
             const mouse_adjusted = this.getRelativeMousePos();
             console.log("position", mouse_adjusted)
             if (this.saved_template) {
-                this.graph.addSubgraph(this.saved_template, mouse_adjusted);
+                this.cgraph.addSubgraph(this.saved_template, mouse_adjusted);
             }
         }
         event.preventDefault()
     }
 
-    handleMouseDown(event) {
+    onMouseDown(event) {
         console.log('mousedown', this);
-        if (E.keys[16] && window.mode === 'create') {
+        if (E.keys[16] && this.getMode() === 'create') {
             this.initial_cut_pos = Object.assign({}, E.mousePosition);
             this.initial_cut_pos.x -= this.paper_element.getBoundingClientRect().left;
             this.initial_cut_pos.y -= this.paper_element.getBoundingClientRect().top;
@@ -219,23 +229,24 @@ export default class Paper extends React.Component {
                 size: {width: 0, height: 0}
             }
             //this.temp_cut = new Cut().create(config);
-            this.temp_cut = this.graph.addCut(config);
+            this.temp_cut = this.cgraph.addCut(config);
             this.temp_cut.active();
             event.preventDefault();
             console.log("CREATED TEMP CUT", this.temp_cut);
         }
     }
 
-    handleMouseUp() {
+    onMouseUp() {
         console.log('mouseup', this);
-        if (window.mode === 'proof') {
-            if (!this.selected_premise && window.action && window.action.name === 'insertDoubleCut') {
+        if (this.getMode() === 'proof') {
+            console.log('yuh');
+            if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
                 const mouse_adjusted = this.getRelativeMousePos();
-                window.action(null, mouse_adjusted);
-                window.action = null;
+                this.props.action(this.cgraph, null, mouse_adjusted);
+                this.props.handleClearAction();
             }
         }
-        if (this.temp_cut && window.mode === 'create') {
+        if (this.temp_cut && this.getMode() === 'create') {
             const position = _.clone(this.temp_cut.get('position'));
             const size = _.clone({width: this.temp_cut.attr('rect/width'), height: this.temp_cut.attr('rect/height')});
             const config = {
@@ -248,7 +259,7 @@ export default class Paper extends React.Component {
             }
             //eslint-disable-next-line
             //let new_rect = new Cut().create(config);
-            this.graph.addCut(config);
+            this.cgraph.addCut(config);
             this.temp_cut.remove();
             console.log('mouse released, deleting temp cut...');
         }
@@ -257,9 +268,9 @@ export default class Paper extends React.Component {
         this.temp_cut = null;
     }
 
-    handleMouseMove() {
+    onMouseMove() {
         //console.log('mousemove', this);
-        if(window.mode === 'create'){
+        if(this.getMode() === 'create'){
             //console.log(E.isMouseDown);
             if (E.isMouseDown && E.keys[16] && this.temp_cut) {
                 const mouse_adjusted = this.getRelativeMousePos();
@@ -271,6 +282,10 @@ export default class Paper extends React.Component {
                 this.temp_cut.attr('rect/height', Math.abs(mouse_adjusted.y - this.initial_cut_pos.y));
             }
         }
+    }
+
+    onMouseEnter() {
+        this.paper_element.focus();
     }
 
     getRelativeMousePos() {
@@ -287,12 +302,13 @@ export default class Paper extends React.Component {
                     <div 
                         id={this.props.id}
                         class="joint-paper"
-                        onClick={this.handleClick}
-                        onKeyDown={this.handleKeyDown}
-                        onKeyUp={(event) => this.handleKeyUp(event)}
-                        onMouseDown={(event) => this.handleMouseDown(event)}
-                        onMouseUp={this.handleMouseUp}
-                        onMouseMove={this.handleMouseMove}
+                        onClick={this.onClick}
+                        onKeyDown={this.onKeyDown}
+                        onKeyUp={(event) => this.onKeyUp(event)}
+                        onMouseDown={(event) => this.onMouseDown(event)}
+                        onMouseUp={this.onMouseUp}
+                        onMouseMove={this.onMouseMove}
+                        onMouseEnter={this.onMouseEnter}
                         tabIndex="0"
                     ></div>
                 </div>

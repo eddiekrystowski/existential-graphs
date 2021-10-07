@@ -1,4 +1,5 @@
 import React from 'react';
+import { act } from 'react-dom/test-utils';
 import Paper from '../Paper/Paper';
 import SideBar from '../SideBar/SideBar';
 
@@ -8,7 +9,8 @@ export default class Workspace extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            mode: 'create'
+            mode: 'create',
+            action: null
         }
     }
 
@@ -21,11 +23,33 @@ export default class Workspace extends React.Component {
         window.mode = this.state.mode === 'create' ? 'proof' : 'create';
     }
 
+    handleActionChange(action) {
+        this.setState({
+            action: action
+        });
+    }
+
+    handleClearAction(){
+        this.handleActionChange(null);
+    }
+
     render() {
         return (
             <div class="workspace">
-                <SideBar  mode={this.state.mode} onStateSwitch={() => { this.handleStateSwitch(); }}></SideBar>
-                <Paper id={this.props.paper_id}></Paper>
+                <SideBar  
+                    mode={this.state.mode} 
+                    onStateSwitch={this.handleStateSwitch.bind(this)} 
+                    handleActionChange={this.handleActionChange.bind(this)}
+                >
+                </SideBar>
+                <Paper 
+                    id={this.props.paper_id} 
+                    mode={this.state.mode} 
+                    action={this.state.action}
+                    handleClearAction={this.handleClearAction.bind(this)}
+                >
+
+                </Paper>
             </div>
         );
     }

@@ -7,3 +7,7 @@
 .paper-root {
     overflow: hidden;
 }
+
+.joint-paper:focus {
+    outline: none;
+}
