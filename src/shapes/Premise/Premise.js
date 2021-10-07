@@ -1,6 +1,5 @@
 import * as joint from 'jointjs'
 import _ from 'lodash'
-import { graph } from '../../index.js'
 import { addPremiseTools } from '../../tools/PremiseTools.js'
 import './Premise.css'
 import { handleCollisions } from '../../util/collisions.js'
@@ -36,7 +35,8 @@ const PREMISE_DEFAULTS = {
       'x-alignment': 'middle',
       'y-alignment': 'middle'
     }
-  }
+  },
+  graph: {}
 }
 
 export class Premise extends joint.dia.Element {
@@ -60,7 +60,7 @@ export class Premise extends joint.dia.Element {
     }]
 
     //custom constructor for shape, should more or less always use this over the default constructor
-    create(config) {
+    create(config, graph) {
 
         const options = _.cloneDeep(PREMISE_DEFAULTS);
 
@@ -70,8 +70,9 @@ export class Premise extends joint.dia.Element {
           options.attrs.rect = Object.assign(options.attrs.rect, config.attrs && config.attrs.rect);
           options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
+        options.graph = graph;
 
-        let premise = new Premise({
+        const premise = new Premise({
           markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
           position: {
               ...options.position
@@ -89,12 +90,12 @@ export class Premise extends joint.dia.Element {
               level: 0
           },
           // set custom attributes here:
+          graph: options.graph
         });
         console.log(premise);
-        premise.addTo(graph)
+        premise.addTo(premise.graph.jgraph)
         //add tools (some events events also)
-        addPremiseTools(premise)
-        handleCollisions(premise)
+        this.addTools(premise)
 
         // Play pop sound
         let pop = new Audio(Pop); 
@@ -113,6 +114,30 @@ export class Premise extends joint.dia.Element {
     inactive(){
       return;
     }
+
+    //TODO: see Cut.addTools()
+    addTools(element) {
+      //element view is in charge of rendering the elements on the paper
+      let elementView = element.findView(element.graph.paper);
+      //clear any old tools
+      elementView.removeTools();
+      // boundary tool shows boundaries of element
+      let boundaryTool = new joint.elementTools.Boundary();
+  
+      let rect_tools = [boundaryTool];
+  
+      let toolsView = new joint.dia.ToolsView({
+          tools: rect_tools
+      });
+  
+      elementView.addTools(toolsView);
+      //start with tools hidden
+      elementView.hideTools();
+      // element.on("change:position", function (eventView) {
+      //     element.toFront();
+      // });
+      // --- end of paper events -----
+  }
 
 }
 

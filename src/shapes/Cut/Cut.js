@@ -1,9 +1,7 @@
 // class for cuts
 import * as joint from 'jointjs'
-import { graph } from '../../index.js'
-import { addCutTools } from '../../tools/CutTools.js'
-import { handleCollisions, treeToFront } from '../../util/collisions.js'
 import _ from 'lodash';
+import $ from 'jquery';
 import Snip from '../../sounds/snip.wav'
 import { treeResize, findRoot, findLevel, colorByLevel } from '../../util/treeUtil.js';
 import { color } from '../../util/color.js';
@@ -36,7 +34,8 @@ const CUT_DEFAULTS = {
             'y-alignment': 'middle',
             'x-alignment': 'middle',
         }
-    }
+    },
+    graph: {}
 }
 
 export class Cut extends joint.dia.Element {
@@ -60,7 +59,7 @@ export class Cut extends joint.dia.Element {
     }]
 
     //custom constructor for shape, should more or less always use this over the default constructor
-    create(config) {
+    create(config, graph) {
 
         const options = _.cloneDeep(CUT_DEFAULTS);
         if (config) {
@@ -69,11 +68,12 @@ export class Cut extends joint.dia.Element {
             options.attrs.rect = Object.assign(options.attrs.rect, config.attrs && config.attrs.rect);
             options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
+        options.graph = graph;
 
         console.log('options', _.cloneDeep(options));
 
         
-        let cut = new Cut({
+        const cut = new Cut({
             markup: '<rect/><text/>',
             position: {
                 ...options.position
@@ -91,17 +91,18 @@ export class Cut extends joint.dia.Element {
                 level: 0
             },
             // set custom attributes here:
+            graph: options.graph
         })
-        cut.addTo(graph);
+        cut.addTo(cut.graph.jgraph);
         //add tools (some events events also)
-        addCutTools(cut);
+        this.addTools(cut);
 
         //check for children
         if (config && config.child) {
             let child = config.child;
             let hasparent = false;
             if (child.get("parent")) {
-                let parent = graph.getCell(child.get("parent"));
+                let parent = cut.graph.jgraph.getCell(child.get("parent"));
                 parent.unembed(child);
                 parent.embed(cut)
                 parent.toBack()
@@ -119,7 +120,6 @@ export class Cut extends joint.dia.Element {
             }
         }
         console.log(cut);
-        handleCollisions(cut);
 
         // Play snip sound
         let snip = new Audio(Snip); 
@@ -136,18 +136,70 @@ export class Cut extends joint.dia.Element {
         }
         this.remove();
         if (parent) {
-            handleCollisions(parent);
+            this.graph.handleCollisions(parent);
         }
     }
 
     active() {
         //cut is being interacted with (ie grabbing, dragging or moving etc)
-        colorByLevel(this, {even:color.shapes.background.even.active, odd:color.shapes.background.odd.active, premise: color.shapes.background.default.color});
+        this.graph.colorByLevel(this, {even:color.shapes.background.even.active, odd:color.shapes.background.odd.active, premise: color.shapes.background.default.color});
     }
 
     inactive() {
         //cut is not being interacted with (ie grabbing, dragging or moving etc)
-        colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
+        this.graph.colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
+    }
+
+    //TODO: refactor function to not take in element. Instead, can we either store model/element in Cut class or access it directly?
+    ///     ( i think we can? )
+    addTools(element) {
+        //element view is in charge of rendering the elements on the paper
+        let elementView = element.findView(element.graph.paper);
+        //clear any old tools
+        elementView.removeTools();
+        // boundary tool shows boundaries of element
+        let boundaryTool = new joint.elementTools.Boundary();
+    
+        let NWresizeTool = new joint.elementTools.Button(createResizeTool({
+            x: "0%",
+            y:"0%",
+            cursor: "nw-resize"
+        }));
+        let NEresizeTool = new joint.elementTools.Button(createResizeTool({
+            x: "100%",
+            y:"0%",
+            cursor: "ne-resize"
+        }));
+        let SWresizeTool = new joint.elementTools.Button(createResizeTool({
+            x: "0%",
+            y:"100%",
+            cursor: "sw-resize"
+        }));
+        let SEresizeTool = new joint.elementTools.Button(createResizeTool({
+            x: "100%",
+            y:"100%",
+            cursor: "se-resize"
+        }));
+    
+        //add event handlers to tools for resizing
+        $(NWresizeTool.el).on('mousedown', resize_mousedown.bind(this));
+        $(NEresizeTool.el).on('mousedown', resize_mousedown.bind(this));
+        $(SWresizeTool.el).on('mousedown', resize_mousedown.bind(this));
+        $(SEresizeTool.el).on('mousedown', resize_mousedown.bind(this));
+    
+        let rect_tools = [boundaryTool, NWresizeTool, NEresizeTool, SEresizeTool, SWresizeTool];
+    
+        let toolsView = new joint.dia.ToolsView({
+            tools: rect_tools
+        });
+    
+        elementView.addTools(toolsView);
+        //start with tools hidden
+        elementView.hideTools();
+        // element.on("change:position", function (eventView) {
+        //     element.toFront();
+        // });
+        // --- end of paper events -----
     }
 }
 
@@ -156,3 +208,169 @@ Object.assign(joint, {
         Cut
     }
 })
+
+
+
+
+//global objects for cut resizing
+let prev_pos = {
+    x: 0,
+    y: 0
+}
+
+let current_pos = {
+    x: 0,
+    y: 0
+}
+
+//TODO: THIS NEEDS TO CHANGE BASED ON HOW MANY THINGS ARE IN THE
+//CUT AND WHERE THEY ARE
+const MIN_SIZE = {
+    width: 40,
+    height: 40
+}
+
+/**
+ * Event handler that sets up resizing when the user first puts their mouse down
+ * on a resize tool.
+ * @param {MouseEvent} event
+ */
+function resize_mousedown(event) {
+    const target = this.graph.jgraph.getCell($(event.target).parent().attr('model-id'));
+    console.log('target model', target);
+    prev_pos = {
+        x: event.clientX,
+        y: event.clientY
+    }
+    
+    $(document).on('mouseup', { target }, resize_mouseup);
+    $(document).on('mousemove', { target, direction: event.target.getAttribute('data-direction') },  resize_mousemove);
+    event.stopPropagation();
+
+    if (target.get('parent')) {
+        this.graph.jgraph.getCell(target.get('parent')).unembed(target);
+    }
+}
+
+/**
+ * Performs different resizing algorithms based on the direction of resizing
+ * @param {MouseEvent} event `event.data` has the following data:
+ *          * target: Cut object representing what Cut the tool belongs to
+ */
+function resize_mousemove(event) {
+    //update current pos to mouse position
+    current_pos = {
+        x: event.clientX,
+        y: event.clientY
+    }
+
+    //extract copy of size from target Cut 
+    const size = {
+        width: event.data.target.attributes.attrs.rect.width,
+        height: event.data.target.attributes.attrs.rect.height
+    };
+
+    //extract copy of position from target Cut
+    const position = {
+        x: event.data.target.attributes.position.x,
+        y: event.data.target.attributes.position.y
+    }
+
+    //calclulate change in mouse position
+    const delta = {
+        x: current_pos.x - prev_pos.x,
+        y: current_pos.y - prev_pos.y
+    }
+
+    //define modifiers to determine how
+    //size/position should respond to the deltas
+    const modifiers = {
+        size_x: 1,
+        size_y: 1,
+        pos_x: 0,
+        pos_y: 0
+    }
+
+    //set the modifiers based on the direction we are resizing
+    switch (event.data.direction) {
+        case 'nw':
+            modifiers.size_x = -1;
+            modifiers.size_y = -1;
+            modifiers.pos_x = 1;
+            modifiers.pos_y = 1;
+            break;
+        case 'ne':
+            modifiers.size_x = 1;
+            modifiers.size_y = -1;
+            modifiers.pos_x = 0;
+            modifiers.pos_y = 1;
+            break;
+        case 'sw':
+            modifiers.size_x = -1;
+            modifiers.size_y = 1;
+            modifiers.pos_x = 1;
+            modifiers.pos_y = 0;
+            break;
+        case 'se':
+            modifiers.size_x = 1;
+            modifiers.size_y = 1;
+            modifiers.pos_x = 0;
+            modifiers.pos_y = 0;
+            break;
+        default:
+            throw new RangeError('Invalid direction value. Expected nw, ne, sw, se. Got ' + event.data.irection);
+    }
+    
+    //if the resize will put us at under MIN_SIZE, then set respective delta to 0 to cancel resize
+    if (size.width + modifiers.size_x * delta.x < MIN_SIZE.width) delta.x = 0;
+    if (size.height + modifiers.size_y * delta.y < MIN_SIZE.height) delta.y = 0;
+
+    //set size based on modifiers and deltas
+    event.data.target.attr('rect/width',  size.width + modifiers.size_x * delta.x);
+    event.data.target.attr('rect/height', size.height + modifiers.size_y * delta.y);
+
+    //adjust position to offset size changes in certain directions
+    event.data.target.set('position',  { x: position.x + modifiers.pos_x * delta.x, y: position.y + modifiers.pos_y * delta.y});
+    
+    //copy current_pos to prev_pos
+    prev_pos = Object.assign({}, current_pos);
+}
+
+/**
+ * Cleans up resize event
+ * @param {MouseEvent} event `event.data` has the following data:
+ *          * target: Cut object representing what Cut the tool belongs to
+ */
+function resize_mouseup (event) {
+    $(document).off('mouseup', resize_mouseup);
+    $(document).off('mousemove', resize_mousemove);
+    event.data.target.graph.handleCollisions(event.data.target);
+}
+
+function createResizeTool(config) {
+    let r = (config && config.r) || 7;
+    let fill = (config && config.fill) || "transparent";
+    let x = (config && config.x) || "0%";
+    let y = (config && config.y) || "0%";
+    let offset = (config && config.offset) || {x: 0, y:0};
+    let cursor = (config && config.cursor) || "nw-resize";
+
+    let ResizeTool = {
+        markup: [{
+            tagName: 'circle',
+            selector: 'button',
+            attributes: {
+                'r': r,
+                'fill': fill,
+                'cursor': cursor,
+                'data-direction': cursor.substring(0,2)
+            }
+        }],
+        x: x,
+        y: y,
+        offset: offset,
+        rotate: true,
+    };
+    return ResizeTool
+}
+

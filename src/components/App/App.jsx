@@ -3,6 +3,7 @@ import React from 'react';
 import '../../index.css'; 
 import SideBar from '../SideBar/SideBar.jsx';
 import MenuBar from '../MenuBar/MenuBar.jsx';
+import Paper from '../Paper/Paper';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -27,9 +28,10 @@ export default class App extends React.Component {
                 <MenuBar id="header"/>
                 <SideBar mode={this.state.mode} onStateSwitch={() => { this.handleStateSwitch(); }}></SideBar>
                 
-                <div id="paper-wrapper">
+                {/* <div id="paper-wrapper">
                     <div id="paper-container"></div>
-                </div>
+                </div> */}
+                <Paper id="main-paper"></Paper>
             </div>
         );
     }

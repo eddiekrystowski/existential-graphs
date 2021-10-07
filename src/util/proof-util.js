@@ -1,5 +1,4 @@
 import { Cut } from "../shapes/Cut/Cut"
-import { graph } from "../index.js"
 import  { handleCollisions} from './collisions.js'
 
 
@@ -33,12 +32,12 @@ export const inferenceErasure = function(model) {
     const children = model.attributes.attrs.embeds;
     model.destroy();
     if(model.attributes.parent) {
-      handleCollisions(graph.getCell(model.attributes.parent));
+      model.graph.handleCollisions(model.graph.jgraph.getCell(model.attributes.parent));
     }
     else {
       children?.forEach(element => {
-          if(graph.getCell(element).__proto__.constructor.name == "Cut") {
-            handleCollisions(graph.getCell(element))
+          if(model.graph.jgraph.getCell(element).__proto__.constructor.name == "Cut") {
+            model.graph.handleCollisions(model.graph.jgraph.getCell(element))
           }
       });
     }  
@@ -74,24 +73,25 @@ export const insertDoubleCut = function(model, mousePosition={}) {
             x: cut.get('position').x - (size.width * multipliers[i]/2),
             y: cut.get('position').y - (size.height * multipliers[i]/2)
         });
-        handleCollisions(cut);
+        cut.graph.handleCollisions(cut);
     }  
 }
 
 export const deleteDoubleCut = function(model) {
     console.log("MODEL: ", model);
+    const jgraph = model.graph.jgraph;
     if(model.__proto__.constructor.name == "Cut" && model.attributes.embeds?.length == 1 && 
-        graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name == "Cut") {
-          const children = graph.getCell(model.attributes.embeds[0]).attributes.embeds;
-          graph.getCell(model.attributes.embeds[0]).destroy();
+        jgraph.getCell(model.attributes.embeds[0]).__proto__.constructor.name == "Cut") {
+          const children = jgraph.getCell(model.attributes.embeds[0]).attributes.embeds;
+          jgraph.getCell(model.attributes.embeds[0]).destroy();
           model.destroy();
           if(model.attributes.parent) {
-            handleCollisions(graph.getCell(model.attributes.parent));
+            model.graph.handleCollisions(jgraph.getCell(model.attributes.parent));
           }
           else {
             children?.forEach(element => {
-                if(graph.getCell(element).__proto__.constructor.name == "Cut") {
-                  handleCollisions(graph.getCell(element))
+                if(jgraph.getCell(element).__proto__.constructor.name == "Cut") {
+                  model.graph.handleCollisions(jgraph.getCell(element))
                 }
             });
           }
