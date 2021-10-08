@@ -3,7 +3,6 @@ import * as joint from 'jointjs'
 import _ from 'lodash';
 import $ from 'jquery';
 import Snip from '../../sounds/snip.wav'
-import { treeResize, findRoot, findLevel, colorByLevel } from '../../util/treeUtil.js';
 import { color } from '../../util/color.js';
 
 
@@ -69,10 +68,7 @@ export class Cut extends joint.dia.Element {
             options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
         options.sheet = sheet;
-
-        console.log('options', _.cloneDeep(options));
-
-        
+       
         const cut = new Cut({
             markup: '<rect/><text/>',
             position: {
@@ -152,6 +148,39 @@ export class Cut extends joint.dia.Element {
         //cut is not being interacted with (ie grabbing, dragging or moving etc)
         this.sheet.colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
     }
+
+    getBoundingBox() {
+        return  {
+                    width: this.attributes.attrs.rect.width,
+                    height: this.attributes.attrs.rect.height,
+                    x: this.attributes.position.x,
+                    y: this.attributes.position.y
+                }
+    }
+
+    getArea() {
+        return this.attributes.attrs.rect.width * this.attributes.attrs.rect.height;
+    }
+
+    // move(position, timestep = 1000, frames = 500) {
+    //     let difference = {
+    //       x: position.x - this.attributes.position.x,
+    //       y: position.y - this.attributes.position.y
+    //     }
+    //     let step = {
+    //       x: difference.x / frames,
+    //       y: difference.y / frames
+    //     }
+    //     for (let i = 0; i < frames; i++) {
+    //       this.position(this.attributes.position.x + step.x, this.attributes.position.y + step.y);
+    //       this.sleep(timestep);
+    //     }
+    //     console.log("move over!");
+    //   }
+  
+    //   sleep(ms) {
+    //     return new Promise(resolve => setTimeout(resolve, ms));
+    //   }
 
     //TODO: refactor function to not take in element. Instead, can we either store model/element in Cut class or access it directly?
     ///     ( i think we can? )
@@ -240,7 +269,6 @@ const MIN_SIZE = {
  */
 function resize_mousedown(event) {
     const target = this.sheet.graph.getCell($(event.target).parent().attr('model-id'));
-    console.log('target model', target);
     prev_pos = {
         x: event.clientX,
         y: event.clientY

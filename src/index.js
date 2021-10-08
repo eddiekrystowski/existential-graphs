@@ -1,16 +1,7 @@
 import ReactDOM from 'react-dom';
 import * as joint from 'jointjs';
 import App from './components/App/App';
-import { Premise } from './shapes/Premise/Premise';
-import { Cut } from './shapes/Cut/Cut.js'
-import $ from 'jquery'
 import  _  from 'lodash'
-import  { handleCollisions, treeToFront } from './util/collisions.js'
-import { findRoot } from './util/treeUtil.js'
-import { addSubgraph } from './util/otherUtil.js'
-import Delete from './sounds/delete.wav'
-import { insertDoubleCut } from './util/proof-util';
-
 
 console.log("Starting...");
 window.joint = joint;

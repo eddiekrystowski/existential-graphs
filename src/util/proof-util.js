@@ -21,7 +21,7 @@ export const inferenceErasure = function(sheet, model) {
     }
     else {
       children?.forEach(element => {
-          if(sheet.graph.getCell(element).__proto__.constructor.name == "Cut") {
+          if(sheet.graph.getCell(element).__proto__.constructor.name === "Cut") {
             sheet.handleCollisions(sheet.graph.getCell(element))
           }
       });
@@ -65,8 +65,8 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
 export const deleteDoubleCut = function(sheet, model) {
     console.log("MODEL: ", model);
     const graph = sheet.graph;
-    if(model.__proto__.constructor.name == "Cut" && model.attributes.embeds?.length == 1 && 
-        graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name == "Cut") {
+    if(model.__proto__.constructor.name === "Cut" && model.attributes.embeds?.length === 1 && 
+        graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name === "Cut") {
         const children = graph.getCell(model.attributes.embeds[0]).attributes.embeds;
         graph.getCell(model.attributes.embeds[0]).destroy();
         model.destroy();
@@ -75,7 +75,7 @@ export const deleteDoubleCut = function(sheet, model) {
         }
         else {
           children?.forEach(element => {
-              if(graph.getCell(element).__proto__.constructor.name == "Cut") {
+              if(graph.getCell(element).__proto__.constructor.name === "Cut") {
                 sheet.handleCollisions(graph.getCell(element))
               }
           });
