@@ -10,7 +10,9 @@ import { addSubgraph } from '../../util/otherUtil.js';
 import Delete from '../../sounds/delete.wav';
 import { Cut } from '../../shapes/Cut/Cut.js';
 import { Premise } from '../../shapes/Premise/Premise.js';
-import Sheet from './Graph/Sheet.js';
+import Sheet from './Sheet/Sheet.js';
+
+import './Paper.css';   
 
 const PAPER_SIZE = { width: 4000, height: 4000 };
 
@@ -45,12 +47,11 @@ export default class Paper extends React.Component {
             model: this.sheet.graph,
             width: PAPER_SIZE.width,
             height: PAPER_SIZE.height,
-            pontextMenu: false,
+            preventContextMenu: false,
             clickThreshold: 1
         });
 
         this.paper_element = document.getElementById(this.props.id);
-        // this.paper_element.focus();
 
         this.setPaperEvents();
     }
@@ -58,6 +59,26 @@ export default class Paper extends React.Component {
     //assume that if there is no workspace associated then we are in create mode
     getMode() {
         return this.props.mode || 'create';
+    }
+
+    setupModalPaper() {
+        this.sheet.graph.clear();
+    }
+
+    copyFrom(modalPaper) {
+        const modal_cells = _.cloneDeep(modalPaper.sheet.graph.getCells());
+        const subgraph = modalPaper.sheet.graph.getSubgraph(modal_cells, {deep: true});
+        console.log('BEFORE', _.cloneDeep(subgraph));
+        this.sheet.graph.addCells(subgraph);
+        for (let cell of subgraph) {
+            cell.graph = this.sheet.graph;
+        }
+        for (let cell of this.sheet.graph.getCells()) {
+            this.sheet.handleCollisions(cell);
+        }
+        console.log('AFTER', subgraph);
+        console.log('MAIN GRAPH', this.sheet.graph);
+        console.log('MODAL GRAPH', modalPaper.sheet.graph);
     }
 
     setPaperEvents(){
@@ -110,13 +131,24 @@ export default class Paper extends React.Component {
             this.sheet.handleCollisions(cell)
             cell.inactive();
 
-            if (this.props.action) this.props.action(this.sheet, cell);
-            this.props.handleClearAction();
+            if (this.props.action) this.props.action(this.sheet, cell, E.mousePosition);
+            if (this.props.handleClearAction) this.props.handleClearAction();
         });
+
+        // if (this.props.isModalPaper) {
+        //     this.paper_element.addEventListener('load-modal', () => {
+        //        this.sheet.graph.clear(); 
+        //     });
+        // }
     }
 
     onClick() {
         console.log('clicked', this);
+        // if (this.getMode() === 'proof' && this.props.action && this.props.action.name === 'inferenceInsertion') {
+        //     const mousePosition = Object.assign({}, E.mousePosition);
+        //     this.props.action(this.sheet, mousePosition);
+        //     this.props.handleClearAction();
+        // }
     }
 
     onKeyDown() {
@@ -132,25 +164,25 @@ export default class Paper extends React.Component {
         if(this.getMode() === 'proof'){
             console.log('here?')
             //TODO: REPLACE THIS WITH AN INTERFACE TO INSERT ANY SUBGRAPH, currently this only lets you insert a single premise
-            if(this.props.action && this.props.action.name === 'inferenceInsertion') {
-                console.log("HEREEEee");
-                if (!this.selected_premise) return;
-                if (this.selected_premise.attributes.attrs.level % 2 === 1) return;
-                console.log("HERE")
-                if (event.keyCode >= 65 && event.keyCode <= 90) {
-                    let config = {
-                        //use capital letters by default, can press shift to make lowercase
-                        attrs:{
-                            text: {
-                                text:event.shiftKey ? event.key.toLocaleLowerCase() : event.key.toLocaleUpperCase()
-                            }
-                        },
-                        position: this.getRelativeMousePos()
-                    }
-                    this.sheet.addPremise(config);
-                }
-                this.props.handleClearAction();
-            }
+            // if(this.props.action && this.props.action.name === 'inferenceInsertion') {
+            //     console.log("HEREEEee");
+            //     if (!this.selected_premise) return;
+            //     if (this.selected_premise.attributes.attrs.level % 2 === 1) return;
+            //     console.log("HERE")
+            //     if (event.keyCode >= 65 && event.keyCode <= 90) {
+            //         let config = {
+            //             //use capital letters by default, can press shift to make lowercase
+            //             attrs:{
+            //                 text: {
+            //                     text:event.shiftKey ? event.key.toLocaleLowerCase() : event.key.toLocaleUpperCase()
+            //                 }
+            //             },
+            //             position: this.getRelativeMousePos()
+            //         }
+            //         this.sheet.addPremise(config);
+            //     }
+            //     this.props.handleClearAction();
+            // }
             return;
         }
         let key = E.key
@@ -296,9 +328,13 @@ export default class Paper extends React.Component {
     }
 
     render() {
+        const styles = {
+            width: this.props.wrapperWidth || '100%',
+            height: this.props.wrapperHeight || '100%'
+        }
         return(
             <div class="paper-root">
-                <div class="paper-wrapper">
+                <div class="paper-wrapper" style={styles}>
                     <div 
                         id={this.props.id}
                         class="joint-paper"
@@ -316,3 +352,48 @@ export default class Paper extends React.Component {
         );
     }
 }
+
+export function initializeContainerDrag(container_id){
+    const ele = document.getElementById(container_id);
+    ele.style.cursor = 'default';
+  
+      let pos = { top: 0, left: 0, x: 0, y: 0 };
+  
+      const mouseDownHandler = function(e) {
+          if (!E.keys[16]) return;
+          ele.style.cursor = 'grabbing';
+          ele.style.userSelect = 'none';
+  
+          pos = {
+              left: ele.scrollLeft,
+              top: ele.scrollTop,
+              // Get the current mouse position
+              x: e.clientX,
+              y: e.clientY,
+          };
+  
+          ele.addEventListener('mousemove', mouseMoveHandler);
+          ele.addEventListener('mouseup', mouseUpHandler);
+      };
+  
+      const mouseMoveHandler = function(e) {
+          // How far the mouse has been moved
+          const dx = e.clientX - pos.x;
+          const dy = e.clientY - pos.y;
+  
+          // Scroll the element
+          ele.scrollTop = pos.top - dy;
+          ele.scrollLeft = pos.left - dx;
+      };
+    
+      const mouseUpHandler = function() {
+          ele.style.cursor = 'default';
+          ele.style.removeProperty('user-select');
+  
+          ele.removeEventListener('mousemove', mouseMoveHandler);
+          ele.removeEventListener('mouseup', mouseUpHandler);
+      };
+  
+      // Attach the handler
+      ele.addEventListener('mousedown', mouseDownHandler);
+  }

@@ -7,8 +7,3 @@
     grid-template-columns: 15vw auto auto;
     overflow: hidden;
 }
-
-.paper-wrapper {
-    grid-area: paper;
-    overflow: hidden;
-}

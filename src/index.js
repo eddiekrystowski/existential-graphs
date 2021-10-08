@@ -21,11 +21,13 @@ window.mode = 'create';
 // const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 // const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
 
-ReactDOM.render(
+const APP = ReactDOM.render(
     <App/>,
     document.getElementById('root')
 );
 
+console.log(APP);
+console.log(APP.workspace);
 
 // let selected_premise = undefined;
 // let saved_template = undefined;

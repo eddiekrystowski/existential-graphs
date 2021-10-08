@@ -4,26 +4,11 @@ import E from '../EventController.js'
 
 
 
-export const inferenceInsertion = function(model) {
-    // if(window.mode != 'create') return;
-    // console.log(event.which);
-    // //a-z for creating premise
-    // if (event.keyCode >= 65 && event.keyCode <= 90) {
-    //     let config = {
-    //         //use capital letters by default, can press shift to make lowercase
-    //         attrs:{
-    //             text: {
-    //                 text:event.shiftKey ? key.toLocaleLowerCase() : key.toLocaleUpperCase()
-    //             }
-    //         },
-    //         position: {
-    //             x: mousePosition.x - paperContainer.getBoundingClientRect().left - 20,
-    //             y: mousePosition.y - paperContainer.getBoundingClientRect().top - 20
-    //         }
-    //     }
-    //     //eslint-disable-next-line
-    //     let new_rect = new Premise().create(config)
-    // }
+export const inferenceInsertion = function(sheet, model, mousePosition) {
+  console.log('ARGS', arguments);
+  if(model.__proto__.constructor.name == "Cut" && model.attributes.embeds?.length == 1) return;
+  const paper = sheet.paper;
+  paper.props.handleOpenModal(mousePosition);
 }
 
 export const inferenceErasure = function(sheet, model) {
