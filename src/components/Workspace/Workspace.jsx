@@ -6,6 +6,8 @@ import Modal from '../Modal/Modal.jsx';
 
 import './Workspace.css'
 
+const LOAD_MODAL = new Event('load-modal');
+
 export default class Workspace extends React.Component {
     constructor(props) {
         super(props);
@@ -46,9 +48,28 @@ export default class Workspace extends React.Component {
         this.setState({
             showModal: true
         })
+        window.dispatchEvent(LOAD_MODAL);
+    }
+
+    handleModalInsert = () => {
+        console.log('inserting...');
+        this.handleModalExit();
     }
 
     render() {
+
+        const buttons = [
+            {
+                name: 'insert',
+                text: 'Insert',
+                onClick: this.handleModalInsert
+            },
+            {
+                name: 'cancel',
+                text: 'X',
+                onClick: this.handleModalExit
+            },
+        ]
 
         return (
             <div class="workspace">
@@ -67,7 +88,7 @@ export default class Workspace extends React.Component {
                 >
 
                 </Paper>
-                <Modal show={this.state.showModal} onClose={this.handleModalExit}>
+                <Modal show={this.state.showModal} buttons={buttons}>
                     <Paper 
                         id={this.props.paper_id + '-modal-paper'} 
                         mode={'create'} 
@@ -76,6 +97,7 @@ export default class Workspace extends React.Component {
                         handleOpenModal={null}
                         wrapperWidth='100%'
                         wrapperHeight='72vh'
+                        isModalPaper={true}
                     >
                     </Paper>
                 </Modal>

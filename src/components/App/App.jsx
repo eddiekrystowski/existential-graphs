@@ -8,13 +8,14 @@ import Workspace from '../Workspace/Workspace.jsx';
 export default class App extends React.Component {
     constructor(props) {
         super(props);
+        this.workspace = React.createRef();
     }
 
     render() {
         return (
             <div id="app" className="app">
                 <MenuBar id="header"/>
-                <Workspace paper_id="main-paper"></Workspace>
+                <Workspace paper_id="main-paper" ref={this.workspace} ></Workspace>
             </div>
         );
     }

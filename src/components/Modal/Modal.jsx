@@ -17,7 +17,11 @@ export default class Modal extends React.Component {
             <div class='modal-bg'>
                 <div class='modal-body'>
                     <div class="modal-top-bar">
-                        <button class="modal-item modal-item-cancel" onClick={this.props.onClose}>X</button>
+                        { this.props.buttons.map(b => 
+                            <button class={`modal-item modal-item-${b.name}`} onClick={b.onClick}>{b.text}</button>
+                        )}
+                        {/* <button class="modal-item modal-item-cancel" onClick={this.props.onClose}>X</button>
+                        <button class="modal-item modal-item-cancel" onClick={this.props.onClose}>X</button> */}
                     </div>
                     <div class="modal-content">
                         { this.props.children }

@@ -52,7 +52,6 @@ export default class Paper extends React.Component {
         });
 
         this.paper_element = document.getElementById(this.props.id);
-        // this.paper_element.focus();
 
         this.setPaperEvents();
     }
@@ -60,6 +59,10 @@ export default class Paper extends React.Component {
     //assume that if there is no workspace associated then we are in create mode
     getMode() {
         return this.props.mode || 'create';
+    }
+
+    setupModalPaper() {
+        this.sheet.graph.clear();
     }
 
     setPaperEvents(){
@@ -113,8 +116,14 @@ export default class Paper extends React.Component {
             cell.inactive();
 
             if (this.props.action) this.props.action(this.sheet, cell);
-            this.props.handleClearAction();
+            if (this.props.handleClearAction) this.props.handleClearAction();
         });
+
+        if (this.props.isModalPaper) {
+            this.paper_element.addEventListener('load-modal', () => {
+               this.sheet.graph.clear(); 
+            });
+        }
     }
 
     onClick() {
