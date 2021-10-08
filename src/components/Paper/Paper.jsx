@@ -131,7 +131,7 @@ export default class Paper extends React.Component {
             this.sheet.handleCollisions(cell)
             cell.inactive();
 
-            if (this.props.action) this.props.action(this.sheet, cell);
+            if (this.props.action) this.props.action(this.sheet, cell, E.mousePosition);
             if (this.props.handleClearAction) this.props.handleClearAction();
         });
 
@@ -144,11 +144,11 @@ export default class Paper extends React.Component {
 
     onClick() {
         console.log('clicked', this);
-        if (this.getMode() === 'proof' && this.props.action && this.props.action.name === 'inferenceInsertion') {
-            const mousePosition = Object.assign({}, E.mousePosition);
-            this.props.action(this.sheet, mousePosition);
-            this.props.handleClearAction();
-        }
+        // if (this.getMode() === 'proof' && this.props.action && this.props.action.name === 'inferenceInsertion') {
+        //     const mousePosition = Object.assign({}, E.mousePosition);
+        //     this.props.action(this.sheet, mousePosition);
+        //     this.props.handleClearAction();
+        // }
     }
 
     onKeyDown() {

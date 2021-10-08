@@ -4,7 +4,9 @@ import E from '../EventController.js'
 
 
 
-export const inferenceInsertion = function(sheet, mousePosition) {
+export const inferenceInsertion = function(sheet, model, mousePosition) {
+  console.log('ARGS', arguments);
+  if(model.__proto__.constructor.name == "Cut" && model.attributes.embeds?.length == 1) return;
   const paper = sheet.paper;
   paper.props.handleOpenModal(mousePosition);
 }
