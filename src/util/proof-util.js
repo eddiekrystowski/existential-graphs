@@ -6,7 +6,7 @@ import E from '../EventController.js'
 
 export const inferenceInsertion = function(sheet, mousePosition) {
   const paper = sheet.paper;
-  paper.props.handleOpenModal();
+  paper.props.handleOpenModal(mousePosition);
 }
 
 export const inferenceErasure = function(sheet, model) {

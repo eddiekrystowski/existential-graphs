@@ -65,6 +65,12 @@ export default class Paper extends React.Component {
         this.sheet.graph.clear();
     }
 
+    copyFrom(modalPaper) {
+        const modal_cells = _.cloneDeep(modalPaper.sheet.graph.getCells());
+        const subgraph = modalPaper.sheet.graph.getSubgraph(modal_cells, {deep: true});
+        this.sheet.graph.addCells(subgraph);
+    }
+
     setPaperEvents(){
         // paper events
         //arrow functions are required to keep proper this context binding
@@ -119,11 +125,11 @@ export default class Paper extends React.Component {
             if (this.props.handleClearAction) this.props.handleClearAction();
         });
 
-        if (this.props.isModalPaper) {
-            this.paper_element.addEventListener('load-modal', () => {
-               this.sheet.graph.clear(); 
-            });
-        }
+        // if (this.props.isModalPaper) {
+        //     this.paper_element.addEventListener('load-modal', () => {
+        //        this.sheet.graph.clear(); 
+        //     });
+        // }
     }
 
     onClick() {

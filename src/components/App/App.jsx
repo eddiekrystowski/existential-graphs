@@ -11,6 +11,10 @@ export default class App extends React.Component {
         this.workspace = React.createRef();
     }
 
+    componentDidMount() {
+        console.log('WORKSPACE', this.workspace);
+    }
+
     render() {
         return (
             <div id="app" className="app">

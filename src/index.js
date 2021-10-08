@@ -29,7 +29,6 @@ const APP = ReactDOM.render(
 console.log(APP);
 console.log(APP.workspace);
 
-
 // let selected_premise = undefined;
 // let saved_template = undefined;
 
