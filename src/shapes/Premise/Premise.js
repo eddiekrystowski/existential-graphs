@@ -58,7 +58,6 @@ export class Premise extends joint.dia.Element {
 
     //custom constructor for shape, should more or less always use this over the default constructor
     create(config, sheet) {
-        console.log("GRAPH: ", sheet)
         const options = _.cloneDeep(PREMISE_DEFAULTS);
 
         if (config) {
@@ -124,9 +123,33 @@ export class Premise extends joint.dia.Element {
               }
     }
 
+    getArea() {
+      return this.attributes.attrs.rect.width * this.attributes.attrs.rect.height;
+    }
+        
+    // move(position, timestep = 1000, frames = 500) {
+    //   let difference = {
+    //     x: position.x - this.attributes.position.x,
+    //     y: position.y - this.attributes.position.y
+    //   }
+    //   let step = {
+    //     x: difference.x / frames,
+    //     y: difference.y / frames
+    //   }
+    //   for (let i = 0; i < frames; i++) {
+    //     this.position(this.attributes.position.x + step.x, this.attributes.position.y + step.y);
+    //     this.sleep(timestep);
+    //   }
+    //   console.log("move over!");
+    // }
+
+    // sleep(ms) {
+    //   return new Promise(resolve => setTimeout(resolve, ms));
+    // }
+    
+
     //TODO: see Cut.addTools()
     addTools(element) {
-      console.log(element)
       //element view is in charge of rendering the elements on the paper
       let elementView = element.findView(element.sheet.paper.jpaper);
       //clear any old tools

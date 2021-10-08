@@ -8,9 +8,6 @@ import Sheet from './Graph/Sheet.js';
 
 const PAPER_SIZE = { width: 4000, height: 4000 };
 
-// const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
-// const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
-
 export default class Paper extends React.Component {
     constructor(props) {
         super(props);
@@ -80,6 +77,7 @@ export default class Paper extends React.Component {
         this.jpaper.on('cell:pointerdown', (cellView, evt, x, y) => {
             
             let cell = cellView.model;
+            console.log("cell", cell)
 
             if (!cell.get('embeds') || cell.get('embeds').length === 0) {
                 // Show the dragged element above all the other cells (except when the
@@ -107,15 +105,10 @@ export default class Paper extends React.Component {
             if (this.props.action) this.props.action(this.sheet, cell);
             this.props.handleClearAction();
         });
-
-        //active when a cell is dragged around
-        this.jpaper.on("element:pointermove", (cellView, evt, x, y) => {
-            console.log("e");
-        })
     }
 
     onClick() {
-        console.log('clicked', this);
+        //console.log('clicked', this);
     }
 
     onKeyDown() {
@@ -127,15 +120,15 @@ export default class Paper extends React.Component {
     }
 
     onKeyUp(event) {
-        console.log('keyup', this);
+        //console.log('keyup', this);
         if(this.getMode() === 'proof'){
-            console.log('here?')
+            //console.log('here?')
             //TODO: REPLACE THIS WITH AN INTERFACE TO INSERT ANY SUBGRAPH, currently this only lets you insert a single premise
             if(this.props.action && this.props.action.name === 'inferenceInsertion') {
-                console.log("HEREEEee");
+                //console.log("HEREEEee");
                 if (!this.selected_premise) return;
                 if (this.selected_premise.attributes.attrs.level % 2 === 1) return;
-                console.log("HERE")
+                //console.log("HERE")
                 if (event.keyCode >= 65 && event.keyCode <= 90) {
                     let config = {
                         //use capital letters by default, can press shift to make lowercase
@@ -194,9 +187,9 @@ export default class Paper extends React.Component {
                 config["child"] = this.selected_premise;
                 this.sheet.addCut(config);
             } else {
-                console.log("creating empty cut")
+                //console.log("creating empty cut")
                 const new_cut = this.sheet.addCut(config);
-                console.log("cut", new_cut)
+                //console.log("cut", new_cut)
             }
         }
     
@@ -209,7 +202,7 @@ export default class Paper extends React.Component {
     
         if (event.keyCode === 50) {
             const mouse_adjusted = this.getRelativeMousePos();
-            console.log("position", mouse_adjusted)
+            //console.log("position", mouse_adjusted)
             if (this.saved_template) {
                 this.sheet.addSubgraph(this.saved_template, mouse_adjusted);
             }
@@ -218,7 +211,7 @@ export default class Paper extends React.Component {
     }
 
     onMouseDown(event) {
-        console.log('mousedown', this);
+        //console.log('mousedown', this);
         if (E.keys[16] && this.getMode() === 'create') {
             this.initial_cut_pos = Object.assign({}, E.mousePosition);
             this.initial_cut_pos.x -= this.paper_element.getBoundingClientRect().left;
@@ -231,14 +224,14 @@ export default class Paper extends React.Component {
             this.temp_cut = this.sheet.addCut(config);
             this.temp_cut.active();
             event.preventDefault();
-            console.log("CREATED TEMP CUT", this.temp_cut);
+            //console.log("CREATED TEMP CUT", this.temp_cut);
         }
     }
 
     onMouseUp() {
-        console.log('mouseup', this);
+        //console.log('mouseup', this);
         if (this.getMode() === 'proof') {
-            console.log('yuh');
+            //console.log('yuh');
             if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
                 const mouse_adjusted = this.getRelativeMousePos();
                 this.props.action(this.sheet, null, mouse_adjusted);
@@ -258,9 +251,10 @@ export default class Paper extends React.Component {
             }
             //eslint-disable-next-line
             //let new_rect = new Cut().create(config);
-            this.sheet.addCut(config);
+            //console.log('mouse released, deleting temp cut...');
             this.temp_cut.remove();
-            console.log('mouse released, deleting temp cut...');
+            //NOTE: Temp cut must be deleted first or there will be uwnanted conflicts with  collisions
+            this.sheet.addCut(config);
         }
     
         this.jpaper.setInteractivity(true);

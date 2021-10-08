@@ -3,7 +3,7 @@ import * as joint from 'jointjs';
 import { Cut } from '../../../shapes/Cut/Cut';
 import { Premise } from '../../../shapes/Premise/Premise';
 import { color } from '../../../util/color';
-import { findSmallestCell } from '../../../util/collisions';
+import { findSmallestCell, overlapsCells, separate } from '../../../util/collisions';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -25,9 +25,11 @@ export default class Sheet {
                 }
             }
         });
+        this.spacing = 10;
     }
 
     addPremise(config) {
+        console.log(config);
         const premise = (new Premise()).create(config, this);
         this.handleCollisions(premise);
         return premise;
@@ -77,10 +79,72 @@ export default class Sheet {
         }
         //recolor trees to reflect new level structure
         this.colorByLevel(cell);
-    
-        //check 
+        this.cleanOverlaps();
     }
 
+    pack() {
+
+    }
+
+    cleanOverlaps() {
+        let roots = this.getCellsByLevel(0);
+        // sort the roots from largest to smallest. this will cause a ripple effect,
+        // starting checks for overlaps at the largest cells and moving outward
+        roots.sort(function(a, b) {
+            return b.getArea() - a.getArea()
+        })
+
+        while (true) {
+            let total_overlaps = 0;
+            for (const root of roots) {
+                let overlaps = overlapsCells(root, roots);
+                if (overlaps.length === 0) {
+                    continue;
+                }
+                total_overlaps += overlaps.length;
+                for (const invader of overlaps) {
+                    this.separate(root, invader);
+                }
+            }
+            if (total_overlaps === 0) break;
+        }
+    }
+
+    separate(main, invader) {
+        console.log("SEPARATING +++++")
+        let mainbbox = main.getBoundingBox();
+        let invaderbbox = invader.getBoundingBox();
+
+        //find the amount of each directional axis that the two cells occupy together
+        //whichever is lower will be chosen to reduce the movement of the invader the smallest possible distance
+        console.log("mainbbox", mainbbox);
+        console.log("invaderbbox", invaderbbox);
+
+        let shared_x = (mainbbox.x < invaderbbox.x) ? mainbbox.x + mainbbox.width - invaderbbox.x : mainbbox.x - invaderbbox.x - invaderbbox.width; 
+        let shared_y = (mainbbox.y < invaderbbox.y) ? mainbbox.y + mainbbox.height - invaderbbox.y : mainbbox.y - invaderbbox.y - invaderbbox.height;
+
+        console.log("shared(x, y)", {shared_x, shared_y})
+
+        if (Math.abs(shared_x) >= Math.abs(shared_y)) {
+            //make adjustment vertically (shorter change)
+            //if shared value is positive, then main is somewhat above the invader
+            this.treeMove(invader, {x: invaderbbox.x, y:invaderbbox.y + shared_y + ((this.spacing) * Math.abs(shared_y) / shared_y)});
+        } else {
+            //make adjustment horizontally (shorter change)
+            //if shared value is positive, then main is somewhat to the left of the invader
+            this.treeMove(invader, {x: invaderbbox.x + shared_x + ((this.spacing) * Math.abs(shared_x) / shared_x), y: invaderbbox.y});
+        }
+    }
+
+    getCellsByLevel(level) {
+        //returns an array of all cells with the matching level
+        let cells = this.graph.getCells();
+        let result = []
+        for (const cell of cells) {
+            if (cell.attributes.attrs.level === level) result.push(cell);
+        }
+        return result;
+    }
 
     findElementsInside(bbox, cells=this.graph.getCells()) {
         //takes two bbox objects as input
@@ -162,7 +226,7 @@ export default class Sheet {
         let next = []
         while (current.length > 0) {
             for (const node of current) {
-                console.log(node);
+                //console.log(node);
                 node.toFront();
                 let children = node.getEmbeddedCells();
                 next.push(...children);
@@ -184,6 +248,7 @@ export default class Sheet {
     }
 
     subgraphToGraph(node, clone, subgraph, parent=null) {
+        clone.sheet = this;
         clone.addTo(this.graph);
         if (parent != null) {
             parent.embed(clone);
@@ -254,14 +319,13 @@ export default class Sheet {
     colorByLevel(node, color_config = DEFAULT_BACKGROUND_COLORS) {
         //find root of node's tree
         let root = this.findRoot(node);
+        root.attr("level", 0)
     
         if (root.attributes.type === "dia.Element.Premise") {
             root.attr('rect/fill', color_config.premise);
             return;
         }
         //otherwise its a cut root
-    
-        root.attr("level", 0);
         root.attr("rect/fill", color_config.odd)
         let level = 0;
         let children = root.getEmbeddedCells();
@@ -304,6 +368,7 @@ export default class Sheet {
             console.log(current);
             for (const node of current) {
                 next.push(...node.getEmbeddedCells());
+                //node.move({x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
                 node.position(node.attributes.position.x + offset.x, node.attributes.position.y + offset.y);
             }
         }
