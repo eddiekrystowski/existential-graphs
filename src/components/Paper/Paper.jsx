@@ -68,7 +68,17 @@ export default class Paper extends React.Component {
     copyFrom(modalPaper) {
         const modal_cells = _.cloneDeep(modalPaper.sheet.graph.getCells());
         const subgraph = modalPaper.sheet.graph.getSubgraph(modal_cells, {deep: true});
+        console.log('BEFORE', _.cloneDeep(subgraph));
         this.sheet.graph.addCells(subgraph);
+        for (let cell of subgraph) {
+            cell.graph = this.sheet.graph;
+        }
+        for (let cell of this.sheet.graph.getCells()) {
+            this.sheet.handleCollisions(cell);
+        }
+        console.log('AFTER', subgraph);
+        console.log('MAIN GRAPH', this.sheet.graph);
+        console.log('MODAL GRAPH', modalPaper.sheet.graph);
     }
 
     setPaperEvents(){
