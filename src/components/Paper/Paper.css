@@ -1,13 +1,18 @@
 
 .paper-wrapper {
     grid-area: paper;
-    overflow: hidden;
+    overflow: scroll;
 }
 
 .paper-root {
     overflow: hidden;
+    position: relative;
 }
 
 .joint-paper:focus {
     outline: none;
+}
+
+.joint-paper {
+    background-color: white;
 }
