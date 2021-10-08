@@ -3,7 +3,7 @@ import * as joint from 'jointjs';
 import { Cut } from '../../../shapes/Cut/Cut';
 import { Premise } from '../../../shapes/Premise/Premise';
 import { color } from '../../../util/color';
-import { findSmallestCell, overlapsCells, separate } from '../../../util/collisions';
+import { findSmallestCell, overlapsCells, contains, safeMove } from '../../../util/collisions';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -111,19 +111,16 @@ export default class Sheet {
     }
 
     separate(main, invader) {
-        console.log("SEPARATING +++++")
+        //assumes main and invader partially overlap
+
         let mainbbox = main.getBoundingBox();
         let invaderbbox = invader.getBoundingBox();
 
         //find the amount of each directional axis that the two cells occupy together
         //whichever is lower will be chosen to reduce the movement of the invader the smallest possible distance
-        console.log("mainbbox", mainbbox);
-        console.log("invaderbbox", invaderbbox);
 
         let shared_x = (mainbbox.x < invaderbbox.x) ? mainbbox.x + mainbbox.width - invaderbbox.x : mainbbox.x - invaderbbox.x - invaderbbox.width; 
         let shared_y = (mainbbox.y < invaderbbox.y) ? mainbbox.y + mainbbox.height - invaderbbox.y : mainbbox.y - invaderbbox.y - invaderbbox.height;
-
-        console.log("shared(x, y)", {shared_x, shared_y})
 
         if (Math.abs(shared_x) >= Math.abs(shared_y)) {
             //make adjustment vertically (shorter change)
@@ -158,7 +155,7 @@ export default class Sheet {
         let elements = []
         for (const cell of cells) {
             let otherbbox = cell.getBoundingBox();
-            if (this.contains(bbox, otherbbox)) {
+            if (contains(bbox, otherbbox)) {
                 elements.push(cell)
             }
         }
@@ -174,7 +171,7 @@ export default class Sheet {
         for (const cell of cells) {
             let otherbbox = cell.getBoundingBox();
             //find cells who contain target cell
-            if (this.contains(otherbbox, targetbbox)) {
+            if (contains(otherbbox, targetbbox)) {
                 //console.log("potential parent found")
                 potential_parents.push(cell)
             }
@@ -195,28 +192,6 @@ export default class Sheet {
         }
         let children = this.findElementsInside(new_child_bbox, potential_children)
         return children;
-    }
-
-    contains(bbox, otherbbox) {
-        // returns true of otherbbox fits completely inside of bbox
-        let bbox_info = {
-            left_x: bbox.x,
-            right_x: bbox.x + bbox.width,
-            top_y: bbox.y,
-            bottom_y: bbox.y + bbox.height
-        }
-        let otherbbox_info = {
-            left_x: otherbbox.x,
-            right_x: otherbbox.x + otherbbox.width,
-            top_y: otherbbox.y,
-            bottom_y: otherbbox.y + otherbbox.height
-        }
-        if (bbox_info.left_x < otherbbox_info.left_x && bbox_info.right_x > otherbbox_info.right_x && bbox_info.top_y < otherbbox_info.top_y && bbox_info.bottom_y > otherbbox_info.bottom_y) {
-            //console.log("bbox contains otherbbox", bbox, otherbbox);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     treeToFront(root) {
@@ -369,6 +344,7 @@ export default class Sheet {
             for (const node of current) {
                 next.push(...node.getEmbeddedCells());
                 //node.move({x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
+                //safeMove(node, {x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
                 node.position(node.attributes.position.x + offset.x, node.attributes.position.y + offset.y);
             }
         }
