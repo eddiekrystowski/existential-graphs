@@ -1,10 +1,7 @@
 import * as joint from 'jointjs'
 import _ from 'lodash'
-import { addPremiseTools } from '../../tools/PremiseTools.js'
 import './Premise.css'
-import { handleCollisions } from '../../util/collisions.js'
 import Pop from '../../sounds/pop.wav'
-import { color } from '../../util/color.js'
 // class for premises (letters)
 
 const PREMISE_DEFAULTS = {
@@ -116,6 +113,15 @@ export class Premise extends joint.dia.Element {
 
     inactive(){
       return;
+    }
+
+    getBoundingBox() {
+      return  {
+                width: this.attributes.attrs.rect.width,
+                height: this.attributes.attrs.rect.height,
+                x: this.attributes.position.x,
+                y: this.attributes.position.y
+              }
     }
 
     //TODO: see Cut.addTools()

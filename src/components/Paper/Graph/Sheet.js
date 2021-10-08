@@ -47,12 +47,7 @@ export default class Sheet {
         // makes any necessary changes to the internal representation of
         // the diagram (parent / child structure (embedding)) to reflect what the user
         // sees on the paper
-        let cellbbox = {
-            width: cell.attributes.attrs.rect.width,
-            height: cell.attributes.attrs.rect.height,
-            x: cell.attributes.position.x,
-            y: cell.attributes.position.y
-        }
+        let cellbbox = cell.getBoundingBox();
     
         let potential_parents = this.findPotentialParents(cellbbox);
         let parent = findSmallestCell(potential_parents);
@@ -98,12 +93,7 @@ export default class Sheet {
         // }
         let elements = []
         for (const cell of cells) {
-            let otherbbox = {
-                width: cell.attributes.attrs.rect.width,
-                height: cell.attributes.attrs.rect.height,
-                x: cell.attributes.position.x,
-                y: cell.attributes.position.y
-            }
+            let otherbbox = cell.getBoundingBox();
             if (this.contains(bbox, otherbbox)) {
                 elements.push(cell)
             }
@@ -118,12 +108,7 @@ export default class Sheet {
         let cells = this.graph.getCells()
         let potential_parents = []
         for (const cell of cells) {
-            let otherbbox = {
-                width: cell.attributes.attrs.rect.width,
-                height: cell.attributes.attrs.rect.height,
-                x: cell.attributes.position.x,
-                y: cell.attributes.position.y
-            }
+            let otherbbox = cell.getBoundingBox();
             //find cells who contain target cell
             if (this.contains(otherbbox, targetbbox)) {
                 //console.log("potential parent found")

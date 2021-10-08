@@ -3,7 +3,6 @@ import * as joint from 'jointjs'
 import _ from 'lodash';
 import $ from 'jquery';
 import Snip from '../../sounds/snip.wav'
-import { treeResize, findRoot, findLevel, colorByLevel } from '../../util/treeUtil.js';
 import { color } from '../../util/color.js';
 
 
@@ -152,6 +151,15 @@ export class Cut extends joint.dia.Element {
         //cut is not being interacted with (ie grabbing, dragging or moving etc)
         this.sheet.colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
     }
+
+    getBoundingBox() {
+        return  {
+                    width: this.attributes.attrs.rect.width,
+                    height: this.attributes.attrs.rect.height,
+                    x: this.attributes.position.x,
+                    y: this.attributes.position.y
+                }
+    }  
 
     //TODO: refactor function to not take in element. Instead, can we either store model/element in Cut class or access it directly?
     ///     ( i think we can? )

@@ -3,13 +3,7 @@ import * as joint from 'jointjs'
 import E from '../../EventController.js';
 import _ from 'lodash';
 
-import { findRoot } from '../../util/treeUtil';
-import { treeToFront } from '../../util/collisions';
-import { addSubgraph } from '../../util/otherUtil.js';
-
 import Delete from '../../sounds/delete.wav';
-import { Cut } from '../../shapes/Cut/Cut.js';
-import { Premise } from '../../shapes/Premise/Premise.js';
 import Sheet from './Graph/Sheet.js';
 
 const PAPER_SIZE = { width: 4000, height: 4000 };
@@ -113,6 +107,11 @@ export default class Paper extends React.Component {
             if (this.props.action) this.props.action(this.sheet, cell);
             this.props.handleClearAction();
         });
+
+        //active when a cell is dragged around
+        this.jpaper.on("element:pointermove", (cellView, evt, x, y) => {
+            console.log("e");
+        })
     }
 
     onClick() {
@@ -204,7 +203,7 @@ export default class Paper extends React.Component {
         if (event.keyCode === 49) {
             //save template
             if (this.selected_premise) {
-                this.saved_template = this.sheet.cloneSubgraph([this.selected_premise], {deep: true});
+                this.saved_template = this.sheet.graph.cloneSubgraph([this.selected_premise], {deep: true});
             }
         }
     
