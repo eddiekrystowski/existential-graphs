@@ -1,6 +1,5 @@
 import React from 'react';
 import MenuItem from './MenuItem.js';
-import MenuItems from './MenuItems.js';
 import './MenuBar.css';
 import $ from 'jquery';
 
