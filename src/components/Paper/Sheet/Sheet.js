@@ -4,6 +4,8 @@ import { Cut } from '../../../shapes/Cut/Cut';
 import { Premise } from '../../../shapes/Premise/Premise';
 import { color } from '../../../util/color';
 import { findSmallestCell, overlapsCells, contains, safeMove } from '../../../util/collisions';
+import Pop from '../../../sounds/pop.wav';
+import Snip from '../../../sounds/snip.wav';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -17,6 +19,7 @@ const DEFAULT_BACKGROUND_COLORS = {
 export default class Sheet {
     constructor(paper) {
         this.paper = paper;
+        this.handlePlayAudio = paper.props.handlePlayAudio
         this.graph = new joint.dia.Graph({}, {
             cellNamespace: {
                 nameSpace: { 
@@ -31,13 +34,21 @@ export default class Sheet {
     addPremise(config) {
         console.log(config);
         const premise = (new Premise()).create(config, this);
-        this.handleCollisions(premise);
+        this.handleCollisions(premise);        
+        
+        // Play pop sound
+        let pop = new Audio(Pop); 
+        this.handlePlayAudio(pop);
         return premise;
     }
 
     addCut(config) {
         const cut = (new Cut()).create(config, this);
         this.handleCollisions(cut);
+
+        // Play snip sound
+        let snip = new Audio(Snip); 
+        this.handlePlayAudio(snip);
         return cut;
     }
 

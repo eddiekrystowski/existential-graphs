@@ -119,10 +119,6 @@ export class Cut extends joint.dia.Element {
             }
         }
         console.log(cut);
-
-        // Play snip sound
-        let snip = new Audio(Snip); 
-        snip.play();
         return cut;
     }
 
