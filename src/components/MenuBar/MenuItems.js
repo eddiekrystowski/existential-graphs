@@ -2,37 +2,72 @@ import importIcon from './MenuIcons/import.png';
 import exportIcon from './MenuIcons/export.png';
 import logoIcon from './MenuIcons/logo.png';
 
-const MenuItems = [
-  {
-    text: '',
-    img: './MenuIcons/logo.png',
-    onClick: function(){
-      window.open('https://github.com/eddiekrystowski/existential-graphs')
-    },
-    margin_left: '0vw',
-  },
-  {
-    text: 'Existential Graphs',
-    img: '',
-    onClick: function(){
-      return;
-    },
-    margin_left: '1vw',
-  },
-  {
-    text: 'Import',
-    img: './MenuIcons/import.png',
-    onClick: importEG,
-    margin_left: '10vw',
-  },
-  {
-    text: 'Export',
-    img: './MenuIcons/export.png',
-    onClick: exportEG,
-    margin_left: '5vw',
-  },
-]
+import $ from 'jquery'
 
+const MenuItems = {
+  left: [
+    {
+      text: '',
+      img: './MenuIcons/logo.png',
+      onClick: function(){
+        window.open('https://github.com/eddiekrystowski/existential-graphs')
+      },
+      custom_style: {
+        marginLeft: '0vw'
+      }
+    },
+    {
+      text: 'Existential Graphs',
+      img: '',
+      onClick: function(){
+        return;
+      },
+      custom_style: {
+        marginLeft: '1vw'
+      }
+    },
+    {
+      text: 'Import',
+      img: './MenuIcons/import.png',
+      onClick: importEG,
+      custom_style: {
+        marginLeft: '10vw'
+      }
+    },
+    {
+      text: 'Export',
+      img: './MenuIcons/export.png',
+      onClick: exportEG,
+      custom_style: {
+        marginLeft: '5vw'
+      }
+    },
+  ],
+  right: [
+    {
+      text: 'Unmute',
+      label: 'Toggle Sound',
+      img: './MenuIcons/export.png',
+      onClick: toggleSound,
+      custom_style: {
+        marginLeft: '5vw'
+      }
+    },
+    {
+      text: 'Settings',
+      img: './MenuIcons/export.png',
+      onClick: () => {},
+      custom_style: {
+        marginLeft: '5vw'
+      }
+    }
+  ]
+}
+
+
+function getMenuItem(item_label) {
+  return $('.header-bar').find(`[aria-label="${item_label}"]`)
+}
 
   //Funtions for the above MenuItems
 //TODO: MAKE IMPORT/EXPORT WORK FOR NEW MULTI-GRAPH SYSTEM
@@ -84,6 +119,12 @@ function importEG(graph) {
         };
     };
     input.click();
+}
+
+
+function toggleSound() {
+  const mute_button = getMenuItem("Toggle Sound")
+  $(mute_button).toggleClass('mute-active');
 }
 
 export default MenuItems;

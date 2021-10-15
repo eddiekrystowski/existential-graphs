@@ -29,9 +29,10 @@ export default function MenuItem(props) {
   let text = props.img==='' ? "100%" : "70%";
   let img_vis = props.img==='' ? "hidden" : "visable";
 
-  return (
+  const style = props.custom_style;
 
-    <div style={{marginLeft: props.margin_left, cursor:'pointer'}} className="menu-item" onClick={props.onClick}>
+  return (
+    <div style={style} className="menu-item" onClick={props.onClick} aria-label={props.label}>
       {SVGS[props.img]}
       {/* <img style={{visibility:img_vis}} src={props.img} alt={props.text} width={size+""} height={size+""}/> */}
       <h4 style={{fontSize: text}}>{props.text}</h4>
