@@ -47,12 +47,13 @@ export default function MenuBar(props) {
         }
       },
     ],
-    
+
     //menu items that float right on the menu bar
     right: [
       {
         text: 'Unmute',
         label: 'Toggle Sound',
+        classString: 'mute-active',
         img: './MenuIcons/export.png',
         onClick: props.handleMuteToggle,
         custom_style: {
@@ -127,7 +128,8 @@ export default function MenuBar(props) {
       <div className="header-bar-left">
         {MenuItems.left.map(menu_item => <MenuItem 
                                     text={menu_item.text} 
-                                    img={menu_item.img} 
+                                    img={menu_item.img}
+                                    classString={menu_item.classString} 
                                     onClick={menu_item.onClick} 
                                     custom_style={menu_item.custom_style} 
                                     label={menu_item.label}
@@ -138,6 +140,7 @@ export default function MenuBar(props) {
         {MenuItems.right.map(menu_item => <MenuItem 
                                     text={menu_item.text} 
                                     img={menu_item.img} 
+                                    classString={menu_item.classString} 
                                     onClick={menu_item.onClick} 
                                     custom_style={menu_item.custom_style} 
                                     label={menu_item.label}

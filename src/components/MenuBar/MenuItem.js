@@ -34,10 +34,10 @@ export default function MenuItem(props) {
   const style = props.custom_style;
 
   return (
-    <div style={style} className="menu-item" onClick={props.onClick} aria-label={props.label}>
+    <div style={style} className={`menu-item ${props.classString || ''}`} onClick={props.onClick} aria-label={props.label}>
       {SVGS[props.img]}
       {/* <img style={{visibility:img_vis}} src={props.img} alt={props.text} width={size+""} height={size+""}/> */}
-      <h4 style={{fontSize: text}}>{props.text}</h4>
+      <h4 className="menu-item-label" style={{fontSize: text}}>{props.text}</h4>
     </div>
   )
 }

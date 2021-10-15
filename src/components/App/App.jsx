@@ -21,7 +21,7 @@ export default class App extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.muted) {
+        if (this.state.muted && this.sound) {
             this.sound.pause();
             this.sound.currentTime = 0;
         }
@@ -32,8 +32,16 @@ export default class App extends React.Component {
             muted: !this.state.muted
         });
 
-        const mute_button = getMenuItem("Toggle Sound")
-        $(mute_button).toggleClass('mute-active');
+        const mute_button = getMenuItem("Toggle Sound");
+        const mute_button_label = mute_button.find('.menu-item-label');
+        mute_button.toggleClass('mute-active');
+
+        if (mute_button.hasClass('mute-active')) {
+            mute_button_label.html('Unmute');
+        }
+        else {
+            mute_button_label.html('Mute');
+        }
         
     }
 
