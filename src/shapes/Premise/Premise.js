@@ -69,7 +69,7 @@ export class Premise extends joint.dia.Element {
         options.sheet = sheet;
 
         const premise = new Premise({
-          markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
+          markup: '<g class="rotatable"><rect/><text/></g>',
           position: {
               ...options.position
           },

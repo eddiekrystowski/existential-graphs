@@ -2,6 +2,7 @@ import React from 'react';
 import * as joint from 'jointjs'
 import E from '../../EventController.js';
 import _ from 'lodash';
+import $ from 'jquery'
 
 import Delete from '../../sounds/delete.wav';
 import Sheet from './Sheet/Sheet.js';
@@ -13,10 +14,10 @@ const PAPER_SIZE = { width: 4000, height: 4000 };
 export default class Paper extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {}
         this.sheet = new Sheet(this);
         this.jpaper = null;
         this.paper_element = null;
+        this.paperRoot = React.createRef();
     
         this.selected_premise = null;
         this.saved_template = null;
@@ -30,6 +31,10 @@ export default class Paper extends React.Component {
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
         this.onMouseEnter = this.onMouseEnter.bind(this);
+
+        this.state = {
+            show: true
+        }
     }
 
     componentDidMount() {
@@ -47,6 +52,20 @@ export default class Paper extends React.Component {
         this.setPaperEvents();
     }
 
+    show() {
+        // this.setState({
+        //     show: true
+        // });
+        $(this.paperRoot.current).css('display', 'block');
+    }
+
+    hide() {
+        // this.setState({
+        //     show: false
+        // })
+        $(this.paperRoot.current).css('display', 'none');
+    }
+
     //assume that if there is no workspace associated then we are in create mode
     getMode() {
         return this.props.mode || 'create';
@@ -56,20 +75,13 @@ export default class Paper extends React.Component {
         this.sheet.graph.clear();
     }
 
-    copyFrom(modalPaper) {
-        const modal_cells = _.cloneDeep(modalPaper.sheet.graph.getCells());
-        const subgraph = modalPaper.sheet.graph.getSubgraph(modal_cells, {deep: true});
-        console.log('BEFORE', _.cloneDeep(subgraph));
-        this.sheet.graph.addCells(subgraph);
-        for (let cell of subgraph) {
-            cell.graph = this.sheet.graph;
+    copyFrom(sourcePaper) {
+        const modal_cells = sourcePaper.sheet.graph.getCells();
+        for (let i = 0; i < modal_cells.length; i++) {
+            modal_cells[i] = modal_cells[i].clone();
+            modal_cells[i].graph = this.sheet.graph;
         }
-        for (let cell of this.sheet.graph.getCells()) {
-            this.sheet.handleCollisions(cell);
-        }
-        console.log('AFTER', subgraph);
-        console.log('MAIN GRAPH', this.sheet.graph);
-        console.log('MODAL GRAPH', modalPaper.sheet.graph);
+        this.sheet.graph.addCells(modal_cells);
     }
 
     setPaperEvents(){
@@ -97,6 +109,7 @@ export default class Paper extends React.Component {
         // First, unembed the cell that has just been grabbed by the user.
         this.jpaper.on('cell:pointerdown', (cellView, evt, x, y) => {
             
+            console.log(cellView)
             let cell = cellView.model;
             console.log("cell", cell)
 
@@ -126,12 +139,6 @@ export default class Paper extends React.Component {
             if (this.props.action) this.props.action(this.sheet, cell, E.mousePosition);
             if (this.props.handleClearAction) this.props.handleClearAction();
         });
-
-        // if (this.props.isModalPaper) {
-        //     this.paper_element.addEventListener('load-modal', () => {
-        //        this.sheet.graph.clear(); 
-        //     });
-        // }
     }
 
     onClick() {
@@ -321,12 +328,13 @@ export default class Paper extends React.Component {
     }
 
     render() {
+        if (!this.state.show) return null;
         const styles = {
             width: this.props.wrapperWidth || '100%',
             height: this.props.wrapperHeight || '100%'
         }
         return(
-            <div class="paper-root">
+            <div class="paper-root" ref={this.paperRoot}>
                 <div class="paper-wrapper" style={styles}>
                     <div 
                         id={this.props.id}

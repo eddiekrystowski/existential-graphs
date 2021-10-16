@@ -272,6 +272,7 @@ export default class Sheet {
     
     findRoot(node) {
         while (true) {
+            console.log('FIND ROOT NODE', node)
             if (node.get("parent")) {
                 node = node.getParentCell();
             } else {
@@ -344,8 +345,8 @@ export default class Sheet {
             for (const node of current) {
                 next.push(...node.getEmbeddedCells());
                 //node.move({x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
-                //safeMove(node, {x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
-                node.position(node.attributes.position.x + offset.x, node.attributes.position.y + offset.y);
+                safeMove(node, {x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
+                //node.position(node.attributes.position.x + offset.x, node.attributes.position.y + offset.y);
             }
         }
     

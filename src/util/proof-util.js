@@ -45,8 +45,11 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
     }
     const multipliers = [0.5, 0.25];
     for(let i = 0; i < multipliers.length; i++) { 
-        const cut = sheet.addCut({
-            position: position,
+        sheet.addCut({
+            position:  {
+              x: model.get('position').x - (size.width * multipliers[i]/2),
+              y: model.get('position').y - (size.height * multipliers[i]/2)
+            },
             attrs: {
                 rect: {
                     width: size.width * (1 + multipliers[i]),
@@ -54,11 +57,6 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
                 }
             }
         });
-        cut.set('position', {
-            x: cut.get('position').x - (size.width * multipliers[i]/2),
-            y: cut.get('position').y - (size.height * multipliers[i]/2)
-        });
-        cut.sheet.handleCollisions(cut);
     }  
 }
 
