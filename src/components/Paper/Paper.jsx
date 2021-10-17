@@ -53,16 +53,10 @@ export default class Paper extends React.Component {
     }
 
     show() {
-        // this.setState({
-        //     show: true
-        // });
         $(this.paperRoot.current).css('display', 'block');
     }
 
     hide() {
-        // this.setState({
-        //     show: false
-        // })
         $(this.paperRoot.current).css('display', 'none');
     }
 
@@ -143,11 +137,6 @@ export default class Paper extends React.Component {
 
     onClick() {
         console.log('clicked', this);
-        // if (this.getMode() === 'proof' && this.props.action && this.props.action.name === 'inferenceInsertion') {
-        //     const mousePosition = Object.assign({}, E.mousePosition);
-        //     this.props.action(this.sheet, mousePosition);
-        //     this.props.handleClearAction();
-        // }
     }
 
     onKeyDown() {
@@ -159,29 +148,7 @@ export default class Paper extends React.Component {
     }
 
     onKeyUp(event) {
-        //console.log('keyup', this);
         if(this.getMode() === 'proof'){
-            //console.log('here?')
-            //TODO: REPLACE THIS WITH AN INTERFACE TO INSERT ANY SUBGRAPH, currently this only lets you insert a single premise
-            // if(this.props.action && this.props.action.name === 'inferenceInsertion') {
-            //     console.log("HEREEEee");
-            //     if (!this.selected_premise) return;
-            //     if (this.selected_premise.attributes.attrs.level % 2 === 1) return;
-            //     console.log("HERE")
-            //     if (event.keyCode >= 65 && event.keyCode <= 90) {
-            //         let config = {
-            //             //use capital letters by default, can press shift to make lowercase
-            //             attrs:{
-            //                 text: {
-            //                     text:event.shiftKey ? event.key.toLocaleLowerCase() : event.key.toLocaleUpperCase()
-            //                 }
-            //             },
-            //             position: this.getRelativeMousePos()
-            //         }
-            //         this.sheet.addPremise(config);
-            //     }
-            //     this.props.handleClearAction();
-            // }
             return;
         }
         let key = E.key

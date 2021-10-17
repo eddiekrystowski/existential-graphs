@@ -79,7 +79,6 @@ export default class Workspace extends React.Component {
 
     handleModalInsert = (position) => {
         console.log('inserting...');
-        //console.log(_.cloneDeep(this.modalPaper));
         this.mainPaper.current.copyFrom(this.modalPaper.current);
         this.handleModalExit();
     }
