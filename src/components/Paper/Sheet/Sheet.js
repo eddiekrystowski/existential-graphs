@@ -41,6 +41,31 @@ export default class Sheet {
         return cut;
     }
 
+    exportAsJSON() {
+        console.log('exporting...');
+        const cells = this.graph.getCells();
+        const exported = cells.map(cell => Object.assign(cell.attributes, { sheet: null }));
+        console.log(exported);
+        const json = JSON.stringify(exported, null, 2);
+        console.log(json);
+        return json;
+    }
+
+    importFromJSON(json) {
+        const parsed = JSON.parse(json);
+        for (let cell of parsed) {
+            if (cell.type === 'dia.Element.Premise') {
+                this.addPremise(cell, true);
+            }
+            else if (cell.type === 'dia.Element.Cut') {
+                this.addCut(cell, true);
+            }
+            else {
+                throw new RangeError(`Cell type must be either dia.Element.Premise or dia.Element.Cut, got ${cell.type}`);
+            }
+        }
+    }
+
     //TODO: some of these functions kind of fit here and also kind of don't. I'm moving them here for now
     // because in the future it would be beneficial to at least have a "entire graph update" be possible, which would be very simple to 
     // do if they are all bundled up.
@@ -272,6 +297,7 @@ export default class Sheet {
     
     findRoot(node) {
         while (true) {
+            console.log('FIND ROOT NODE', node)
             if (node.get("parent")) {
                 node = node.getParentCell();
             } else {
@@ -348,6 +374,7 @@ export default class Sheet {
                 node.position(node.attributes.position.x + offset.x, node.attributes.position.y + offset.y);
             }
         }
-    
     }
+
+
 }

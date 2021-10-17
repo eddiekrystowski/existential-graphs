@@ -6,26 +6,26 @@ import E from '../EventController.js'
 
 export const inferenceInsertion = function(sheet, model, mousePosition) {
   console.log('ARGS', arguments);
-  if(model.__proto__.constructor.name == "Cut" && model.attributes.embeds?.length == 1) return;
+  if(model.__proto__.constructor.name == "Cut" && (model.attributes.level) % 2 === 0) return;
+  console.log('opening modal...')
   const paper = sheet.paper;
   paper.props.handleOpenModal(mousePosition);
 }
 
 export const inferenceErasure = function(sheet, model) {
   console.log(model.attributes.attrs.level)
-  if(model.attributes.attrs.level%2 === 0) {
-    const children = model.attributes.attrs.embeds;
+  if(model.attributes.attrs.level % 2 === 0) {
+    const children = model.getEmbeddedCells({deep: true});
+    const parent = sheet.graph.getCell(model.attributes.parent);
+
     model.destroy();
-    if(model.attributes.parent) {
-      sheet.handleCollisions(sheet.graph.getCell(model.attributes.parent));
+    for (let i = 0; i < children.length; i++){
+      children[i].destroy();
     }
-    else {
-      children?.forEach(element => {
-          if(sheet.graph.getCell(element).__proto__.constructor.name === "Cut") {
-            sheet.handleCollisions(sheet.graph.getCell(element))
-          }
-      });
-    }  
+
+    if(parent) {
+      sheet.handleCollisions(parent);
+    }
   }
 }
 
@@ -34,7 +34,7 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
     let size = {}
     if (!model && mousePosition) {
         position = mousePosition;
-        size = { width: 40, height: 40 }
+        size = { width: 80, height: 80 }
     }
     else if (model){
         position = model.get('position');
@@ -43,10 +43,13 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
     else {
         throw new Error('Bad arguments');
     }
-    const multipliers = [0.5, 0.25];
+    const multipliers = [0.8, 0.25];
     for(let i = 0; i < multipliers.length; i++) { 
-        const cut = sheet.addCut({
-            position: position,
+        sheet.addCut({
+            position:  {
+              x: position.x - (size.width * multipliers[i]/2),
+              y: position.y - (size.height * multipliers[i]/2)
+            },
             attrs: {
                 rect: {
                     width: size.width * (1 + multipliers[i]),
@@ -54,11 +57,6 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
                 }
             }
         });
-        cut.set('position', {
-            x: cut.get('position').x - (size.width * multipliers[i]/2),
-            y: cut.get('position').y - (size.height * multipliers[i]/2)
-        });
-        cut.sheet.handleCollisions(cut);
     }  
 }
 
