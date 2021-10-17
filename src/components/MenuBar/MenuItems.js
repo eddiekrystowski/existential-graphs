@@ -1,6 +1,9 @@
-import { graph } from '../../index.js';
-
+import $ from 'jquery'
+import ReactDOM from 'react-dom'
+import {application} from '../../index.js'
 const fs = require('../../util/file-system')
+
+
 
 const MenuItems = [
   {
@@ -38,19 +41,20 @@ const MenuItems = [
 //    - have importEG return a new graph?
 //      ex. Paper.graph = importEG();
 function exportEG() {
-  fs.saveGraphAsJSON(graph)
+  //console.log(page.App)
+  //fs.saveGraphAsJSON(page.App.Workspgraph)
+  console.log(application);
 }
 
 // FIXME: graph arg is here just so linter is happy, see above TODO about fixing this
 // for multi graph system
 // We also have to consider... should this function make a paper? or just set graph of of existing paper...
 // return Graph class (components/Paper/Graph/Graph.js)
-
 //Funtions for the above MenuItems. Created to avoid error of not initialized graph.
 
 
 function importEG() {
-  fs.loadGraphFromJSON(graph)
+  //fs.loadGraphFromJSON(graph)
 }
 
 export default MenuItems;
