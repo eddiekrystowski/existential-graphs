@@ -79,7 +79,7 @@ export default class Workspace extends React.Component {
 
     handleModalInsert = (position) => {
         console.log('inserting...');
-        this.mainPaper.current.copyFrom(this.modalPaper.current);
+        this.proofPaper.current.sheet.importFromJSON(this.modalPaper.current.sheet.exportAsJSON());
         this.handleModalExit();
     }
 

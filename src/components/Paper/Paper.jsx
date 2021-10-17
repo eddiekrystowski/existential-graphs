@@ -132,6 +132,7 @@ export default class Paper extends React.Component {
 
             if (this.props.action) this.props.action(this.sheet, cell, E.mousePosition);
             if (this.props.handleClearAction) this.props.handleClearAction();
+            this.selected_premise = null;
         });
     }
 
@@ -237,7 +238,6 @@ export default class Paper extends React.Component {
     onMouseUp() {
         //console.log('mouseup', this);
         if (this.getMode() === 'proof') {
-            //console.log('yuh');
             if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
                 const mouse_adjusted = this.getRelativeMousePos();
                 this.props.action(this.sheet, null, mouse_adjusted);
