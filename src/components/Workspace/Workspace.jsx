@@ -25,7 +25,7 @@ export default class Workspace extends React.Component {
     }
 
     componentDidMount() {
-        //this.proofPaper.current.hide();
+        this.proofPaper.current.hide();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -34,20 +34,16 @@ export default class Workspace extends React.Component {
          if (prevState.mode !== this.state.mode) {
             //switch to proof mode
             if (this.state.mode === 'proof') {
-                // this.mainPaper.current.hide();
+                this.mainPaper.current.hide();
                 this.proofPaper.current.sheet.graph.clear();
-                this.proofPaper.current.copyFrom(this.mainPaper.current);
-                // this.proofPaper.current.show();
+                this.proofPaper.current.sheet.importFromJSON(this.mainPaper.current.sheet.exportAsJSON());
+                this.proofPaper.current.show();
             }
             //switch to create mode
             else {
-                // this.mainPaper.current.show();
-                // this.proofPaper.current.hide();
+                this.mainPaper.current.show();
+                this.proofPaper.current.hide();
             }
-
-            console.log('GRAPH CELLS', this.mainPaper.current.sheet.graph.getCells())
-            console.log('GRAPH GRAPH', _.cloneDeep(this.mainPaper.current.sheet.graph))
-
         }
     }
 
