@@ -22,6 +22,7 @@ export default class Workspace extends React.Component {
         this.modalPaper = React.createRef();
         this.mainPaper = React.createRef();
         this.proofPaper= React.createRef();
+        this.history = [];
     }
 
     componentDidMount() {

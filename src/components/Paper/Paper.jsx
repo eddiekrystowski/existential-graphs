@@ -6,6 +6,7 @@ import $ from 'jquery'
 
 import Delete from '../../sounds/delete.wav';
 import Sheet from './Sheet/Sheet.js';
+import History from './History/History.js'
 
 import './Paper.css';   
 
@@ -35,6 +36,8 @@ export default class Paper extends React.Component {
         this.state = {
             show: true
         }
+
+        this.history = [];
     }
 
     componentDidMount() {
@@ -50,6 +53,11 @@ export default class Paper extends React.Component {
         this.paper_element = document.getElementById(this.props.id);
 
         this.setPaperEvents();
+    }
+
+    onGraphUpdate() {
+        const new_graph = this.sheet.exportAsJSON();
+        this.history.push(new_graph);
     }
 
     show() {
@@ -134,6 +142,10 @@ export default class Paper extends React.Component {
             if (this.props.handleClearAction) this.props.handleClearAction();
             this.selected_premise = null;
         });
+
+        this.sheet.graph.on('change', () => {
+            this.onGraphUpdate();
+        })
     }
 
     onClick() {

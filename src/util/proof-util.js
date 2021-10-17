@@ -26,13 +26,6 @@ export const inferenceErasure = function(sheet, model) {
     if(parent) {
       sheet.handleCollisions(parent);
     }
-    // else {
-    //   children?.forEach(element => {
-    //       if(sheet.graph.getCell(element).__proto__.constructor.name === "Cut") {
-    //         sheet.handleCollisions(sheet.graph.getCell(element))
-    //       }
-    //   });
-    // }  
   }
 }
 
