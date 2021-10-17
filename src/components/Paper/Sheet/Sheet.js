@@ -4,6 +4,7 @@ import { Cut } from '../../../shapes/Cut/Cut';
 import { Premise } from '../../../shapes/Premise/Premise';
 import { color } from '../../../util/color';
 import { findSmallestCell, overlapsCells, contains, safeMove } from '../../../util/collisions';
+import $ from 'jquery'
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -54,15 +55,21 @@ export default class Sheet {
     importFromJSON(json) {
         const parsed = JSON.parse(json);
         for (let cell of parsed) {
+            let new_element;
             if (cell.type === 'dia.Element.Premise') {
-                this.addPremise(cell, true);
+                new_element = this.addPremise(cell, true);
             }
             else if (cell.type === 'dia.Element.Cut') {
-                this.addCut(cell, true);
+                new_element = this.addCut(cell, true);
             }
             else {
                 throw new RangeError(`Cell type must be either dia.Element.Premise or dia.Element.Cut, got ${cell.type}`);
             }
+
+            //fix for small outline box first time mousing over after importing
+            const dom_element = $(`svg [model-id="${new_element.attributes.id}"]`);
+            dom_element.trigger('mouseenter');
+            dom_element.trigger('mouseleave');
         }
     }
 
