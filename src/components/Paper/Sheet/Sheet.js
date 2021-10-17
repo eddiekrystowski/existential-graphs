@@ -43,12 +43,9 @@ export default class Sheet {
     }
 
     exportAsJSON() {
-        console.log('exporting...');
         const cells = this.graph.getCells();
         const exported = cells.map(cell => Object.assign(cell.attributes, { sheet: null }));
-        console.log(exported);
         const json = JSON.stringify(exported, null, 2);
-        console.log(json);
         return json;
     }
 
@@ -304,7 +301,6 @@ export default class Sheet {
     
     findRoot(node) {
         while (true) {
-            console.log('FIND ROOT NODE', node)
             if (node.get("parent")) {
                 node = node.getParentCell();
             } else {
@@ -367,13 +363,11 @@ export default class Sheet {
             x: position.x - root.attributes.position.x,
             y: position.y - root.attributes.position.y
         }
-        console.log(offset);
         let current = [];
         let next = [root];
         while (next.length > 0) {
             current = next;
             next = [];
-            console.log(current);
             for (const node of current) {
                 next.push(...node.getEmbeddedCells());
                 //node.move({x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})

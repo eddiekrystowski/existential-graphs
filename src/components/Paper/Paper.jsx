@@ -24,20 +24,14 @@ export default class Paper extends React.Component {
         this.saved_template = null;
         this.temp_cut = null;
         this.initial_cut_pos = {x: 0, y: 0};
-
-        this.onClick = this.onClick.bind(this);
-        this.onKeyDown = this.onKeyDown.bind(this);
-        this.onKeyUp = this.onKeyUp.bind(this);
-        this.onMouseMove = this.onMouseMove.bind(this);
-        this.onMouseDown = this.onMouseDown.bind(this);
-        this.onMouseUp = this.onMouseUp.bind(this);
-        this.onMouseEnter = this.onMouseEnter.bind(this);
+        this.canInsertPremise = true;
+        this.previousPremiseCode = 0;
 
         this.state = {
             show: true
         }
 
-        this.history = [];
+        this.history = new History();
     }
 
     componentDidMount() {
@@ -51,8 +45,9 @@ export default class Paper extends React.Component {
         });
 
         this.paper_element = document.getElementById(this.props.id);
-
+        
         this.setPaperEvents();
+        this.onGraphUpdate();
     }
 
     onGraphUpdate() {
@@ -143,28 +138,54 @@ export default class Paper extends React.Component {
             this.selected_premise = null;
         });
 
-        this.sheet.graph.on('change', () => {
+        this.sheet.graph.on('add', () => {
             this.onGraphUpdate();
-        })
+        });
+
+        this.sheet.graph.on('delete', () => {
+            this.onGraphUpdate();
+        });
+
+        $(this.paperRoot.current).on('keydown', (event) => {
+            if (event.keyCode === 90 && event.ctrlKey && !event.shiftKey) {
+                console.log('undoing...')
+                console.log(this.history);
+                const new_state = this.history.undo();
+                this.sheet.graph.clear();
+                this.history.lock();
+                this.sheet.importFromJSON(new_state);
+                this.history.unlock();
+            }
+            if (event.keyCode === 90 && event.ctrlKey && event.shiftKey) {
+                const new_state = this.history.redo();
+                console.log('redoing...')
+                this.sheet.graph.clear();
+                this.history.lock();
+                this.sheet.importFromJSON(new_state);
+                this.history.unlock();
+            }
+        });
     }
 
-    onClick() {
+    onClick = () => {
         console.log('clicked', this);
     }
 
-    onKeyDown() {
+    onKeyUp = (event) => {
+        if(event.keyCode === this.previousPremiseCode) this.canInsertPremise = true;
+    }
+
+    onKeyDown = (event) => {
+        if(this.getMode() === 'proof'){
+            return;
+        }
+
         if(this.getMode() === 'create'){
             if (E.keys[16]) {
                 this.jpaper.setInteractivity(false);
             }
         }
-    }
 
-    onKeyUp(event) {
-        if(this.getMode() === 'proof'){
-            return;
-        }
-        let key = E.key
         //backspace (delete premise or cut)
         if (E.isActive('backspace') ) {
             if (this.selected_premise) {
@@ -181,13 +202,16 @@ export default class Paper extends React.Component {
             }
             this.selected_premise = null;
         }
+
         //a-z for creating premise
-        if (event.keyCode >= 65 && event.keyCode <= 90) {
+        const key = event.key.toLocaleUpperCase();
+        const code = key.charCodeAt(0);
+        if (this.canInsertPremise && key.length === 1 && !(event.ctrlKey) && code >= 65 && code <= 90) {
             let config = {
                 //use capital letters by default, can press shift to make lowercase
                 attrs:{
                     text: {
-                        text:event.shiftKey ? key.toLocaleLowerCase() : key.toLocaleUpperCase()
+                        text: key
                     }
                 },
                 position: this.getRelativeMousePos()
@@ -195,6 +219,8 @@ export default class Paper extends React.Component {
             //eslint-disable-next-line
             //let new_rect = new Premise().create(config)
             this.sheet.addPremise(config);
+            this.canInsertPremise = false;
+            this.previousPremiseCode = code;
         }
         //ENTER
         // new cut
@@ -226,10 +252,9 @@ export default class Paper extends React.Component {
                 this.sheet.addSubgraph(this.saved_template, mouse_adjusted);
             }
         }
-        event.preventDefault()
     }
 
-    onMouseDown(event) {
+    onMouseDown = (event) => {
         //console.log('mousedown', this);
         if (E.keys[16] && this.getMode() === 'create') {
             this.initial_cut_pos = Object.assign({}, E.mousePosition);
@@ -240,6 +265,7 @@ export default class Paper extends React.Component {
                 size: {width: 0, height: 0}
             }
             //this.temp_cut = new Cut().create(config);
+            this.history.lock();
             this.temp_cut = this.sheet.addCut(config);
             this.temp_cut.active();
             event.preventDefault();
@@ -247,14 +273,16 @@ export default class Paper extends React.Component {
         }
     }
 
-    onMouseUp() {
+    onMouseUp = () => {
         //console.log('mouseup', this);
         if (this.getMode() === 'proof') {
+            this.history.startBatch();
             if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
                 const mouse_adjusted = this.getRelativeMousePos();
                 this.props.action(this.sheet, null, mouse_adjusted);
                 this.props.handleClearAction();
             }
+            this.history.endBatch();
         }
         if (this.temp_cut && this.getMode() === 'create') {
             const position = _.clone(this.temp_cut.get('position'));
@@ -271,6 +299,7 @@ export default class Paper extends React.Component {
             //let new_rect = new Cut().create(config);
             //console.log('mouse released, deleting temp cut...');
             this.temp_cut.remove();
+            this.history.unlock();
             //NOTE: Temp cut must be deleted first or there will be uwnanted conflicts with  collisions
             this.sheet.addCut(config);
         }
@@ -279,7 +308,7 @@ export default class Paper extends React.Component {
         this.temp_cut = null;
     }
 
-    onMouseMove() {
+    onMouseMove = () => {
         //console.log('mousemove', this);
         if(this.getMode() === 'create'){
             //console.log(E.isMouseDown);
@@ -295,7 +324,7 @@ export default class Paper extends React.Component {
         }
     }
 
-    onMouseEnter() {
+    onMouseEnter = () => {
         this.paper_element.focus();
     }
 
@@ -319,7 +348,7 @@ export default class Paper extends React.Component {
                         id={this.props.id}
                         class="joint-paper"
                         onClick={this.onClick}
-                        onKeyDown={this.onKeyDown}
+                        onKeyDown={(event) => this.onKeyDown(event)}
                         onKeyUp={(event) => this.onKeyUp(event)}
                         onMouseDown={(event) => this.onMouseDown(event)}
                         onMouseUp={this.onMouseUp}
