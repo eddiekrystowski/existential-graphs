@@ -68,6 +68,18 @@ export class Cut extends joint.dia.Element {
             options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
         options.sheet = sheet;
+
+        // adjust size / position if cut was created with a child
+        // in order for undo/redo to function properly
+        if (config.child) {
+            const child = config.child;
+            options.attrs.rect.width = child.attributes.attrs.rect.width + options.attrs.rect.width;
+            options.attrs.rect.height = child.attributes.attrs.rect.height + options.attrs.rect.height;
+            options.position = {
+                x: child.attributes.position.x - (options.attrs.rect.width - child.attributes.attrs.rect.width) / 2,
+                y: child.attributes.position.y - (options.attrs.rect.height - child.attributes.attrs.rect.height) / 2,
+            }
+        }
        
         const cut = new Cut({
             markup: '<rect/><text/>',
@@ -109,12 +121,6 @@ export class Cut extends joint.dia.Element {
                 hasparent = true;
             }
             cut.embed(child)
-            cut.attr("rect/width", child.attributes.attrs.rect.width + cut.attributes.attrs.rect.width)
-            cut.attr("rect/height", child.attributes.attrs.rect.height + cut.attributes.attrs.rect.height)
-            cut.set("position", {
-                x: child.attributes.position.x - (cut.attributes.attrs.rect.width - child.attributes.attrs.rect.width) / 2,
-                y: child.attributes.position.y - (cut.attributes.attrs.rect.height - child.attributes.attrs.rect.height) / 2,
-            })
             if (hasparent) {
                 cut.sheet.treeResize(cut, cut.attributes.attrs.rect.width / 2);
             }

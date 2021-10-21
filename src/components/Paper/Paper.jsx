@@ -91,7 +91,7 @@ export default class Paper extends React.Component {
             model.attr("rect/stroke", "red")
             model.attr("text/fill", "red")
             this.selected_premise = model
-        })
+        });
 
         this.jpaper.on("element:mouseleave", ( cellView, evt) =>{
             let model = cellView.model
@@ -133,6 +133,8 @@ export default class Paper extends React.Component {
             this.sheet.handleCollisions(cell)
             cell.inactive();
 
+            if(!this.props.action) this.onGraphUpdate();
+
             if (this.props.action) this.props.action(this.sheet, cell, E.mousePosition);
             if (this.props.handleClearAction) this.props.handleClearAction();
             this.selected_premise = null;
@@ -146,6 +148,7 @@ export default class Paper extends React.Component {
             this.onGraphUpdate();
         });
 
+        //PAPER UNDO AND REDO EVENTS
         $(this.paperRoot.current).on('keydown', (event) => {
             if (event.keyCode === 90 && event.ctrlKey && !event.shiftKey) {
                 console.log('undoing...')
