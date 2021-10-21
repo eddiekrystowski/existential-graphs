@@ -143,3 +143,54 @@ export const deiteration = function(sheet, model) {
   } 
 
 }
+
+/**
+ * Returns if two subgraphs match.
+ * @param {Cell} model_one - The first model.
+ * @param {Cell} model_two - The second model.
+ * @returns {Boolean} - If the two subgraphs match
+ */
+function matchingModel(model_one, model_two) {
+  //  If comparing premise to a cut, return false
+  if(model_one.__proto__.constructor.name !== model_two.__proto__.constructor.name) return false;
+
+  //  If comparing a premise to a premise, return based on text
+  if (model_one.__proto__.constructor.name === "Premise") {
+    return model_one.attributes.attrs.text.text === model_two.attributes.attrs.text.text;
+  }
+
+  //  If comparing a cut, return based on a match to all children
+  if(model_one.__proto__.constructor.name === "Cut") {
+    // Get the children of each cut
+    let model_one_children = model_one.attributes.embeds;
+    let model_two_children = model_one.attributes.embeds;
+
+    //  If dissimilar sizes, return false
+    if(model_one_children.length !== model_two_children) return false;
+
+    //  Match children until children array are of size zero, or all options are exaughsted
+    //  Runtime : O(n^2) where n = number of children per model.
+    //  To attempt optimization, search for "Graph Isomorphism Problem"
+    outer:
+    while(model_one_children.length > 0) {
+      let child = model_one_children[0];
+
+      //  Iterate through all children of model_two and compare to child
+      for (let i = 0; i < model_two_children.length; i++) {
+        if(matchingModel(child, model_one_children[i])) {
+          //  Remove the elements from the arrays
+          model_one_children.shift() // Removes the first index
+          model_two_children.splice(i, 1) //  Removes index i
+          continue outer;
+         }
+      }
+      //  If you get here, it didn't match :(
+      return false;
+    }
+    //  If you get here, it matched! Congrats! :)
+    return true;
+  }
+  //  If comparing something other than a premise or cut, contact an administatior
+  console.error("Can not compare models of type " + model_one.__proto__.constructor.name + ". Contact administrator");
+  return false;
+}
