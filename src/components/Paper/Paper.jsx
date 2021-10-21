@@ -171,10 +171,10 @@ export default class Paper extends React.Component {
                 let delete_noise = new Audio(Delete); 
                 if (this.selected_premise.attributes.type === "dia.Element.Premise") {
                     this.selected_premise.destroy()
-                    delete_noise.play();
+                    this.props.handlePlayAudio(delete_noise);
                 } else if (this.selected_premise.attributes.type === "dia.Element.Cut") {
                     this.selected_premise.destroy();        // Play pop sound
-                    delete_noise.play();
+                    this.props.handlePlayAudio(delete_noise);
                 } else {
                     console.error("attempted to delete shape of unknown type: " + this.selected_premise.attributes.type)
                 }
