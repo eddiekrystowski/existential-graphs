@@ -85,4 +85,12 @@ export const iteration = function(sheet, model) {
 }
 
 export const deiteration = function(sheet, model) {
+  const graph = sheet.graph;
+  if(model.__proto__.constructor.name === "Premise") {
+    console.log('MYSHIT')
+    console.log(model);
+    let ancestor = model;
+
+  } 
+
 }
