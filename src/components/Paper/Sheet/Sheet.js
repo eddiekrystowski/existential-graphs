@@ -43,12 +43,12 @@ export default class Sheet {
     }
 
     exportAsJSON() {
-        console.log('exporting...');
+        //console.log('exporting...');
         const cells = this.graph.getCells();
         const exported = cells.map(cell => Object.assign(cell.attributes, { sheet: null }));
-        console.log(exported);
+        //console.log(exported);
         const json = JSON.stringify(exported, null, 2);
-        console.log(json);
+        //console.log(json);
         return json;
     }
 
