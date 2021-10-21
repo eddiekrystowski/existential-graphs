@@ -31,7 +31,7 @@ export default class Paper extends React.Component {
             show: true
         }
 
-        this.history = new History();
+        this.history = React.createRef();
     }
 
     componentDidMount() {
@@ -51,8 +51,9 @@ export default class Paper extends React.Component {
     }
 
     onGraphUpdate() {
+        console.log('onGraphUpdate');
         const new_graph = this.sheet.exportAsJSON();
-        this.history.push(new_graph);
+        this.history.current.push(new_graph);
     }
 
     show() {
@@ -153,19 +154,19 @@ export default class Paper extends React.Component {
             if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
                 console.log('undoing...')
                 console.log(this.history);
-                const new_state = this.history.undo();
+                const new_state = this.history.current.undo();
                 this.sheet.graph.clear();
-                this.history.lock();
+                this.history.current.lock();
                 this.sheet.importFromJSON(new_state);
-                this.history.unlock();
+                this.history.current.unlock();
             }
             if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && event.shiftKey) {
-                const new_state = this.history.redo();
+                const new_state = this.history.current.redo();
                 console.log('redoing...')
                 this.sheet.graph.clear();
-                this.history.lock();
+                this.history.current.lock();
                 this.sheet.importFromJSON(new_state);
-                this.history.unlock();
+                this.history.current.unlock();
             }
         });
     }
@@ -268,7 +269,7 @@ export default class Paper extends React.Component {
                 size: {width: 0, height: 0}
             }
             //this.temp_cut = new Cut().create(config);
-            this.history.lock();
+            this.history.current.lock();
             this.temp_cut = this.sheet.addCut(config);
             this.temp_cut.active();
             event.preventDefault();
@@ -279,13 +280,13 @@ export default class Paper extends React.Component {
     onMouseUp = () => {
         //console.log('mouseup', this);
         if (this.getMode() === 'proof') {
-            this.history.startBatch();
+            this.history.current.startBatch();
             if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
                 const mouse_adjusted = this.getRelativeMousePos();
                 this.props.action(this.sheet, null, mouse_adjusted);
                 this.props.handleClearAction();
             }
-            this.history.endBatch();
+            this.history.current.endBatch();
         }
         if (this.temp_cut && this.getMode() === 'create') {
             const position = _.clone(this.temp_cut.get('position'));
@@ -302,7 +303,7 @@ export default class Paper extends React.Component {
             //let new_rect = new Cut().create(config);
             //console.log('mouse released, deleting temp cut...');
             this.temp_cut.remove();
-            this.history.unlock();
+            this.history.current.unlock();
             //NOTE: Temp cut must be deleted first or there will be uwnanted conflicts with  collisions
             this.sheet.addCut(config);
         }
@@ -346,6 +347,7 @@ export default class Paper extends React.Component {
         }
         return(
             <div class="paper-root" ref={this.paperRoot}>
+                <History ref={this.history}/>
                 <div class="paper-wrapper" style={styles}>
                     <div 
                         id={this.props.id}

@@ -50,6 +50,7 @@ export default class Sheet {
     }
 
     importFromJSON(json) {
+        console.log('json', json)
         const parsed = JSON.parse(json);
         for (let cell of parsed) {
             let new_element;

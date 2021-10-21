@@ -59,7 +59,6 @@ export class Cut extends joint.dia.Element {
 
     //custom constructor for shape, should more or less always use this over the default constructor
     create(config, sheet) {
-
         const options = _.cloneDeep(CUT_DEFAULTS);
         if (config) {
             options.position = Object.assign(options.position, config.position);

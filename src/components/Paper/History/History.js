@@ -1,59 +1,89 @@
+import React from "react";
+import _ from 'lodash';
 
 
-export default class History {
-    constructor() {
-        this.data = [];
-        this.index = 0;
+export default class History extends React.Component {
+    constructor(props) {
+        super(props);
+
         this.MAX_SIZE = 1024;
-        this.locked = false;
+
         this.batch_mode = false;
-        this.batch_state = null;
+        this.batch_state = false;
+
+
+        this.state = {
+            data: [],
+            index: 0,
+            locked: false
+        }
     }
 
     push(item) {
-        if(this.locked) return;
+        if(this.state.locked) return;
 
         if(this.batch_mode) {
-            this.batch_state = item;
+            this.setState({
+                batch_state: item
+            });
             return;
         }
 
-        if (this.index !== this.data.length - 1) {
-            this.diverge();
+        const data = _.cloneDeep(this.state.data);
+
+        if (this.state.index !== this.state.data.length - 1) {
+            //remove all states after current index
+            data.splice(this.state.index + 1);
         }
-        this.data.push(item);
+        
+        data.push(item);
         //remove from bottom of stack if we have more items than the max size allows
-        if (this.data.length >= this.MAX_SIZE) {
-            this.data.shift();
+        if (data.length >= this.MAX_SIZE) {
+            data.shift();
         }
-        this.index = this.data.length - 1;
+
+        this.setState({
+            data: data,
+            index: data.length - 1
+        });
     }
 
     undo() {
-        if (this.index > 0) this.index -= 1;
-        return this.getState();
+        let index = this.state.index;
+        if (this.state.index > 0) {
+            this.setState({
+                index: this.state.index - 1
+            });
+            index -= 1;
+        }
+        return this.getItem(index);
     }
 
     redo() {
-        if (this.index < this.data.length - 1) this.index += 1;
-        return this.getState();
+        let index = this.state.index;
+        if (this.state.index < this.state.data.length - 1) {
+            this.setState({
+                index: this.state.index + 1
+            });
+            index += 1;
+        }
+        return this.getItem(index);
     }
 
-    getState() {
-        return this.data[this.index];
-    }
-
-    diverge() {
-        //remove all states after the current index
-        this.data.splice(this.index + 1);
+    getItem(index) {
+        return this.state.data[index];
     }
 
     lock() {
-        this.locked = true;
+        this.setState({
+            locked: true
+        });
     }
 
     unlock() {
-        this.locked = false;
+        this.setState({
+            locked: false
+        });
     }
 
     startBatch() {
@@ -63,7 +93,15 @@ export default class History {
 
     endBatch() {
         this.batch_mode = false;
-        if (this.batch_state !== null) this.push(this.batch_state);
+        if (this.batch_state !== null) {
+            this.push(this.batch_state);
+        }
+    }
+
+    render() {
+        return (
+            <div></div>
+        );
     }
 
 }
