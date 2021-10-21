@@ -30,7 +30,7 @@ export default class SideBar extends React.Component {
                         text: 'Insertion',
                         onClick: () => {
                             this.props.handleActionChange(inferenceInsertion);
-                            console.log('Performing insertion...');
+                            console.log('Loading insertion into action...');
                         }
                     },
                     {

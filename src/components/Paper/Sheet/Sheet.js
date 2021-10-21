@@ -6,6 +6,7 @@ import { color } from '../../../util/color';
 import { findSmallestCell, overlapsCells, contains, safeMove } from '../../../util/collisions';
 import Pop from '../../../sounds/pop.wav';
 import Snip from '../../../sounds/snip.wav';
+import $ from 'jquery'
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -50,6 +51,37 @@ export default class Sheet {
         let snip = new Audio(Snip); 
         this.handlePlayAudio(snip);
         return cut;
+    }
+
+    exportAsJSON() {
+        console.log('exporting...');
+        const cells = this.graph.getCells();
+        const exported = cells.map(cell => Object.assign(cell.attributes, { sheet: null }));
+        console.log(exported);
+        const json = JSON.stringify(exported, null, 2);
+        console.log(json);
+        return json;
+    }
+
+    importFromJSON(json) {
+        const parsed = JSON.parse(json);
+        for (let cell of parsed) {
+            let new_element;
+            if (cell.type === 'dia.Element.Premise') {
+                new_element = this.addPremise(cell, true);
+            }
+            else if (cell.type === 'dia.Element.Cut') {
+                new_element = this.addCut(cell, true);
+            }
+            else {
+                throw new RangeError(`Cell type must be either dia.Element.Premise or dia.Element.Cut, got ${cell.type}`);
+            }
+
+            //fix for small outline box first time mousing over after importing
+            const dom_element = $(`svg [model-id="${new_element.attributes.id}"]`);
+            dom_element.trigger('mouseenter');
+            dom_element.trigger('mouseleave');
+        }
     }
 
     //TODO: some of these functions kind of fit here and also kind of don't. I'm moving them here for now
@@ -283,6 +315,7 @@ export default class Sheet {
     
     findRoot(node) {
         while (true) {
+            console.log('FIND ROOT NODE', node)
             if (node.get("parent")) {
                 node = node.getParentCell();
             } else {
@@ -359,6 +392,7 @@ export default class Sheet {
                 node.position(node.attributes.position.x + offset.x, node.attributes.position.y + offset.y);
             }
         }
-    
     }
+
+
 }

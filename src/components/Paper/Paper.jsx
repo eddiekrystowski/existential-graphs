@@ -2,9 +2,11 @@ import React from 'react';
 import * as joint from 'jointjs'
 import E from '../../EventController.js';
 import _ from 'lodash';
+import $ from 'jquery'
 
 import Delete from '../../sounds/delete.wav';
 import Sheet from './Sheet/Sheet.js';
+import History from './History/History.js'
 
 import './Paper.css';   
 
@@ -13,10 +15,10 @@ const PAPER_SIZE = { width: 4000, height: 4000 };
 export default class Paper extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {}
         this.sheet = new Sheet(this);
         this.jpaper = null;
         this.paper_element = null;
+        this.paperRoot = React.createRef();
     
         this.selected_premise = null;
         this.saved_template = null;
@@ -30,6 +32,12 @@ export default class Paper extends React.Component {
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
         this.onMouseEnter = this.onMouseEnter.bind(this);
+
+        this.state = {
+            show: true
+        }
+
+        this.history = [];
     }
 
     componentDidMount() {
@@ -47,6 +55,19 @@ export default class Paper extends React.Component {
         this.setPaperEvents();
     }
 
+    onGraphUpdate() {
+        const new_graph = this.sheet.exportAsJSON();
+        this.history.push(new_graph);
+    }
+
+    show() {
+        $(this.paperRoot.current).css('display', 'block');
+    }
+
+    hide() {
+        $(this.paperRoot.current).css('display', 'none');
+    }
+
     //assume that if there is no workspace associated then we are in create mode
     getMode() {
         return this.props.mode || 'create';
@@ -56,20 +77,13 @@ export default class Paper extends React.Component {
         this.sheet.graph.clear();
     }
 
-    copyFrom(modalPaper) {
-        const modal_cells = _.cloneDeep(modalPaper.sheet.graph.getCells());
-        const subgraph = modalPaper.sheet.graph.getSubgraph(modal_cells, {deep: true});
-        console.log('BEFORE', _.cloneDeep(subgraph));
-        this.sheet.graph.addCells(subgraph);
-        for (let cell of subgraph) {
-            cell.graph = this.sheet.graph;
+    copyFrom(sourcePaper) {
+        const modal_cells = sourcePaper.sheet.graph.getCells();
+        for (let i = 0; i < modal_cells.length; i++) {
+            modal_cells[i] = modal_cells[i].clone();
+            modal_cells[i].graph = this.sheet.graph;
         }
-        for (let cell of this.sheet.graph.getCells()) {
-            this.sheet.handleCollisions(cell);
-        }
-        console.log('AFTER', subgraph);
-        console.log('MAIN GRAPH', this.sheet.graph);
-        console.log('MODAL GRAPH', modalPaper.sheet.graph);
+        this.sheet.graph.addCells(modal_cells);
     }
 
     setPaperEvents(){
@@ -97,6 +111,7 @@ export default class Paper extends React.Component {
         // First, unembed the cell that has just been grabbed by the user.
         this.jpaper.on('cell:pointerdown', (cellView, evt, x, y) => {
             
+            console.log(cellView)
             let cell = cellView.model;
             console.log("cell", cell)
 
@@ -125,22 +140,16 @@ export default class Paper extends React.Component {
 
             if (this.props.action) this.props.action(this.sheet, cell, E.mousePosition);
             if (this.props.handleClearAction) this.props.handleClearAction();
+            this.selected_premise = null;
         });
 
-        // if (this.props.isModalPaper) {
-        //     this.paper_element.addEventListener('load-modal', () => {
-        //        this.sheet.graph.clear(); 
-        //     });
-        // }
+        this.sheet.graph.on('change', () => {
+            this.onGraphUpdate();
+        })
     }
 
     onClick() {
         console.log('clicked', this);
-        // if (this.getMode() === 'proof' && this.props.action && this.props.action.name === 'inferenceInsertion') {
-        //     const mousePosition = Object.assign({}, E.mousePosition);
-        //     this.props.action(this.sheet, mousePosition);
-        //     this.props.handleClearAction();
-        // }
     }
 
     onKeyDown() {
@@ -152,29 +161,7 @@ export default class Paper extends React.Component {
     }
 
     onKeyUp(event) {
-        //console.log('keyup', this);
         if(this.getMode() === 'proof'){
-            //console.log('here?')
-            //TODO: REPLACE THIS WITH AN INTERFACE TO INSERT ANY SUBGRAPH, currently this only lets you insert a single premise
-            // if(this.props.action && this.props.action.name === 'inferenceInsertion') {
-            //     console.log("HEREEEee");
-            //     if (!this.selected_premise) return;
-            //     if (this.selected_premise.attributes.attrs.level % 2 === 1) return;
-            //     console.log("HERE")
-            //     if (event.keyCode >= 65 && event.keyCode <= 90) {
-            //         let config = {
-            //             //use capital letters by default, can press shift to make lowercase
-            //             attrs:{
-            //                 text: {
-            //                     text:event.shiftKey ? event.key.toLocaleLowerCase() : event.key.toLocaleUpperCase()
-            //                 }
-            //             },
-            //             position: this.getRelativeMousePos()
-            //         }
-            //         this.sheet.addPremise(config);
-            //     }
-            //     this.props.handleClearAction();
-            // }
             return;
         }
         let key = E.key
@@ -263,7 +250,6 @@ export default class Paper extends React.Component {
     onMouseUp() {
         //console.log('mouseup', this);
         if (this.getMode() === 'proof') {
-            //console.log('yuh');
             if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
                 const mouse_adjusted = this.getRelativeMousePos();
                 this.props.action(this.sheet, null, mouse_adjusted);
@@ -321,12 +307,13 @@ export default class Paper extends React.Component {
     }
 
     render() {
+        if (!this.state.show) return null;
         const styles = {
             width: this.props.wrapperWidth || '100%',
             height: this.props.wrapperHeight || '100%'
         }
         return(
-            <div class="paper-root">
+            <div class="paper-root" ref={this.paperRoot}>
                 <div class="paper-wrapper" style={styles}>
                     <div 
                         id={this.props.id}

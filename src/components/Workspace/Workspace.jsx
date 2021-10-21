@@ -6,6 +6,7 @@ import Modal from '../Modal/Modal.jsx';
 import _ from 'lodash';
 
 import './Workspace.css'
+import E from '../../EventController';
 
 const LOAD_MODAL = new Event('load-modal');
 
@@ -20,15 +21,37 @@ export default class Workspace extends React.Component {
         this.insertPosition = { x: 0, y: 0 };
         this.modalPaper = React.createRef();
         this.mainPaper = React.createRef();
+        this.proofPaper= React.createRef();
+        this.history = [];
+    }
+
+    componentDidMount() {
+        this.proofPaper.current.hide();
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+
+        // //if state.mode changed
+         if (prevState.mode !== this.state.mode) {
+            //switch to proof mode
+            if (this.state.mode === 'proof') {
+                this.mainPaper.current.hide();
+                this.proofPaper.current.sheet.graph.clear();
+                this.proofPaper.current.sheet.importFromJSON(this.mainPaper.current.sheet.exportAsJSON());
+                this.proofPaper.current.show();
+            }
+            //switch to create mode
+            else {
+                this.mainPaper.current.show();
+                this.proofPaper.current.hide();
+            }
+        }
     }
 
     handleStateSwitch() {
-        console.log('Switching state...');
-        console.log(this.state);
         this.setState({
             mode: this.state.mode === 'create' ? 'proof' : 'create'
         });
-        window.mode = this.state.mode === 'create' ? 'proof' : 'create';
     }
 
     handleActionChange(action) {
@@ -57,8 +80,7 @@ export default class Workspace extends React.Component {
 
     handleModalInsert = (position) => {
         console.log('inserting...');
-        //console.log(_.cloneDeep(this.modalPaper));
-        this.mainPaper.current.copyFrom(this.modalPaper.current);
+        this.proofPaper.current.sheet.importFromJSON(this.modalPaper.current.sheet.exportAsJSON());
         this.handleModalExit();
     }
 
@@ -94,8 +116,19 @@ export default class Workspace extends React.Component {
                     handlePlayAudio={this.props.handlePlayAudio}
                     ref={this.mainPaper}
                 >
-
                 </Paper>
+
+                <Paper 
+                    id={this.props.paper_id + '-proof-paper'} 
+                    mode={this.state.mode} 
+                    action={this.state.action}
+                    handleClearAction={this.handleClearAction.bind(this)}
+                    handleOpenModal={this.handleOpenModal}
+                    ref={this.proofPaper}
+                >
+                </Paper>
+
+
                 <Modal show={this.state.showModal} buttons={buttons}>
                     <Paper 
                         id={this.props.paper_id + '-modal-paper'} 
@@ -106,7 +139,6 @@ export default class Workspace extends React.Component {
                         handlePlayAudio={this.props.handlePlayAudio}
                         wrapperWidth='100%'
                         wrapperHeight='72vh'
-                        isModalPaper={true}
                         ref={this.modalPaper}
                     >
                     </Paper>

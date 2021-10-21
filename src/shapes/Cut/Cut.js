@@ -87,7 +87,8 @@ export class Cut extends joint.dia.Element {
                 level: 0
             },
             // set custom attributes here:
-        })
+            sheet: options.sheet
+        });
 
         //have to set this out here since we actually do want a reference to this object, not a copy
         cut.sheet = options.sheet;
