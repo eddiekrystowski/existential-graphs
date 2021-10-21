@@ -140,15 +140,11 @@ export default class Sheet {
             //let total_overlaps = 0;
             for (const cell of current) {
                 let overlaps = overlapsCells(cell, roots);
-                //total_overlaps += overlaps.length;
-                console.log(overlaps.length + " overlaps detected!")
-                console.log("overlaps", overlaps.map((x) => x))
+
                 for (const invader of overlaps) {
-                    console.log("starting separate")
                     this.separate(cell, invader);
-                    console.log("ending separate")
-                    let unique = cellInArray(invader, next);
-                    if (unique) next.push(invader);
+                    let dupe = cellInArray(invader, next);
+                    if (!dupe) next.push(invader);
                 }
             }
             current = next;
@@ -173,12 +169,17 @@ export default class Sheet {
         if (Math.abs(shared_x) >= Math.abs(shared_y)) {
             //make adjustment vertically (shorter change)
             //if shared value is positive, then main is somewhat above the invader
-            this.treeMove(invader, {x: invaderbbox.x, y:invaderbbox.y + shared_y + ((this.spacing) * Math.sign(shared_y))});
+            let dir = Math.sign(shared_y);
+            if (dir === 0) dir = 1;
+            this.treeMove(invader, {x: invaderbbox.x, y: invaderbbox.y + shared_y + (this.spacing * dir)});
         } else {
             //make adjustment horizontally (shorter change)
             //if shared value is positive, then main is somewhat to the left of the invader
-            this.treeMove(invader, {x: invaderbbox.x + shared_x + ((this.spacing) * Math.sign(shared_x)), y: invaderbbox.y});
+            let dir = Math.sign(shared_x);
+            if (dir === 0) dir = 1;
+            this.treeMove(invader, {x: invaderbbox.x + shared_x + (this.spacing * dir), y: invaderbbox.y});
         }
+
     }
 
     getCellsByLevel(level) {

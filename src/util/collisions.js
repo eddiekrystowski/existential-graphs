@@ -49,6 +49,10 @@ export function overlapsCells(target, cells) {
 }
 
 function intersects(mainbbox, otherbbox) {
+    if (contains(mainbbox, otherbbox) || contains(otherbbox, mainbbox)) {
+        return true;
+    }
+
     // check if bounding boxes overlap one another
     
     //check if either bbox is completely above the other
