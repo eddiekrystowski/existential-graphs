@@ -168,11 +168,11 @@ export default class Sheet {
         if (Math.abs(shared_x) >= Math.abs(shared_y)) {
             //make adjustment vertically (shorter change)
             //if shared value is positive, then main is somewhat above the invader
-            this.treeMove(invader, {x: invaderbbox.x, y:invaderbbox.y + shared_y + ((this.spacing) * Math.abs(shared_y) / shared_y)});
+            this.treeMove(invader, {x: invaderbbox.x, y:invaderbbox.y + shared_y + ((this.spacing) * Math.sign(shared_y))});
         } else {
             //make adjustment horizontally (shorter change)
             //if shared value is positive, then main is somewhat to the left of the invader
-            this.treeMove(invader, {x: invaderbbox.x + shared_x + ((this.spacing) * Math.abs(shared_x) / shared_x), y: invaderbbox.y});
+            this.treeMove(invader, {x: invaderbbox.x + shared_x + ((this.spacing) * Math.sign(shared_x)), y: invaderbbox.y});
         }
     }
 
