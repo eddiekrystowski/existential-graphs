@@ -7,6 +7,7 @@ import { findSmallestCell, overlapsCells, contains, safeMove } from '../../../ut
 import Pop from '../../../sounds/pop.wav';
 import Snip from '../../../sounds/snip.wav';
 import $ from 'jquery'
+import { cellInArray } from '../../../util/otherUtil';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -33,7 +34,6 @@ export default class Sheet {
     }
 
     addPremise(config) {
-        console.log(config);
         const premise = (new Premise()).create(config, this);
         this.handleCollisions(premise);        
         
@@ -54,12 +54,9 @@ export default class Sheet {
     }
 
     exportAsJSON() {
-        console.log('exporting...');
         const cells = this.graph.getCells();
         const exported = cells.map(cell => Object.assign(cell.attributes, { sheet: null }));
-        console.log(exported);
         const json = JSON.stringify(exported, null, 2);
-        console.log(json);
         return json;
     }
 
@@ -135,21 +132,36 @@ export default class Sheet {
         // starting checks for overlaps at the largest cells and moving outward
         roots.sort(function(a, b) {
             return b.getArea() - a.getArea()
-        })
-
-        while (true) {
-            let total_overlaps = 0;
-            for (const root of roots) {
-                let overlaps = overlapsCells(root, roots);
-                if (overlaps.length === 0) {
-                    continue;
-                }
-                total_overlaps += overlaps.length;
+        }) 
+        let current = roots;
+        console.log("starting clean overlaps")
+        while (current.length > 0) {
+            let next = [];
+            //let total_overlaps = 0;
+            for (const cell of current) {
+                let overlaps = overlapsCells(cell, roots);
+                //total_overlaps += overlaps.length;
+                console.log(overlaps.length + " overlaps detected!")
+                console.log("overlaps", overlaps.map((x) => x))
                 for (const invader of overlaps) {
-                    this.separate(root, invader);
+                    console.log("starting separate")
+                    this.separate(cell, invader);
+                    console.log("ending separate")
+                    let unique = cellInArray(invader, next);
+                    if (unique) next.push(invader);
                 }
             }
-            if (total_overlaps === 0) break;
+            current = next;
+            //if (total_overlaps === 0) break;
+        }
+        console.log("ending clean overlaps")
+        //sanity check
+        let insane = false
+        for (const cell of roots) {
+            if (overlapsCells(cell, roots).length != 0) {
+                insane = true;
+                break
+            }
         }
     }
 
@@ -302,7 +314,6 @@ export default class Sheet {
         //resizes all the children of a root, not including the root
         let current = root.getParentCell();
         while (current) {
-            console.log("current", current)
             current.attr("rect/width", current.attributes.attrs.rect.width + resize_value);
             current.attr("rect/height", current.attributes.attrs.rect.height + resize_value);
             if (center_nodes) {
@@ -315,7 +326,6 @@ export default class Sheet {
     
     findRoot(node) {
         while (true) {
-            console.log('FIND ROOT NODE', node)
             if (node.get("parent")) {
                 node = node.getParentCell();
             } else {
