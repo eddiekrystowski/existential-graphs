@@ -150,7 +150,7 @@ export default class Paper extends React.Component {
 
         //PAPER UNDO AND REDO EVENTS
         $(this.paperRoot.current).on('keydown', (event) => {
-            if (event.keyCode === 90 && event.ctrlKey && !event.shiftKey) {
+            if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
                 console.log('undoing...')
                 console.log(this.history);
                 const new_state = this.history.undo();
@@ -159,7 +159,7 @@ export default class Paper extends React.Component {
                 this.sheet.importFromJSON(new_state);
                 this.history.unlock();
             }
-            if (event.keyCode === 90 && event.ctrlKey && event.shiftKey) {
+            if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && event.shiftKey) {
                 const new_state = this.history.redo();
                 console.log('redoing...')
                 this.sheet.graph.clear();
@@ -190,7 +190,7 @@ export default class Paper extends React.Component {
         }
 
         //backspace (delete premise or cut)
-        if (E.isActive('backspace') ) {
+        if (event.keyCode === 8) {
             if (this.selected_premise) {
                 let delete_noise = new Audio(Delete); 
                 if (this.selected_premise.attributes.type === "dia.Element.Premise") {
@@ -209,7 +209,7 @@ export default class Paper extends React.Component {
         //a-z for creating premise
         const key = event.key.toLocaleUpperCase();
         const code = key.charCodeAt(0);
-        if (this.canInsertPremise && key.length === 1 && !(event.ctrlKey) && code >= 65 && code <= 90) {
+        if (this.canInsertPremise && key.length === 1 && !(event.ctrlKey || event.metaKey) && code >= 65 && code <= 90) {
             let config = {
                 //use capital letters by default, can press shift to make lowercase
                 attrs:{
