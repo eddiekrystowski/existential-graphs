@@ -156,13 +156,6 @@ export default class Sheet {
         }
         console.log("ending clean overlaps")
         //sanity check
-        let insane = false
-        for (const cell of roots) {
-            if (overlapsCells(cell, roots).length != 0) {
-                insane = true;
-                break
-            }
-        }
     }
 
     separate(main, invader) {
