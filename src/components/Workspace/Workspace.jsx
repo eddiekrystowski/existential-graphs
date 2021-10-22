@@ -54,7 +54,7 @@ export default class Workspace extends React.Component {
         });
     }
 
-    handleActionChange(action) {
+    handleActionChange = (action) => {
         this.setState({
             action: action
         });
@@ -112,6 +112,7 @@ export default class Workspace extends React.Component {
                     mode={this.state.mode} 
                     action={this.state.action}
                     handleClearAction={this.handleClearAction.bind(this)}
+                    handleActionChange={this.handleActionChange}
                     handleOpenModal={this.handleOpenModal}
                     handlePlayAudio={this.props.handlePlayAudio}
                     ref={this.mainPaper}
@@ -123,6 +124,7 @@ export default class Workspace extends React.Component {
                     mode={this.state.mode} 
                     action={this.state.action}
                     handleClearAction={this.handleClearAction.bind(this)}
+                    handleActionChange={this.handleActionChange}
                     handleOpenModal={this.handleOpenModal}
                     handlePlayAudio={this.props.handlePlayAudio}
                     ref={this.proofPaper}
@@ -136,6 +138,7 @@ export default class Workspace extends React.Component {
                         mode={'create'} 
                         action={null}
                         handleClearAction={null}
+                        handleActionChange={null}
                         handleOpenModal={null}
                         handlePlayAudio={this.props.handlePlayAudio}
                         wrapperWidth='100%'

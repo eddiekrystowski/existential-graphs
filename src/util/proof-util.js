@@ -82,6 +82,17 @@ export const deleteDoubleCut = function(sheet, model) {
 }
 
 export const iteration = function(sheet, model) {
+  return iterationend.bind(null, model);
+}
+
+const iterationend = function(model, sheet, model_clone, mousePosition={}) {
+  let subgraph = sheet.graph.cloneSubgraph([model], {deep: true});
+  let sub_id = sheet.addSubgraph(subgraph, mousePosition, model_clone);
+  
+  subgraph = sheet.graph.getCell(sub_id);
+  if(!legalIteration(sheet,model,subgraph)) {
+    obliterate(sheet, subgraph);
+  }
 }
 
 export const deiteration = function(sheet, model) {
@@ -151,8 +162,8 @@ function matchingModel(sheet, model_one, model_two) {
   if(model_one.__proto__.constructor.name === "Cut") {
     
     // Get the children of each cut
-    let model_one_children = [...model_one.attributes.embeds];
-    let model_two_children = [...model_two.attributes.embeds];
+    let model_one_children = [...(model_one.attributes.embeds || [])];
+    let model_two_children = [...(model_two.attributes.embeds || [])];
 
     //  If both embeds dont exist
     if(!model_one_children && !model_two_children) return true;
@@ -196,6 +207,7 @@ function obliterate(sheet, model) {
   //  If premise or empty cell
   if(model.__proto__.constructor.name === "Premise" || model.attributes.embeds?.length === 0) {
     model.destroy();
+    console.log('ballse');
     return;
   }
 
@@ -218,16 +230,15 @@ function obliterate(sheet, model) {
  */
 function legalIteration(sheet, model, model_clone) {
   //  First, confirm the two models are the same.
-  if(!matchingModel(model,model_clone)) {
+  if(!matchingModel(sheet, model,model_clone)) {
     console.error("Model discrepency when detecting legality of iteration.");
     return false;
   }
-
   //  If the first model is on the sheet of assertion return true
-  if(model.attributes.atts.level === 0) { return true; }
+  if(model.attributes.attrs.level === 0) { return true; }
 
   //  If the clone is on a lower level than the origin, return false
-  if(model.attributes.atts.level > model_clone.attributes.attrs.level) { return false; }
+  if(model.attributes.attrs.level > model_clone.attributes.attrs.level) { return false; }
 
   //  Add all sibling cuts to a list (all children of parent, remove self)
   let search = [...sheet.graph.getCell(model.attributes.parent).attributes.embeds];
