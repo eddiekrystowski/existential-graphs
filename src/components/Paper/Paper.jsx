@@ -55,17 +55,16 @@ export default class Paper extends React.Component {
         this.history.current.push(this.sheet.exportAsJSON());
     }
 
-    handleHistoryJump = (new_state) => {
-        console.log('new state', new_state);
+    handleHistoryJump = (cells) => {
         this.history.current.lock();
-        this.sheet.graph.clear();
-        this.sheet.importFromJSON(new_state);
+        this.sheet.importCells(cells);
         this.history.current.unlock();
     }
 
     onGraphUpdate() {
-        const new_graph = this.sheet.exportAsJSON();
-        this.history.current.push(new_graph);
+        //const new_graph = this.sheet.exportAsJSON();
+        const cells = this.sheet.graph.getCells();
+        this.history.current.push(cells);
     }
 
     show() {
@@ -168,9 +167,8 @@ export default class Paper extends React.Component {
                 //only update graph if new state exists
                 //undo will return false if can't undo anymore
                 if (new_state) {
-                    this.sheet.graph.clear();
                     this.history.current.lock();
-                    this.sheet.importFromJSON(new_state);
+                    this.sheet.importCells(new_state);
                     this.history.current.unlock();
                 }
             }
@@ -179,9 +177,8 @@ export default class Paper extends React.Component {
                 //only update graph if new state exists
                 //redo will return false if can't redo anymore
                 if (new_state) {
-                    this.sheet.graph.clear();
                     this.history.current.lock();
-                    this.sheet.importFromJSON(new_state);
+                    this.sheet.importCells(new_state);
                     this.history.current.unlock();
                 }
             }

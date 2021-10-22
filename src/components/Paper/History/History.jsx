@@ -24,13 +24,7 @@ export default class History extends React.Component {
         }
     }
 
-    componentDidUpdate(pp, ps) {
-        console.log('current state', this.state.data.map(x => JSON.parse(x)));
-        console.log('prev state', ps);
-    }
-
     handleJump = (num) => {
-        console.log('handleJump');
         this.setState({
             index: num
         });
@@ -56,13 +50,10 @@ export default class History extends React.Component {
 
         if (this.state.index !== this.state.data.length - 1) {
             //remove all states after current index
-            console.log('splicing...', data);
             data.splice(this.state.index + 1);
-            console.log('after splice', data);
         }
 
         data.push(item);
-        console.log('after push to copy', data);
         //remove from bottom of stack if we have more items than the max size allows
         if (data.length >= this.MAX_SIZE) {
             data.shift();
@@ -129,8 +120,10 @@ export default class History extends React.Component {
                     this.state.data.map((history_item, num) => (
                         (num === 0) ?  null :
                         <HistoryItem 
+                            num={num}
+                            total={this.state.data.length}
                             id={this.props.id_prefix + num}
-                            json={history_item}
+                            cells={history_item}
                             active={this.state.index === num}
                             onClick={this.handleJump.bind(this, num)}
                             key={num}

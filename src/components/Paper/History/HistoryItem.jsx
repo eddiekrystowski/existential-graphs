@@ -1,6 +1,6 @@
 import React from 'react';
-import * as joint from 'jointjs';
 import $ from 'jquery';
+import * as joint from 'jointjs';
 
 import Sheet from '../Sheet/Sheet';
 
@@ -12,10 +12,11 @@ export default class HistoryItem extends React.Component {
         this.sheet = new Sheet(this);
     }
 
-    componentDidUpdate() {
-        this.sheet.graph.clear();
-        this.sheet.importFromJSON(this.props.json);
-        this.jpaper.scaleContentToFit();
+    componentDidUpdate(prevProps, prevState) {
+        if(this.props.num === this.props.total -1 ){
+            this.sheet.importCells(this.props.cells);
+            this.jpaper.scaleContentToFit();
+        }
     }
 
     componentDidMount() {
@@ -28,7 +29,7 @@ export default class HistoryItem extends React.Component {
             clickThreshold: 1
         });
 
-        this.sheet.importFromJSON(this.props.json);
+        this.sheet.importCells(this.props.cells);
         this.jpaper.scaleContentToFit();
         this.jpaper.updateViews();
 

@@ -57,7 +57,7 @@ export class Premise extends joint.dia.Element {
     }]
 
     //custom constructor for shape, should more or less always use this over the default constructor
-    create(config, sheet) {
+    create(config, sheet, fast) {
         const options = _.cloneDeep(PREMISE_DEFAULTS);
 
         if (config) {
@@ -91,10 +91,10 @@ export class Premise extends joint.dia.Element {
         //have to set this out here since we actually do want a reference to this object, not a copy
         premise.sheet = options.sheet;
 
-        console.log(premise);
         premise.addTo(premise.sheet.graph)
         //add tools (some events events also)
-        this.addTools(premise)
+
+        if(!fast) this.addTools(premise);
 
         // Play pop sound
         let pop = new Audio(Pop); 
