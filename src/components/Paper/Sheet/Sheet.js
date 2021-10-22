@@ -37,6 +37,11 @@ export default class Sheet {
     addPremise(config, mute, fast=false) {
         const premise = (new Premise()).create(config, this, fast);
         this.handleCollisions(premise);
+
+        // Play snip sound
+        let pop = new Audio(Pop); 
+        this.handlePlayAudio(pop);
+
         return premise;
     }
 

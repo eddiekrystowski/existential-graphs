@@ -95,10 +95,6 @@ export class Premise extends joint.dia.Element {
         //add tools (some events events also)
         if(!fast) this.addTools(premise);
 
-        // Play pop sound
-        let pop = new Audio(Pop); 
-        pop.play();
-
         return premise;
     }
 
