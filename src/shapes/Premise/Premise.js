@@ -104,6 +104,7 @@ export class Premise extends joint.dia.Element {
 
     destroy() {
       this.remove();
+      this.sheet.paper.handleDeleteCell();
     }
   
     active() {

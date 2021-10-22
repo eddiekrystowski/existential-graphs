@@ -139,6 +139,8 @@ export class Cut extends joint.dia.Element {
         if (parent) {
             this.sheet.handleCollisions(parent);
         }
+
+        this.sheet.paper.handleDeleteCell();
     }
 
     active() {

@@ -156,10 +156,6 @@ export default class Paper extends React.Component {
             this.onGraphUpdate();
         });
 
-        this.sheet.graph.on('delete', () => {
-            this.onGraphUpdate();
-        });
-
         //PAPER UNDO AND REDO EVENTS
         $(this.paperRoot.current).on('keydown', (event) => {
             if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
@@ -183,6 +179,10 @@ export default class Paper extends React.Component {
                 }
             }
         });
+    }
+
+    handleDeleteCell = () => {
+        this.onGraphUpdate();
     }
 
     onClick = () => {

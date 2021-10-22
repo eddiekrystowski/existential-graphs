@@ -21,7 +21,7 @@ export default class Workspace extends React.Component {
         this.insertPosition = { x: 0, y: 0 };
         this.modalPaper = React.createRef();
         this.mainPaper = React.createRef();
-        this.proofPaper= React.createRef();
+        this.proofPaper = React.createRef();
         this.history = [];
     }
 
