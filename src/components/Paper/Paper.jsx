@@ -223,7 +223,7 @@ export default class Paper extends React.Component {
             const mouse_adjusted = this.getRelativeMousePos();
             //console.log("position", mouse_adjusted)
             if (this.saved_template) {
-                this.sheet.addSubgraph(this.saved_template, mouse_adjusted);
+                this.sheet.addSubgraph(this.saved_template, mouse_adjusted, this.selected_premise);
             }
         }
         event.preventDefault()
