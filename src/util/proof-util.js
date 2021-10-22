@@ -189,6 +189,7 @@ function matchingModel(sheet, model_one, model_two) {
 
 /**
  * Destroys the root and all decendants.
+ * @param {Sheet} sheet - The sheet the subgraph is contained by.
  * @param {Cell} model - Root of subgraph to be destroyed.
  */
 function obliterate(sheet, model) {
