@@ -124,6 +124,7 @@ export default class Workspace extends React.Component {
                     action={this.state.action}
                     handleClearAction={this.handleClearAction.bind(this)}
                     handleOpenModal={this.handleOpenModal}
+                    handlePlayAudio={this.props.handlePlayAudio}
                     ref={this.proofPaper}
                 >
                 </Paper>
