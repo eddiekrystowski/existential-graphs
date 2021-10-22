@@ -5,22 +5,6 @@
   grid-area: header;
   padding: 10px;
   text-align: center;
-  justify-content: flex-start;
-}
-
-.header-bar-left {
-  display: flex;
-  flex-direction: row;
-  text-align: center;
-  justify-content: flex-start;
-}
-
-.header-bar-right {
-  display: flex;
-  flex-direction: row;
-  text-align: center;
-  justify-content: flex-start;
-  margin-left: auto;
 }
 
 .menu-item {
@@ -34,14 +18,8 @@
   justify-content: center;
   align-items: center;
   font-size: 20px;
-  cursor: pointer;
-  user-select: none;
 }
 
-
-.mute-active {
-  color: red;
-}
 
 
 h4 {
