@@ -85,72 +85,60 @@ export const iteration = function(sheet, model) {
 }
 
 export const deiteration = function(sheet, model) {
+  const model_id = model.id;
 
-  const premise_text = model.attributes.attrs.text.text;
-  const premise_id = model.id;
+  let ancestor = model;
+  while(ancestor.attributes.parent) {
+    //  Iterate up to parent
+    ancestor = sheet.graph.getCell(ancestor.attributes.parent);
 
-  if(model.__proto__.constructor.name === "Premise") {
-
-    let ancestor = model;
-
-    while(ancestor.attributes.parent) {
-
-      //  Iterate up to parent
-      ancestor = sheet.graph.getCell(ancestor.attributes.parent);
-
-      //  Parent must be of type cut, however we check for redundancy
-      if(ancestor.__proto__.constructor.name !== "Cut") {
-        console.error("Parent is of type " + ancestor.__proto__.constructor.name + ". Expected Cut. Contact administrator." );
-        return;
-      }
-
-      //  Now, recursivly check all premises in the cut and look for a matching premise
-      let children = ancestor.attributes.embeds
-
-      children?.forEach(element => {
-
-        let child = sheet.graph.getCell(element);
-
-        if(child?.__proto__.constructor.name === "Premise") {
-
-          //Check if premise text is the same and if premise id is dissimilar
-          if(child.attributes.attrs.text.text === premise_text &&
-              child.id !== premise_id) {
-            //  Remove desired element and return
-            model.destroy()
-            return;
-          }
-        }
-      });
+    //  Parent must be of type cut, however we check for redundancy
+    if(ancestor.__proto__.constructor.name !== "Cut") {
+      console.error("Parent is of type " + ancestor.__proto__.constructor.name + ". Expected Cut. Contact administrator." );
+      return;
     }
 
-    //  Finally, check sheet of assertion becuase of Joey's "Multi-tree" theory...
+    //  Now, recursivly check all premises in the cut and look for a matching subgraph
+    let children = ancestor.attributes.embeds
 
-    let all_models = sheet.graph.attributes.cells.models;
-
-    all_models?.forEach(child => {
-      if(child?.attributes.attrs.level === 0 && 
-         child?.__proto__.constructor.name === "Premise" &&
-         child?.attributes.attrs.text.text === premise_text &&
-         child?.id !== premise_id) {
+    children?.forEach(element => {
+      let child = sheet.graph.getCell(element);
+        //Check if premise text is the same and if premise id is dissimilar
+        if(child.id !== model_id &&
+        matchingModel(sheet, model, child)) {
           //  Remove desired element and return
-          model.destroy()
+          obliterate(sheet, model);
           return;
-         }
+        }
     });
+  }
 
+  //  Finally, check sheet of assertion becuase of Joey's "Multi-tree" theory...
 
-  } 
+  let all_models = sheet.graph.attributes.cells.models;
 
-}
+  all_models?.forEach(element => {
+    let child = sheet.graph.getCell(element);
+    if(child?.attributes.attrs.level === 0 && 
+    child?.id !== model_id &&
+    matchingModel(sheet, model,child)) {
+      //  Remove desired element and return
+      obliterate(sheet, model);
+      return;
+      }
+  });
+} 
+
 
 /**
  * Returns if two subgraphs match.
- * @param {Cell} model_one - The first model.
- * @param {Cell} model_two - The second model.
- * @returns {Boolean} - If the two subgraphs match
+ * @param {Sheet} sheet - The sheet the two subgraphs are contained by.
+ * @param {Cell} model_one - The root cell of the first subgraph.
+ * @param {Cell} model_two - The root cell of the second subgraph.
+ * @returns {Boolean} - If the two subgraphs match.
  */
-function matchingModel(model_one, model_two) {
+function matchingModel(sheet, model_one, model_two) {
+    
   //  If comparing premise to a cut, return false
   if(model_one.__proto__.constructor.name !== model_two.__proto__.constructor.name) return false;
 
@@ -161,23 +149,27 @@ function matchingModel(model_one, model_two) {
 
   //  If comparing a cut, return based on a match to all children
   if(model_one.__proto__.constructor.name === "Cut") {
+    
     // Get the children of each cut
-    let model_one_children = model_one.attributes.embeds;
-    let model_two_children = model_one.attributes.embeds;
+    let model_one_children = [...model_one.attributes.embeds];
+    let model_two_children = [...model_two.attributes.embeds];
 
+    //  If both embeds dont exist
+    if(!model_one_children && !model_two_children) return true;
+    
     //  If dissimilar sizes, return false
-    if(model_one_children.length !== model_two_children) return false;
+    if(model_one_children.length !== model_two_children.length) return false;
 
     //  Match children until children array are of size zero, or all options are exaughsted
     //  Runtime : O(n^2) where n = number of children per model.
     //  To attempt optimization, search for "Graph Isomorphism Problem"
     outer:
     while(model_one_children.length > 0) {
-      let child = model_one_children[0];
+      let child = sheet.graph.getCell(model_one_children[0]);
 
       //  Iterate through all children of model_two and compare to child
       for (let i = 0; i < model_two_children.length; i++) {
-        if(matchingModel(child, model_one_children[i])) {
+        if(matchingModel(sheet, child, sheet.graph.getCell(model_two_children[i]))) {
           //  Remove the elements from the arrays
           model_one_children.shift() // Removes the first index
           model_two_children.splice(i, 1) //  Removes index i
@@ -193,4 +185,23 @@ function matchingModel(model_one, model_two) {
   //  If comparing something other than a premise or cut, contact an administatior
   console.error("Can not compare models of type " + model_one.__proto__.constructor.name + ". Contact administrator");
   return false;
+}
+
+/**
+ * Destroys the root and all decendants.
+ * @param {Cell} model - Root of subgraph to be destroyed.
+ */
+function obliterate(sheet, model) {
+  //  If premise or empty cell
+  if(model.__proto__.constructor.name === "Premise" || model.attributes.embeds?.length === 0) {
+    model.destroy();
+    return;
+  }
+
+  //  If non-empty cell, destroy all children
+  let children = model.attributes.embeds;
+  children.forEach(child => {obliterate(sheet, sheet.graph.getCell(child))});
+  //  Then destroy self
+  model.destroy();
+
 }
