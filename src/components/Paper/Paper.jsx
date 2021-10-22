@@ -6,9 +6,13 @@ import $ from 'jquery'
 
 import Delete from '../../sounds/delete.wav';
 import Sheet from './Sheet/Sheet.js';
-import History from './History/History.js'
+import History from './History/History.jsx'
 
 import './Paper.css';   
+import UtilBar from './UtilBar/UtilBar.jsx';
+import UtilBarItem from './UtilBar/UtilBarItem.jsx';
+import './UtilBar/UtilBar.css';
+import { faHistory } from '@fortawesome/free-solid-svg-icons';
 
 const PAPER_SIZE = { width: 4000, height: 4000 };
 
@@ -24,20 +28,15 @@ export default class Paper extends React.Component {
         this.saved_template = null;
         this.temp_cut = null;
         this.initial_cut_pos = {x: 0, y: 0};
-
-        this.onClick = this.onClick.bind(this);
-        this.onKeyDown = this.onKeyDown.bind(this);
-        this.onKeyUp = this.onKeyUp.bind(this);
-        this.onMouseMove = this.onMouseMove.bind(this);
-        this.onMouseDown = this.onMouseDown.bind(this);
-        this.onMouseUp = this.onMouseUp.bind(this);
-        this.onMouseEnter = this.onMouseEnter.bind(this);
+        this.canInsertPremise = true;
+        this.previousPremiseCode = 0;
 
         this.state = {
             show: true
         }
 
-        this.history = [];
+        this.UtilBar = React.createRef();
+        this.history = React.createRef();
     }
 
     componentDidMount() {
@@ -51,17 +50,25 @@ export default class Paper extends React.Component {
         });
 
         this.paper_element = document.getElementById(this.props.id);
-
+        
         this.setPaperEvents();
+        this.history.current.push(this.sheet.exportAsJSON());
+    }
+
+    handleHistoryJump = (cells) => {
+        this.history.current.lock();
+        this.sheet.importCells(cells);
+        this.history.current.unlock();
     }
 
     onGraphUpdate() {
-        const new_graph = this.sheet.exportAsJSON();
-        this.history.push(new_graph);
+        //const new_graph = this.sheet.exportAsJSON();
+        const cells = this.sheet.graph.getCells();
+        this.history.current.push(cells);
     }
 
     show() {
-        $(this.paperRoot.current).css('display', 'block');
+        $(this.paperRoot.current).css('display', 'flex');
     }
 
     hide() {
@@ -96,7 +103,7 @@ export default class Paper extends React.Component {
             model.attr("rect/stroke", "red")
             model.attr("text/fill", "red")
             this.selected_premise = model
-        })
+        });
 
         this.jpaper.on("element:mouseleave", ( cellView, evt) =>{
             let model = cellView.model
@@ -138,35 +145,67 @@ export default class Paper extends React.Component {
             this.sheet.handleCollisions(cell)
             cell.inactive();
 
+            if(!this.props.action) this.onGraphUpdate();
+
             if (this.props.action) this.props.action(this.sheet, cell, E.mousePosition);
             if (this.props.handleClearAction) this.props.handleClearAction();
             this.selected_premise = null;
         });
 
-        this.sheet.graph.on('change', () => {
+        this.sheet.graph.on('add', () => {
             this.onGraphUpdate();
-        })
+        });
+
+        //PAPER UNDO AND REDO EVENTS
+        $(this.paperRoot.current).on('keydown', (event) => {
+            if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
+                const new_state = this.history.current.undo();
+                //only update graph if new state exists
+                //undo will return false if can't undo anymore
+                if (new_state) {
+                    this.history.current.lock();
+                    this.sheet.importCells(new_state);
+                    this.history.current.unlock();
+                }
+            }
+            if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && event.shiftKey) {
+                const new_state = this.history.current.redo();
+                //only update graph if new state exists
+                //redo will return false if can't redo anymore
+                if (new_state) {
+                    this.history.current.lock();
+                    this.sheet.importCells(new_state);
+                    this.history.current.unlock();
+                }
+            }
+        });
     }
 
-    onClick() {
+    handleDeleteCell = () => {
+        this.onGraphUpdate();
+    }
+
+    onClick = () => {
         console.log('clicked', this);
     }
 
-    onKeyDown() {
+    onKeyUp = (event) => {
+        if(event.keyCode === this.previousPremiseCode) this.canInsertPremise = true;
+    }
+
+    onKeyDown = (event) => {
+        if(this.getMode() === 'proof'){
+            return;
+        }
+
         if(this.getMode() === 'create'){
             if (E.keys[16]) {
                 this.jpaper.setInteractivity(false);
             }
         }
-    }
 
-    onKeyUp(event) {
-        if(this.getMode() === 'proof'){
-            return;
-        }
-        let key = E.key
         //backspace (delete premise or cut)
-        if (E.isActive('backspace') ) {
+        if (event.keyCode === 8) {
             if (this.selected_premise) {
                 let delete_noise = new Audio(Delete); 
                 if (this.selected_premise.attributes.type === "dia.Element.Premise") {
@@ -181,13 +220,16 @@ export default class Paper extends React.Component {
             }
             this.selected_premise = null;
         }
+
         //a-z for creating premise
-        if (event.keyCode >= 65 && event.keyCode <= 90) {
+        const key = event.key.toLocaleUpperCase();
+        const code = key.charCodeAt(0);
+        if (this.canInsertPremise && key.length === 1 && !(event.ctrlKey || event.metaKey) && code >= 65 && code <= 90) {
             let config = {
                 //use capital letters by default, can press shift to make lowercase
                 attrs:{
                     text: {
-                        text:event.shiftKey ? key.toLocaleLowerCase() : key.toLocaleUpperCase()
+                        text: key
                     }
                 },
                 position: this.getRelativeMousePos()
@@ -195,6 +237,8 @@ export default class Paper extends React.Component {
             //eslint-disable-next-line
             //let new_rect = new Premise().create(config)
             this.sheet.addPremise(config);
+            this.canInsertPremise = false;
+            this.previousPremiseCode = code;
         }
         //ENTER
         // new cut
@@ -226,10 +270,9 @@ export default class Paper extends React.Component {
                 this.sheet.addSubgraph(this.saved_template, mouse_adjusted, this.selected_premise);
             }
         }
-        event.preventDefault()
     }
 
-    onMouseDown(event) {
+    onMouseDown = (event) => {
         //console.log('mousedown', this);
         if (E.keys[16] && this.getMode() === 'create') {
             this.initial_cut_pos = Object.assign({}, E.mousePosition);
@@ -240,6 +283,7 @@ export default class Paper extends React.Component {
                 size: {width: 0, height: 0}
             }
             //this.temp_cut = new Cut().create(config);
+            this.history.current.lock();
             this.temp_cut = this.sheet.addCut(config);
             this.temp_cut.active();
             event.preventDefault();
@@ -247,14 +291,16 @@ export default class Paper extends React.Component {
         }
     }
 
-    onMouseUp() {
+    onMouseUp = () => {
         //console.log('mouseup', this);
         if (this.getMode() === 'proof') {
+            this.history.current.startBatch();
             if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
                 const mouse_adjusted = this.getRelativeMousePos();
                 this.props.action(this.sheet, null, mouse_adjusted);
                 this.props.handleClearAction();
             }
+            this.history.current.endBatch();
         }
         if (this.temp_cut && this.getMode() === 'create') {
             const position = _.clone(this.temp_cut.get('position'));
@@ -271,6 +317,7 @@ export default class Paper extends React.Component {
             //let new_rect = new Cut().create(config);
             //console.log('mouse released, deleting temp cut...');
             this.temp_cut.remove();
+            this.history.current.unlock();
             //NOTE: Temp cut must be deleted first or there will be uwnanted conflicts with  collisions
             this.sheet.addCut(config);
         }
@@ -279,7 +326,7 @@ export default class Paper extends React.Component {
         this.temp_cut = null;
     }
 
-    onMouseMove() {
+    onMouseMove = () => {
         //console.log('mousemove', this);
         if(this.getMode() === 'create'){
             //console.log(E.isMouseDown);
@@ -295,7 +342,7 @@ export default class Paper extends React.Component {
         }
     }
 
-    onMouseEnter() {
+    onMouseEnter = () => {
         this.paper_element.focus();
     }
 
@@ -312,6 +359,7 @@ export default class Paper extends React.Component {
             width: this.props.wrapperWidth || '100%',
             height: this.props.wrapperHeight || '100%'
         }
+
         return(
             <div class="paper-root" ref={this.paperRoot}>
                 <div class="paper-wrapper" style={styles}>
@@ -319,7 +367,7 @@ export default class Paper extends React.Component {
                         id={this.props.id}
                         class="joint-paper"
                         onClick={this.onClick}
-                        onKeyDown={this.onKeyDown}
+                        onKeyDown={(event) => this.onKeyDown(event)}
                         onKeyUp={(event) => this.onKeyUp(event)}
                         onMouseDown={(event) => this.onMouseDown(event)}
                         onMouseUp={this.onMouseUp}
@@ -328,6 +376,16 @@ export default class Paper extends React.Component {
                         tabIndex="0"
                     ></div>
                 </div>
+                <UtilBar ref={this.UtilBar}>
+                    <UtilBarItem icon={faHistory}>
+                        <History 
+                            ref={this.history} 
+                            id_prefix={`${this.props.id}-`}
+                            handleHistoryJump={this.handleHistoryJump}
+                            handleInitializeHistory={this.handleInitializeHistory}
+                        />
+                    </UtilBarItem>
+                </UtilBar>
             </div>
         );
     }

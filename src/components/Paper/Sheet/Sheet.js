@@ -34,13 +34,9 @@ export default class Sheet {
         this.spacing = 10;
     }
 
-    addPremise(config) {
-        const premise = (new Premise()).create(config, this);
-        this.handleCollisions(premise);        
-        
-        // Play pop sound
-        let pop = new Audio(Pop); 
-        this.handlePlayAudio(pop);
+    addPremise(config, mute, fast=false) {
+        const premise = (new Premise()).create(config, this, fast);
+        this.handleCollisions(premise);
         return premise;
     }
 
@@ -54,6 +50,14 @@ export default class Sheet {
         return cut;
     }
 
+    importCells(cells) {
+        this.graph.resetCells(cells.map(cell => {
+            cell = cell.clone();
+            cell.graph = this.graph;
+            return cell;
+        }));
+    }
+
     exportAsJSON() {
         const cells = this.graph.getCells();
         const exported = cells.map(cell => Object.assign(cell.attributes, { sheet: null }));
@@ -61,15 +65,16 @@ export default class Sheet {
         return json;
     }
 
+    //VERY SLOW, USE sheet.importCells(cells) instead if possible, which takes an array of cells
     importFromJSON(json) {
         const parsed = JSON.parse(json);
         for (let cell of parsed) {
             let new_element;
             if (cell.type === 'dia.Element.Premise') {
-                new_element = this.addPremise(cell, true);
+                new_element = this.addPremise(cell, true, true);
             }
             else if (cell.type === 'dia.Element.Cut') {
-                new_element = this.addCut(cell, true);
+                new_element = this.addCut(cell, true, true);
             }
             else {
                 throw new RangeError(`Cell type must be either dia.Element.Premise or dia.Element.Cut, got ${cell.type}`);
@@ -413,13 +418,11 @@ export default class Sheet {
             x: position.x - root.attributes.position.x,
             y: position.y - root.attributes.position.y
         }
-        console.log(offset);
         let current = [];
         let next = [root];
         while (next.length > 0) {
             current = next;
             next = [];
-            console.log(current);
             for (const node of current) {
                 next.push(...node.getEmbeddedCells());
                 //node.move({x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})

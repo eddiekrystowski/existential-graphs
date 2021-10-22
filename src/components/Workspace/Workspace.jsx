@@ -21,12 +21,13 @@ export default class Workspace extends React.Component {
         this.insertPosition = { x: 0, y: 0 };
         this.modalPaper = React.createRef();
         this.mainPaper = React.createRef();
-        this.proofPaper= React.createRef();
+        this.proofPaper = React.createRef();
         this.history = [];
     }
 
     componentDidMount() {
         this.proofPaper.current.hide();
+        this.proofPaper.current.history.current.clear();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -37,13 +38,15 @@ export default class Workspace extends React.Component {
             if (this.state.mode === 'proof') {
                 this.mainPaper.current.hide();
                 this.proofPaper.current.sheet.graph.clear();
-                this.proofPaper.current.sheet.importFromJSON(this.mainPaper.current.sheet.exportAsJSON());
+                const copy = this.mainPaper.current.sheet.exportAsJSON();
+                this.proofPaper.current.sheet.importFromJSON(copy);
                 this.proofPaper.current.show();
             }
             //switch to create mode
             else {
                 this.mainPaper.current.show();
                 this.proofPaper.current.hide();
+                this.proofPaper.current.history.current.clear();
             }
         }
     }
