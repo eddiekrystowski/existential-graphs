@@ -3,8 +3,12 @@ import * as joint from 'jointjs';
 import { Cut } from '../../../shapes/Cut/Cut';
 import { Premise } from '../../../shapes/Premise/Premise';
 import { color } from '../../../util/color';
-import { findSmallestCell, overlapsCells, contains, safeMove } from '../../../util/collisions';
+import { findSmallestCell, overlapsCells, contains, safeMove, getCellsBoundingBox, intersects } from '../../../util/collisions';
+import Pop from '../../../sounds/pop.wav';
+import Snip from '../../../sounds/snip.wav';
 import $ from 'jquery'
+import { cellInArray } from '../../../util/otherUtil';
+import { find } from 'lodash';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -18,6 +22,7 @@ const DEFAULT_BACKGROUND_COLORS = {
 export default class Sheet {
     constructor(paper) {
         this.paper = paper;
+        this.handlePlayAudio = paper.props.handlePlayAudio
         this.graph = new joint.dia.Graph({}, {
             cellNamespace: {
                 nameSpace: { 
@@ -38,6 +43,10 @@ export default class Sheet {
     addCut(config) {
         const cut = (new Cut()).create(config, this);
         this.handleCollisions(cut);
+
+        // Play snip sound
+        let snip = new Audio(Snip); 
+        this.handlePlayAudio(snip);
         return cut;
     }
 
@@ -87,6 +96,7 @@ export default class Sheet {
     // because in the future it would be beneficial to at least have a "entire graph update" be possible, which would be very simple to 
     // do if they are all bundled up.
     handleCollisions(cell) {
+        console.log("=================== HANDLE COLLISIONS =========================")
         //This function takes a Cell as input and, using its position
         // makes any necessary changes to the internal representation of
         // the diagram (parent / child structure (embedding)) to reflect what the user
@@ -121,34 +131,64 @@ export default class Sheet {
         }
         //recolor trees to reflect new level structure
         this.colorByLevel(cell);
+        this.pack(cell);
         this.cleanOverlaps();
     }
 
-    pack() {
-
+    pack(cell) {
+        let root = this.findRoot(cell);
+        console.log("ROOT EMBEDS", root.getEmbeddedCells())
+        this.pack_rec(root);
     }
 
-    cleanOverlaps() {
-        let roots = this.getCellsByLevel(0);
+    pack_rec(cell) {
+        //let level = cell.attributes.attrs.level;
+        let siblings = cell.getEmbeddedCells()
+        console.log("siblings", siblings)
+        if (siblings.length === 0) {
+            return;
+        }
+        for (const child of siblings) {
+            this.pack_rec(child);
+        }
+        //cell is inside a cut
+        //get siblings
+        this.cleanOverlaps(siblings);
+        let siblingsbbox = getCellsBoundingBox(siblings)
+        let cellbbox = cell.getBoundingBox()
+        if (!contains(cellbbox, siblingsbbox)) {
+            if (!intersects(cellbbox, siblingsbbox)) return;
+            if (siblingsbbox.x < cellbbox.x || siblingsbbox.x + siblingsbbox.width > cellbbox.x + cellbbox.width) {
+                cell.position(siblingsbbox.x - this.spacing, cell.attributes.position.y)
+                cell.attr("rect/width", siblingsbbox.width + 2 * this.spacing)
+            }
+            if (siblingsbbox.y < cellbbox.y || siblingsbbox.y + siblingsbbox.height > cellbbox.y + cellbbox.height) {
+                cell.position(cell.attributes.position.x, siblingsbbox.y - this.spacing)
+                cell.attr("rect/height", siblingsbbox.height + 2 * this.spacing)
+            }
+        }
+    }
+
+    cleanOverlaps(roots = this.getCellsByLevel(0)) {
         // sort the roots from largest to smallest. this will cause a ripple effect,
         // starting checks for overlaps at the largest cells and moving outward
         roots.sort(function(a, b) {
             return b.getArea() - a.getArea()
-        })
+        }) 
+        let current = roots;
+        while (current.length > 0) {
+            let next = [];
+            //let total_overlaps = 0;
+            for (const cell of current) {
+                let overlaps = overlapsCells(cell, roots);
 
-        while (true) {
-            let total_overlaps = 0;
-            for (const root of roots) {
-                let overlaps = overlapsCells(root, roots);
-                if (overlaps.length === 0) {
-                    continue;
-                }
-                total_overlaps += overlaps.length;
                 for (const invader of overlaps) {
-                    this.separate(root, invader);
+                    this.separate(cell, invader);
+                    let dupe = cellInArray(invader, next);
+                    if (!dupe) next.push(invader);
                 }
             }
-            if (total_overlaps === 0) break;
+            current = next;
         }
     }
 
@@ -164,15 +204,20 @@ export default class Sheet {
         let shared_x = (mainbbox.x < invaderbbox.x) ? mainbbox.x + mainbbox.width - invaderbbox.x : mainbbox.x - invaderbbox.x - invaderbbox.width; 
         let shared_y = (mainbbox.y < invaderbbox.y) ? mainbbox.y + mainbbox.height - invaderbbox.y : mainbbox.y - invaderbbox.y - invaderbbox.height;
 
-        if (Math.abs(shared_x) >= Math.abs(shared_y)) {
+        if (Math.abs(shared_x) > Math.abs(shared_y)) {
             //make adjustment vertically (shorter change)
             //if shared value is positive, then main is somewhat above the invader
-            this.treeMove(invader, {x: invaderbbox.x, y:invaderbbox.y + shared_y + ((this.spacing) * Math.abs(shared_y) / shared_y)});
+            let dir = Math.sign(shared_y);
+            if (dir === 0) dir = 1;
+            this.treeMove(invader, {x: invaderbbox.x, y: invaderbbox.y + shared_y + (this.spacing * dir)});
         } else {
             //make adjustment horizontally (shorter change)
             //if shared value is positive, then main is somewhat to the left of the invader
-            this.treeMove(invader, {x: invaderbbox.x + shared_x + ((this.spacing) * Math.abs(shared_x) / shared_x), y: invaderbbox.y});
+            let dir = Math.sign(shared_x);
+            if (dir === 0) dir = 1;
+            this.treeMove(invader, {x: invaderbbox.x + shared_x + (this.spacing * dir), y: invaderbbox.y});
         }
+
     }
 
     getCellsByLevel(level) {
@@ -256,12 +301,15 @@ export default class Sheet {
 
     //i think these are graph related functions??? since they call handle collisions, tree stuff, etc which
     //could be specific to a graph
-    addSubgraph(subgraph, position) {
+    addSubgraph(subgraph, position, selected = null) {
         let root = subgraph[Object.keys(subgraph)[0]];
         let root_clone = root.clone();
         let new_root = this.subgraphToGraph(root, root_clone, subgraph)
         this.treeMove(new_root, position);
-        this.handleCollisions(new_root);
+        if (selected && selected.attributes.type === "dia.Element.Cut") {
+            selected.embed(new_root);
+        }
+        this.handleCollisions(new_root)
     }
 
     subgraphToGraph(node, clone, subgraph, parent=null) {
@@ -301,7 +349,6 @@ export default class Sheet {
         //resizes all the children of a root, not including the root
         let current = root.getParentCell();
         while (current) {
-            console.log("current", current)
             current.attr("rect/width", current.attributes.attrs.rect.width + resize_value);
             current.attr("rect/height", current.attributes.attrs.rect.height + resize_value);
             if (center_nodes) {
