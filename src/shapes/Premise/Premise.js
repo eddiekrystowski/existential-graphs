@@ -110,7 +110,7 @@ export class Premise extends joint.dia.Element {
 
     addTransition(path, value, time, timeFunc = joint.util.timing.linear, valueFunc = joint.util.interpolate.number, delay = 100) {
       this.transition(path, value, {
-        delay: delay,
+        delay: 0,
         duration: time,
         timingFunction: timeFunc,
         valueFunction: valueFunc
