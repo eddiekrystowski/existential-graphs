@@ -15,17 +15,30 @@ export default class History extends React.Component {
 
         this.batch_mode = false;
         this.batch_state = false;
+        this.locked = false;
 
 
         this.state = {
             data: [],
-            index: 0,
-            locked: false
+            index: 0
         }
     }
 
+    componentDidUpdate(pp, ps) {
+        console.log('current state', this.state.data.map(x => JSON.parse(x)));
+        console.log('prev state', ps);
+    }
+
+    handleJump = (num) => {
+        console.log('handleJump');
+        this.setState({
+            index: num
+        });
+        this.props.handleHistoryJump(this.getItem(num));
+    }
+
     push(item) {
-        if(this.state.locked) return;
+        if(this.locked) return;
 
         if(this.batch_mode) {
             this.setState({
@@ -34,14 +47,17 @@ export default class History extends React.Component {
             return;
         }
 
-        const data = _.cloneDeep(this.state.data);
+        const data = [...this.state.data];
 
         if (this.state.index !== this.state.data.length - 1) {
             //remove all states after current index
+            console.log('splicing...', data);
             data.splice(this.state.index + 1);
+            console.log('after splice', data);
         }
-        
+
         data.push(item);
+        console.log('after push to copy', data);
         //remove from bottom of stack if we have more items than the max size allows
         if (data.length >= this.MAX_SIZE) {
             data.shift();
@@ -80,15 +96,11 @@ export default class History extends React.Component {
     }
 
     lock() {
-        this.setState({
-            locked: true
-        });
+        this.locked = true;
     }
 
     unlock() {
-        this.setState({
-            locked: false
-        });
+        this.locked = false;
     }
 
     startBatch() {
@@ -108,7 +120,14 @@ export default class History extends React.Component {
             <div class="history">
                 {
                     this.state.data.map((history_item, num) => (
-                        <HistoryItem id={this.props.id_prefix + num}json={history_item}/>
+                        (num === 0) ?  null :
+                        <HistoryItem 
+                            id={this.props.id_prefix + num}
+                            json={history_item}
+                            active={this.state.index === num}
+                            onClick={this.handleJump.bind(this, num)}
+                            key={num}
+                        />
                     ))
                 }
             </div>

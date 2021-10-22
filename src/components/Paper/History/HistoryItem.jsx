@@ -12,6 +12,12 @@ export default class HistoryItem extends React.Component {
         this.sheet = new Sheet(this);
     }
 
+    componentDidUpdate() {
+        this.sheet.graph.clear();
+        this.sheet.importFromJSON(this.props.json);
+        this.jpaper.scaleContentToFit();
+    }
+
     componentDidMount() {
         this.jpaper = new joint.dia.Paper({
             el: document.getElementById(this.props.id),
@@ -38,12 +44,20 @@ export default class HistoryItem extends React.Component {
         });
     }
 
+    refresh() {
+
+    }
+
     render() {
+        const style = {
+            backgroundColor: this.props.active ? '#ed6b4d' : ''
+        }
         return(
-            <div class="history-item">
+            <div class="history-item"style={style}>
                     <div 
                         id={this.props.id}
                         class="joint-paper history-item-paper"
+                        onClick={this.props.onClick}
                     ></div>
             </div>
         )

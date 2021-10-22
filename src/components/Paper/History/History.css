@@ -17,7 +17,7 @@
 }
 
 .history-selected {
-    background-color: lightskyblue;
+    background-color: lightskyblue !important;
 }
 
 .history-item {

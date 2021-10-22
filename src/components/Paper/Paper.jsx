@@ -52,7 +52,15 @@ export default class Paper extends React.Component {
         this.paper_element = document.getElementById(this.props.id);
         
         this.setPaperEvents();
-        //this.onGraphUpdate();
+        this.history.current.push(this.sheet.exportAsJSON());
+    }
+
+    handleHistoryJump = (new_state) => {
+        console.log('new state', new_state);
+        this.history.current.lock();
+        this.sheet.graph.clear();
+        this.sheet.importFromJSON(new_state);
+        this.history.current.unlock();
     }
 
     onGraphUpdate() {
@@ -369,7 +377,12 @@ export default class Paper extends React.Component {
                 </div>
                 <UtilBar ref={this.UtilBar}>
                     <UtilBarItem icon={faHistory}>
-                        <History ref={this.history} id_prefix={`${this.props.id}-`}/>
+                        <History 
+                            ref={this.history} 
+                            id_prefix={`${this.props.id}-`}
+                            handleHistoryJump={this.handleHistoryJump}
+                            handleInitializeHistory={this.handleInitializeHistory}
+                        />
                     </UtilBarItem>
                 </UtilBar>
             </div>
