@@ -98,6 +98,25 @@ export class Premise extends joint.dia.Element {
         return premise;
     }
 
+    changeSize(size, time = 500) {
+      this.addTransition('attrs/rect/width', size.width, time);
+      this.addTransition('attrs/rect/height', size.height, time);
+    }
+
+    changePosition(position, time = 500) {
+      this.addTransition('position/x', position.x, time);
+      this.addTransition('position/y', position.y, time);
+    }
+
+    addTransition(path, value, time, timeFunc = joint.util.timing.linear, valueFunc = joint.util.interpolate.number, delay = 100) {
+      this.transition(path, value, {
+        delay: delay,
+        duration: time,
+        timingFunction: timeFunc,
+        valueFunction: valueFunc
+      });
+    }
+
     destroy() {
       this.remove();
       this.sheet.paper.handleDeleteCell();

@@ -56,11 +56,16 @@ export default class Sheet {
     }
 
     importCells(cells) {
+        let clones = []
         this.graph.resetCells(cells.map(cell => {
             cell = cell.clone();
-            cell.graph = this.graph;
+            clones.push(cell)
+            cell.sheet = this;
             return cell;
         }));
+        for (const cell of clones) {
+            this.handleCollisions(cell);
+        }
     }
 
     exportAsJSON() {
@@ -160,11 +165,11 @@ export default class Sheet {
             if (!intersects(cellbbox, siblingsbbox)) return;
             if (siblingsbbox.x < cellbbox.x || siblingsbbox.x + siblingsbbox.width > cellbbox.x + cellbbox.width) {
                 cell.position(siblingsbbox.x - this.spacing, cell.attributes.position.y)
-                cell.attr("rect/width", siblingsbbox.width + 2 * this.spacing)
+                cell.addTransition('attrs/rect/width', siblingsbbox.width + 2 * this.spacing, 500);
             }
             if (siblingsbbox.y < cellbbox.y || siblingsbbox.y + siblingsbbox.height > cellbbox.y + cellbbox.height) {
                 cell.position(cell.attributes.position.x, siblingsbbox.y - this.spacing)
-                cell.attr("rect/height", siblingsbbox.height + 2 * this.spacing)
+                cell.addTransition('attrs/rect/height', siblingsbbox.height + 2 * this.spacing, 500);
             }
         }
     }
@@ -284,13 +289,16 @@ export default class Sheet {
     treeToFront(root) {
         //loops through a tree from its root to the leaves
         //to ensure correct z order
+        console.log('root', root);
         let current = [root]
         let next = []
         while (current.length > 0) {
             for (const node of current) {
-                //console.log(node);
+                console.log(node);
                 node.toFront();
                 let children = node.getEmbeddedCells();
+                if (children === undefined ) continue
+                console.log('children ', children)
                 next.push(...children);
             }
             current = next
@@ -350,11 +358,11 @@ export default class Sheet {
         //resizes all the children of a root, not including the root
         let current = root.getParentCell();
         while (current) {
-            current.attr("rect/width", current.attributes.attrs.rect.width + resize_value);
-            current.attr("rect/height", current.attributes.attrs.rect.height + resize_value);
+            current.changeSize({width: current.attributes.attrs.rect.width + resize_value, height: current.attributes.attrs.rect.height + resize_value})
             if (center_nodes) {
-                current.set("position", {x: current.attributes.position.x - resize_value/2,
-                                         y: current.attributes.position.y - resize_value/2});
+                current.changePosition({x: current.attributes.position.x - resize_value/2, y: current.attributes.position.y - resize_value/2})
+                // current.set("position", {x: current.attributes.position.x - resize_value/2,
+                //                          y: current.attributes.position.y - resize_value/2});
             }
             current = current.getParentCell();
         }
@@ -433,6 +441,8 @@ export default class Sheet {
                 next.push(...node.getEmbeddedCells());
                 //node.move({x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
                 //safeMove(node, {x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
+                console.log("AAAAAA")
+                //node.changePosition({x: node.attributes.position.x + offset.x, y:node.attributes.position.y + offset.y}, 10)
                 node.position(node.attributes.position.x + offset.x, node.attributes.position.y + offset.y);
             }
         }

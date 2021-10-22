@@ -129,6 +129,25 @@ export class Cut extends joint.dia.Element {
         return cut;
     }
 
+    changeSize(size, time = 500) {
+        this.addTransition('attrs/rect/width', size.width, time);
+        this.addTransition('attrs/rect/height', size.height, time);
+    }
+
+    changePosition(position, time = 500) {
+        this.addTransition('position/x', position.x, time);
+        this.addTransition('position/y', position.y, time);
+    }
+  
+    addTransition(path, value, time, timeFunc = joint.util.timing.linear, valueFunc = joint.util.interpolate.number, delay = 100) {
+        this.transition(path, value, {
+            delay: delay,
+            duration: time,
+            timingFunction: timeFunc,
+            valueFunction: valueFunc
+        });
+    }
+
     destroy() {
         //check if cut has parents or children, if so children become new children of parent;
         let parent = this.getParentCell();
@@ -366,7 +385,8 @@ function resize_mousemove(event) {
     event.data.target.attr('rect/height', size.height + modifiers.size_y * delta.y);
 
     //adjust position to offset size changes in certain directions
-    event.data.target.set('position',  { x: position.x + modifiers.pos_x * delta.x, y: position.y + modifiers.pos_y * delta.y});
+    event.data.target.changePosition( { x: position.x + modifiers.pos_x * delta.x, y: position.y + modifiers.pos_y * delta.y} )
+    //event.data.target.set('position',  { x: position.x + modifiers.pos_x * delta.x, y: position.y + modifiers.pos_y * delta.y});
     
     //copy current_pos to prev_pos
     prev_pos = Object.assign({}, current_pos);
