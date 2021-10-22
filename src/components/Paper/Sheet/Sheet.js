@@ -127,21 +127,22 @@ export default class Sheet {
 
     pack(cell) {
         let root = this.findRoot(cell);
+        console.log("ROOT EMBEDS", root.getEmbeddedCells())
         this.pack_rec(root);
     }
 
     pack_rec(cell) {
         //let level = cell.attributes.attrs.level;
-        let children = (cell.get("embeds")) ? cell.getEmbeddedCells() : null
-        if (children === null) {
+        let siblings = cell.getEmbeddedCells()
+        console.log("siblings", siblings)
+        if (siblings.length === 0) {
             return;
         }
-        for (const child of children) {
+        for (const child of siblings) {
             this.pack_rec(child);
         }
         //cell is inside a cut
         //get siblings
-        let siblings = cell.getEmbeddedCells();
         this.cleanOverlaps(siblings);
         let siblingsbbox = getCellsBoundingBox(siblings)
         let cellbbox = cell.getBoundingBox()
@@ -158,8 +159,7 @@ export default class Sheet {
         }
     }
 
-    cleanOverlaps(roots = []) {
-        if (roots.length === 0) roots = this.getCellsByLevel(0);
+    cleanOverlaps(roots = this.getCellsByLevel(0)) {
         // sort the roots from largest to smallest. this will cause a ripple effect,
         // starting checks for overlaps at the largest cells and moving outward
         roots.sort(function(a, b) {
