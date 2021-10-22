@@ -114,10 +114,6 @@ export default class Sheet {
         this.cleanOverlaps();
     }
 
-    pack() {
-
-    }
-
     cleanOverlaps() {
         let roots = this.getCellsByLevel(0);
         // sort the roots from largest to smallest. this will cause a ripple effect,
