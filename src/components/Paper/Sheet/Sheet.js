@@ -56,11 +56,16 @@ export default class Sheet {
     }
 
     importCells(cells) {
-        this.graph.resetCells(cells.map(cell => {
+        const clones =  cells.map(cell => {
             cell = cell.clone();
-            cell.graph = this.graph;
+            cell.sheet = this;
             return cell;
-        }));
+        })
+        this.graph.resetCells(clones);
+
+        for(let cell of clones) {
+            this.handleCollisions(cell)
+        }
     }
 
     exportAsJSON() {
