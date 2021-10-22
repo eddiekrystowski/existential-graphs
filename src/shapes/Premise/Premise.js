@@ -1,7 +1,6 @@
 import * as joint from 'jointjs'
 import _ from 'lodash'
 import './Premise.css'
-import Pop from '../../sounds/pop.wav'
 // class for premises (letters)
 
 const PREMISE_DEFAULTS = {
@@ -92,13 +91,14 @@ export class Premise extends joint.dia.Element {
         premise.sheet = options.sheet;
 
         premise.addTo(premise.sheet.graph)
+      
         //add tools (some events events also)
-
         if(!fast) this.addTools(premise);
 
         // Play pop sound
         let pop = new Audio(Pop); 
         pop.play();
+
         return premise;
     }
 
