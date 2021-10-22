@@ -1,12 +1,9 @@
-import { Cut } from "../shapes/Cut/Cut"
-import  { handleCollisions} from './collisions.js'
-import E from '../EventController.js'
 
 
 
 export const inferenceInsertion = function(sheet, model, mousePosition) {
   console.log('ARGS', arguments);
-  if(model.__proto__.constructor.name == "Cut" && (model.attributes.level) % 2 === 0) return;
+  if(model.__proto__.constructor.name === "Cut" && (model.attributes.level) % 2 === 0) return;
   console.log('opening modal...')
   const paper = sheet.paper;
   paper.props.handleOpenModal(mousePosition);

@@ -3,12 +3,11 @@ import * as joint from 'jointjs';
 import { Cut } from '../../../shapes/Cut/Cut';
 import { Premise } from '../../../shapes/Premise/Premise';
 import { color } from '../../../util/color';
-import { findSmallestCell, overlapsCells, contains, safeMove, getCellsBoundingBox, intersects } from '../../../util/collisions';
+import { findSmallestCell, overlapsCells, contains, getCellsBoundingBox, intersects } from '../../../util/collisions';
 import Pop from '../../../sounds/pop.wav';
 import Snip from '../../../sounds/snip.wav';
 import $ from 'jquery'
 import { cellInArray } from '../../../util/otherUtil';
-import { find } from 'lodash';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);

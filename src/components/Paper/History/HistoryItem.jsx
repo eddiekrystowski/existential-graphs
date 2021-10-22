@@ -54,10 +54,10 @@ export default class HistoryItem extends React.Component {
             backgroundColor: this.props.active ? '#ed6b4d' : ''
         }
         return(
-            <div class="history-item"style={style}>
+            <div className="history-item"style={style}>
                     <div 
                         id={this.props.id}
-                        class="joint-paper history-item-paper"
+                        className="joint-paper history-item-paper"
                         onClick={this.props.onClick}
                     ></div>
             </div>

@@ -1,14 +1,11 @@
 import React from 'react';
-import { act } from 'react-dom/test-utils';
 import Paper from '../Paper/Paper';
 import SideBar from '../SideBar/SideBar';
 import Modal from '../Modal/Modal.jsx';
-import _ from 'lodash';
 
 import './Workspace.css'
-import E from '../../EventController';
 
-const LOAD_MODAL = new Event('load-modal');
+new Event('load-modal');
 
 export default class Workspace extends React.Component {
     constructor(props) {
@@ -82,7 +79,7 @@ export default class Workspace extends React.Component {
     }
 
     handleModalInsert = (position) => {
-        console.log('inserting...');
+        console.log('inserting...', position);
         this.proofPaper.current.sheet.importFromJSON(this.modalPaper.current.sheet.exportAsJSON());
         this.handleModalExit();
     }
@@ -103,7 +100,7 @@ export default class Workspace extends React.Component {
         ]
 
         return (
-            <div class="workspace">
+            <div className="workspace">
                 <SideBar  
                     mode={this.state.mode} 
                     onStateSwitch={this.handleStateSwitch.bind(this)} 

@@ -1,7 +1,6 @@
 import React from 'react';
 import MenuItem from './MenuItem.js';
 import './MenuBar.css';
-import $ from 'jquery';
 
 export default function MenuBar(props) {
   //have to have menu items inside Menu Bar here since some buttons (such as the mute button) are responsible

@@ -1,5 +1,4 @@
 import React from "react";
-import _ from 'lodash';
 
 import './UtilBar.css';
 
@@ -20,7 +19,7 @@ export default class UtilBar extends React.Component {
 
     render() {
         return (
-            <div class="util-bar-root">
+            <div className="util-bar-root">
                 { 
                     //loop through children and pass active prop to child whose index corresponds to
                     //this.state.active

@@ -3,10 +3,6 @@ import React from 'react';
 import './Modal.css'
 
 export default class Modal extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         if (!this.props.show) {
             console.log('early');

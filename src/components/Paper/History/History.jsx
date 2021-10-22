@@ -1,8 +1,4 @@
 import React from "react";
-import _ from 'lodash';
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHistory } from "@fortawesome/free-solid-svg-icons";
 
 import './History.css';
 import HistoryItem from "./HistoryItem";
@@ -115,7 +111,7 @@ export default class History extends React.Component {
 
     render() {
         return (
-            <div class="history">
+            <div className="history">
                 {
                     this.state.data.map((history_item, num) => (
                         (num === 0) ?  null :

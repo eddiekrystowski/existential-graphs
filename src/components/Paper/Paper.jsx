@@ -254,7 +254,7 @@ export default class Paper extends React.Component {
                 this.sheet.addCut(config);
             } else {
                 //console.log("creating empty cut")
-                const new_cut = this.sheet.addCut(config);
+                this.sheet.addCut(config);
                 //console.log("cut", new_cut)
             }
         }
@@ -369,11 +369,11 @@ export default class Paper extends React.Component {
         }
 
         return(
-            <div class="paper-root" ref={this.paperRoot}>
-                <div class="paper-wrapper" style={styles}>
+            <div className="paper-root" ref={this.paperRoot}>
+                <div className="paper-wrapper" style={styles}>
                     <div 
                         id={this.props.id}
-                        class="joint-paper"
+                        className="joint-paper"
                         onClick={this.onClick}
                         onKeyDown={(event) => this.onKeyDown(event)}
                         onKeyUp={(event) => this.onKeyUp(event)}
