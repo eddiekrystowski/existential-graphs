@@ -305,6 +305,7 @@ export default class Sheet {
             selected.embed(new_root);
         }
         this.handleCollisions(new_root)
+        return root_clone.id;
     }
 
     subgraphToGraph(node, clone, subgraph, parent=null) {

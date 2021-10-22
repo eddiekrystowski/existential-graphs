@@ -107,7 +107,8 @@ export class Cut extends joint.dia.Element {
         cut.addTo(cut.sheet.graph);
         //add tools (some events events also)
         this.addTools(cut);
-
+        let audio = new Audio(Snip);
+        audio.play();
         //check for children
         if (config && config.child) {
             let child = config.child;

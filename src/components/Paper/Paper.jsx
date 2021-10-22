@@ -146,9 +146,12 @@ export default class Paper extends React.Component {
             cell.inactive();
 
             if(!this.props.action) this.onGraphUpdate();
-
-            if (this.props.action) this.props.action(this.sheet, cell, E.mousePosition);
-            if (this.props.handleClearAction) this.props.handleClearAction();
+            let nextAction;
+            if (this.props.action) {
+                nextAction = this.props.action(this.sheet, cell, this.getRelativeMousePos());
+            }
+            if (this.props.handleClearAction && !nextAction) this.props.handleClearAction();
+            if(nextAction) this.props.handleActionChange(nextAction);
             this.selected_premise = null;
         });
 
@@ -296,6 +299,11 @@ export default class Paper extends React.Component {
         if (this.getMode() === 'proof') {
             this.history.current.startBatch();
             if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
+                const mouse_adjusted = this.getRelativeMousePos();
+                this.props.action(this.sheet, null, mouse_adjusted);
+                this.props.handleClearAction();
+            }
+            if (!this.selected_premise && this.props.action && this.props.action.name === 'bound iterationend') {
                 const mouse_adjusted = this.getRelativeMousePos();
                 this.props.action(this.sheet, null, mouse_adjusted);
                 this.props.handleClearAction();
