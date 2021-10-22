@@ -205,4 +205,53 @@ function obliterate(sheet, model) {
   //  Then destroy self
   model.destroy();
 
+
+
+}
+
+/**
+ * Returns if a iteration is legal
+ * @param {Sheet} sheet - The sheet the subgraphs are contained by.
+ * @param {Cell} model - The origin subgraph.
+ * @param {Cell} model_clone - The clone of the origin subgraph
+ * @returns {Boolean} - If the iteration is legal.
+ */
+function legalIteration(sheet, model, model_clone) {
+  //  First, confirm the two models are the same.
+  if(!matchingModel(model,model_clone)) {
+    console.error("Model discrepency when detecting legality of iteration.");
+    return false;
+  }
+
+  //  If the first model is on the sheet of assertion return true
+  if(model.attributes.atts.level === 0) { return true; }
+
+  //  If the clone is on a lower level than the origin, return false
+  if(model.attributes.atts.level > model_clone.attributes.attrs.level) { return false; }
+
+  //  Add all sibling cuts to a list (all children of parent, remove self)
+  let search = [...sheet.graph.getCell(model.attributes.parent).attributes.embeds];
+  search.splice(search.indexOf(model.id, 1));
+
+  //Iterativly search
+
+  while(search.length > 0) {
+    let current = search.shift();
+    //  Check if it is clone
+    if( current === model_clone.id) {
+      return true;
+    }
+    //  If it is a cut, add all children
+    if(sheet.graph.getCell(current).__proto__.constructor.name === "Cut") {
+      sheet.graph.getCell(current).attributes.embeds?.forEach( element => {
+        search.push(element);
+      });
+    }
+  }
+
+  //  If you get here, it's illegal! >:o
+  return false;
+    
+  
+
 }
