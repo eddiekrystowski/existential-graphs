@@ -48,7 +48,11 @@ export function overlapsCells(target, cells) {
     return cell_collisions;
 }
 
-function intersects(mainbbox, otherbbox) {
+export function intersects(mainbbox, otherbbox) {
+    if (contains(mainbbox, otherbbox) || contains(otherbbox, mainbbox)) {
+        return true;
+    }
+
     // check if bounding boxes overlap one another
     
     //check if either bbox is completely above the other
@@ -167,4 +171,25 @@ function pushRight(main, invader) {
         y: invader.attributes.position.y
     }
     safeMove(invader, move_target);
+}
+
+export function getCellsBoundingBox(cells) {
+    let min_x = cells[0].attributes.position.x
+    let max_x = cells[0].attributes.attrs.rect.width + min_x
+    let min_y = cells[0].attributes.position.y
+    let max_y = cells[0].attributes.attrs.rect.height + min_y
+    for (let i = 1; i < cells.length; i++) {
+        let cell = cells[i];
+        let cellbbox = cell.getBoundingBox();
+        if (cellbbox.x < min_x) min_x = cellbbox.x;
+        if (cellbbox.y < min_y) min_y = cellbbox.y;
+        if (cellbbox.x + cellbbox.width > max_x) max_x = cellbbox.x + cellbbox.width;
+        if (cellbbox.y + cellbbox.height > max_y) max_y = cellbbox.y + cellbbox.height; 
+    }
+    return {
+        x: min_x,
+        y: min_y,
+        width: max_x - min_x,
+        height: max_y - min_y
+    }
 }
