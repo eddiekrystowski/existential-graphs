@@ -63,7 +63,8 @@ export default class Paper extends React.Component {
 
     onGraphUpdate() {
         //const new_graph = this.sheet.exportAsJSON();
-        const cells = this.sheet.graph.getCells();
+        //const cells = Object.values(this.sheet.graph.cloneCells(this.sheet.graph.getCells()));
+        const cells = this.sheet.graph.getCells()
         this.history.current.push(cells);
     }
 
@@ -131,7 +132,6 @@ export default class Paper extends React.Component {
             if (cell.get('parent')) {
                 this.sheet.graph.getCell(cell.get('parent')).unembed(cell);
             }
-
             cell.active();
             this.sheet.treeToFront(this.sheet.findRoot(cell));
         });
