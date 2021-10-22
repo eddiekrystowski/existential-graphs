@@ -1,6 +1,6 @@
 .util-bar-root {
     width: 3vw;
-    height: 100%;
+    height: auto;
     background-color: rgb(61, 90, 128);
     display: flex;
     flex-direction: column;

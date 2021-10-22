@@ -37,13 +37,18 @@ export default class History extends React.Component {
         this.props.handleHistoryJump(this.getItem(num));
     }
 
+    clear(callback) {
+        this.setState({
+            data: [],
+            index: 0
+        }, callback && callback);
+    }
+
     push(item) {
         if(this.locked) return;
 
         if(this.batch_mode) {
-            this.setState({
-                batch_state: item
-            });
+            this.batch_state = item
             return;
         }
 
@@ -76,8 +81,9 @@ export default class History extends React.Component {
                 index: this.state.index - 1
             });
             index -= 1;
+            return this.getItem(index);
         }
-        return this.getItem(index);
+        return false;
     }
 
     redo() {
@@ -87,8 +93,9 @@ export default class History extends React.Component {
                 index: this.state.index + 1
             });
             index += 1;
+            return this.getItem(index);
         }
-        return this.getItem(index);
+        return false;
     }
 
     getItem(index) {

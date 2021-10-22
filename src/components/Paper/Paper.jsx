@@ -64,13 +64,12 @@ export default class Paper extends React.Component {
     }
 
     onGraphUpdate() {
-        console.log('onGraphUpdate');
         const new_graph = this.sheet.exportAsJSON();
         this.history.current.push(new_graph);
     }
 
     show() {
-        $(this.paperRoot.current).css('display', 'block');
+        $(this.paperRoot.current).css('display', 'flex');
     }
 
     hide() {
@@ -165,21 +164,26 @@ export default class Paper extends React.Component {
         //PAPER UNDO AND REDO EVENTS
         $(this.paperRoot.current).on('keydown', (event) => {
             if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
-                console.log('undoing...')
-                console.log(this.history);
                 const new_state = this.history.current.undo();
-                this.sheet.graph.clear();
-                this.history.current.lock();
-                this.sheet.importFromJSON(new_state);
-                this.history.current.unlock();
+                //only update graph if new state exists
+                //undo will return false if can't undo anymore
+                if (new_state) {
+                    this.sheet.graph.clear();
+                    this.history.current.lock();
+                    this.sheet.importFromJSON(new_state);
+                    this.history.current.unlock();
+                }
             }
             if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && event.shiftKey) {
                 const new_state = this.history.current.redo();
-                console.log('redoing...')
-                this.sheet.graph.clear();
-                this.history.current.lock();
-                this.sheet.importFromJSON(new_state);
-                this.history.current.unlock();
+                //only update graph if new state exists
+                //redo will return false if can't redo anymore
+                if (new_state) {
+                    this.sheet.graph.clear();
+                    this.history.current.lock();
+                    this.sheet.importFromJSON(new_state);
+                    this.history.current.unlock();
+                }
             }
         });
     }
