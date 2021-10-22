@@ -33,9 +33,9 @@ export default class Sheet {
         this.spacing = 10;
     }
 
-    addPremise(config, mute, fast=false) {
+    addPremise(config, fast=false) {
         const premise = (new Premise()).create(config, this, fast);
-        this.handleCollisions(premise);
+        if (!fast) this.handleCollisions(premise);
 
         // Play snip sound
         let pop = new Audio(Pop); 
@@ -44,9 +44,9 @@ export default class Sheet {
         return premise;
     }
 
-    addCut(config) {
+    addCut(config, fast=false) {
         const cut = (new Cut()).create(config, this);
-        this.handleCollisions(cut);
+        if (!fast) this.handleCollisions(cut);
 
         // Play snip sound
         let snip = new Audio(Snip); 

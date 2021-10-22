@@ -27,6 +27,7 @@ export const inferenceErasure = function(sheet, model) {
 }
 
 export const insertDoubleCut = function(sheet, model, mousePosition={}) {
+    let selected_premise = sheet.paper.selected_premise
     let position = {};
     let size = {}
     if (!model && mousePosition) {
@@ -41,8 +42,9 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
         throw new Error('Bad arguments');
     }
     const multipliers = [0.8, 0.25];
+    let new_cuts = []
     for(let i = 0; i < multipliers.length; i++) { 
-        sheet.addCut({
+        let cut = sheet.addCut({
             position:  {
               x: position.x - (size.width * multipliers[i]/2),
               y: position.y - (size.height * multipliers[i]/2)
@@ -53,8 +55,17 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
                     height: size.height * (1 + multipliers[i])
                 }
             }
-        });
-    }  
+        }, true);
+        new_cuts.push(cut);
+    } 
+    new_cuts[0].embed(new_cuts[1])
+    sheet.colorByLevel(new_cuts[0])
+    if (selected_premise && selected_premise.attributes.type === "dia.Element.Cut") {
+      selected_premise.embed(new_cuts[0]);
+      sheet.colorByLevel(selected_premise)
+      sheet.pack(selected_premise)
+    }
+    sheet.handleCollisions(new_cuts[0])
 }
 
 export const deleteDoubleCut = function(sheet, model) {
