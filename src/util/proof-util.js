@@ -251,7 +251,4 @@ function legalIteration(sheet, model, model_clone) {
 
   //  If you get here, it's illegal! >:o
   return false;
-    
-  
-
 }
