@@ -6,9 +6,13 @@ import $ from 'jquery'
 
 import Delete from '../../sounds/delete.wav';
 import Sheet from './Sheet/Sheet.js';
-import History from './History/History.js'
+import History from './History/History.jsx'
 
 import './Paper.css';   
+import UtilBar from './UtilBar/UtilBar.jsx';
+import UtilBarItem from './UtilBar/UtilBarItem.jsx';
+import './UtilBar/UtilBar.css';
+import { faHistory } from '@fortawesome/free-solid-svg-icons';
 
 const PAPER_SIZE = { width: 4000, height: 4000 };
 
@@ -31,6 +35,7 @@ export default class Paper extends React.Component {
             show: true
         }
 
+        this.UtilBar = React.createRef();
         this.history = React.createRef();
     }
 
@@ -47,7 +52,7 @@ export default class Paper extends React.Component {
         this.paper_element = document.getElementById(this.props.id);
         
         this.setPaperEvents();
-        this.onGraphUpdate();
+        //this.onGraphUpdate();
     }
 
     onGraphUpdate() {
@@ -345,9 +350,9 @@ export default class Paper extends React.Component {
             width: this.props.wrapperWidth || '100%',
             height: this.props.wrapperHeight || '100%'
         }
+
         return(
             <div class="paper-root" ref={this.paperRoot}>
-                <History ref={this.history}/>
                 <div class="paper-wrapper" style={styles}>
                     <div 
                         id={this.props.id}
@@ -362,6 +367,11 @@ export default class Paper extends React.Component {
                         tabIndex="0"
                     ></div>
                 </div>
+                <UtilBar ref={this.UtilBar}>
+                    <UtilBarItem icon={faHistory}>
+                        <History ref={this.history} id_prefix={`${this.props.id}-`}/>
+                    </UtilBarItem>
+                </UtilBar>
             </div>
         );
     }

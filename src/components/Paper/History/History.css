@@ -1,0 +1,27 @@
+.history-item-paper {
+    display: inline-block !important;
+    border: 2px solid #293241;
+    margin: 10px;
+    cursor: pointer;
+}
+
+.history-item-paper * {
+    cursor: pointer;
+}
+
+.history {
+    overflow: scroll;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.history-selected {
+    background-color: lightskyblue;
+}
+
+.history-item {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}

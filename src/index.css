@@ -16,3 +16,12 @@ html, body, #root, .app {
     /* grid-template-rows: 10vh auto auto;
     grid-template-columns: 15vw auto auto; */
 }
+
+.visually-hidden {
+    position: absolute !important;
+    left:     -10000px !important;
+    top:      auto !important;
+    width:    1px !important;
+    height:   1px !important;
+    overflow: hidden !important;
+}

@@ -1,0 +1,30 @@
+.util-bar-root {
+    width: 3vw;
+    height: 100%;
+    background-color: rgb(61, 90, 128);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 15px;
+    position: relative;
+}
+
+.util-bar-item-icon {
+    font-size: 30px;
+    color: orange;
+    cursor: pointer;
+    padding-top: 20px;
+}
+
+.util-bar-item-root {
+    
+}
+
+.util-bar-active-menu {
+    position: absolute;
+    left: -15vw;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #3189c1;
+}
