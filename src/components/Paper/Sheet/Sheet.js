@@ -3,11 +3,12 @@ import * as joint from 'jointjs';
 import { Cut } from '../../../shapes/Cut/Cut';
 import { Premise } from '../../../shapes/Premise/Premise';
 import { color } from '../../../util/color';
-import { findSmallestCell, overlapsCells, contains, safeMove } from '../../../util/collisions';
+import { findSmallestCell, overlapsCells, contains, safeMove, getCellsBoundingBox, intersects } from '../../../util/collisions';
 import Pop from '../../../sounds/pop.wav';
 import Snip from '../../../sounds/snip.wav';
 import $ from 'jquery'
 import { cellInArray } from '../../../util/otherUtil';
+import { find } from 'lodash';
 
 const NSPremise = joint.dia.Element.define('nameSpace.Premise',Premise);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -85,6 +86,7 @@ export default class Sheet {
     // because in the future it would be beneficial to at least have a "entire graph update" be possible, which would be very simple to 
     // do if they are all bundled up.
     handleCollisions(cell) {
+        console.log("=================== HANDLE COLLISIONS =========================")
         //This function takes a Cell as input and, using its position
         // makes any necessary changes to the internal representation of
         // the diagram (parent / child structure (embedding)) to reflect what the user
@@ -119,22 +121,51 @@ export default class Sheet {
         }
         //recolor trees to reflect new level structure
         this.colorByLevel(cell);
+        this.pack(cell);
         this.cleanOverlaps();
     }
 
-    pack() {
-
+    pack(cell) {
+        let root = this.findRoot(cell);
+        this.pack_rec(root);
     }
 
-    cleanOverlaps() {
-        let roots = this.getCellsByLevel(0);
+    pack_rec(cell) {
+        //let level = cell.attributes.attrs.level;
+        let children = (cell.get("embeds")) ? cell.getEmbeddedCells() : null
+        if (children === null) {
+            return;
+        }
+        for (const child of children) {
+            this.pack_rec(child);
+        }
+        //cell is inside a cut
+        //get siblings
+        let siblings = cell.getEmbeddedCells();
+        this.cleanOverlaps(siblings);
+        let siblingsbbox = getCellsBoundingBox(siblings)
+        let cellbbox = cell.getBoundingBox()
+        if (!contains(cellbbox, siblingsbbox)) {
+            if (!intersects(cellbbox, siblingsbbox)) return;
+            if (siblingsbbox.x < cellbbox.x || siblingsbbox.x + siblingsbbox.width > cellbbox.x + cellbbox.width) {
+                cell.position(siblingsbbox.x - this.spacing, cell.attributes.position.y)
+                cell.attr("rect/width", siblingsbbox.width + 2 * this.spacing)
+            }
+            if (siblingsbbox.y < cellbbox.y || siblingsbbox.y + siblingsbbox.height > cellbbox.y + cellbbox.height) {
+                cell.position(cell.attributes.position.x, siblingsbbox.y - this.spacing)
+                cell.attr("rect/height", siblingsbbox.height + 2 * this.spacing)
+            }
+        }
+    }
+
+    cleanOverlaps(roots = []) {
+        if (roots.length === 0) roots = this.getCellsByLevel(0);
         // sort the roots from largest to smallest. this will cause a ripple effect,
         // starting checks for overlaps at the largest cells and moving outward
         roots.sort(function(a, b) {
             return b.getArea() - a.getArea()
         }) 
         let current = roots;
-        console.log("starting clean overlaps")
         while (current.length > 0) {
             let next = [];
             //let total_overlaps = 0;
@@ -148,10 +179,7 @@ export default class Sheet {
                 }
             }
             current = next;
-            //if (total_overlaps === 0) break;
         }
-        console.log("ending clean overlaps")
-        //sanity check
     }
 
     separate(main, invader) {
@@ -166,7 +194,7 @@ export default class Sheet {
         let shared_x = (mainbbox.x < invaderbbox.x) ? mainbbox.x + mainbbox.width - invaderbbox.x : mainbbox.x - invaderbbox.x - invaderbbox.width; 
         let shared_y = (mainbbox.y < invaderbbox.y) ? mainbbox.y + mainbbox.height - invaderbbox.y : mainbbox.y - invaderbbox.y - invaderbbox.height;
 
-        if (Math.abs(shared_x) >= Math.abs(shared_y)) {
+        if (Math.abs(shared_x) > Math.abs(shared_y)) {
             //make adjustment vertically (shorter change)
             //if shared value is positive, then main is somewhat above the invader
             let dir = Math.sign(shared_y);
@@ -263,12 +291,15 @@ export default class Sheet {
 
     //i think these are graph related functions??? since they call handle collisions, tree stuff, etc which
     //could be specific to a graph
-    addSubgraph(subgraph, position) {
+    addSubgraph(subgraph, position, selected = null) {
         let root = subgraph[Object.keys(subgraph)[0]];
         let root_clone = root.clone();
         let new_root = this.subgraphToGraph(root, root_clone, subgraph)
         this.treeMove(new_root, position);
-        this.handleCollisions(new_root);
+        if (selected && selected.attributes.type === "dia.Element.Cut") {
+            selected.embed(new_root);
+        }
+        this.handleCollisions(new_root)
     }
 
     subgraphToGraph(node, clone, subgraph, parent=null) {

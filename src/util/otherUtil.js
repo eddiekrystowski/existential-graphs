@@ -5,4 +5,4 @@ export function cellInArray(cell, arr) {
         }
     }
     return false;
-}   
+} 
