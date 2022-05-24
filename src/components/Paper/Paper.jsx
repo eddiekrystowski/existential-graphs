@@ -163,6 +163,7 @@ export default class Paper extends React.Component {
         $(this.paperRoot.current).on('keydown', (event) => {
             if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
                 const new_state = this.history.current.undo();
+                this.selected_premise = null;
                 //only update graph if new state exists
                 //undo will return false if can't undo anymore
                 if (new_state) {
