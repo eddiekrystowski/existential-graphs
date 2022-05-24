@@ -119,7 +119,6 @@ export default class SideBar extends React.Component {
                     </div>
 
                     <ButtonGroup buttons={this.state.buttons[this.props.mode]} mode={this.props.mode} action={this.props.action}/>
-                    {console.log(this.props.action)}
                 </div>
             </div>
         ); 
