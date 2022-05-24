@@ -105,6 +105,7 @@ export default class Workspace extends React.Component {
                     mode={this.state.mode} 
                     onStateSwitch={this.handleStateSwitch.bind(this)} 
                     handleActionChange={this.handleActionChange.bind(this)}
+                    action={this.state.action}
                 >
                 </SideBar>
                 <Paper 

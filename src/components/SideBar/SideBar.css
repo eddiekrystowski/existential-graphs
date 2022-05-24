@@ -12,4 +12,12 @@
 
 #side-wrapper {
     margin: 5px;
+    width : 100%
+}
+
+#mode-header {
+    display: flexbox;
+    width: 100%;
+    height: max-content;
+    text-align: center;
 }
