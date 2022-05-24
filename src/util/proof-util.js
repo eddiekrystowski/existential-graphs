@@ -56,7 +56,6 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
             }
         }, false));
     } 
-    console.log("NEW CUTS: ",new_cuts[0], new_cuts[1]);
     new_cuts[0].embed(new_cuts[1])
     sheet.colorByLevel(new_cuts[0])
     let selected_premise = sheet.paper.selected_premise;
