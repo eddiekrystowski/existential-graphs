@@ -44,9 +44,9 @@ export default class Sheet {
         return premise;
     }
 
-    addCut(config) {
-        const cut = (new Cut()).create(config, this);
-        this.handleCollisions(cut);
+    addCut(config, collisions=true) {
+        const cut = (new Cut()).create(config, this, collisions);
+        if (collisions) this.handleCollisions(cut);
 
         // Play snip sound
         let snip = new Audio(Snip); 
