@@ -155,9 +155,9 @@ export default class Paper extends React.Component {
             this.selected_premise = null;
         });
 
-        this.sheet.graph.on('add', () => {
-            this.onGraphUpdate();
-        });
+        // this.sheet.graph.on('add', () => {
+        //     this.onGraphUpdate();
+        // });
 
         //PAPER UNDO AND REDO EVENTS
         $(this.paperRoot.current).on('keydown', (event) => {

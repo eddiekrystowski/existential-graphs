@@ -40,7 +40,7 @@ export default class Sheet {
         // Play snip sound
         let pop = new Audio(Pop); 
         this.handlePlayAudio(pop);
-
+        this.paper.onGraphUpdate();
         return premise;
     }
 
@@ -51,6 +51,7 @@ export default class Sheet {
         // Play snip sound
         let snip = new Audio(Snip); 
         this.handlePlayAudio(snip);
+        this.paper.onGraphUpdate();
         return cut;
     }
 
@@ -60,10 +61,11 @@ export default class Sheet {
             cell.sheet = this;
             return cell;
         })
+        this.graph.clear();
         this.graph.resetCells(clones);
 
         for(let cell of clones) {
-            this.handleCollisions(cell)
+            this.handleCollisions(cell, false)
         }
     }
 
@@ -99,7 +101,7 @@ export default class Sheet {
     //TODO: some of these functions kind of fit here and also kind of don't. I'm moving them here for now
     // because in the future it would be beneficial to at least have a "entire graph update" be possible, which would be very simple to 
     // do if they are all bundled up.
-    handleCollisions(cell) {
+    handleCollisions(cell, clean=true) {
         console.log("=================== HANDLE COLLISIONS =========================")
         //This function takes a Cell as input and, using its position
         // makes any necessary changes to the internal representation of
@@ -135,8 +137,10 @@ export default class Sheet {
         }
         //recolor trees to reflect new level structure
         this.colorByLevel(cell);
-        this.pack(cell);
-        this.cleanOverlaps();
+        if (clean) {
+            this.pack(cell);
+            this.cleanOverlaps();
+        }
     }
 
     pack(cell) {
@@ -277,7 +281,7 @@ export default class Sheet {
         let cells = this.graph.getCells();
         let potential_children = [];
         for (const cell of cells) {
-            if (!(cell.get("parent")) || cell.get("parent") === parent.id){
+            if (cell.get("parent") === parent.id){
                 potential_children.push(cell)
             }
         }
