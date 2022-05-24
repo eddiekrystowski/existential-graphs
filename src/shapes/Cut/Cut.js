@@ -381,6 +381,7 @@ function resize_mouseup (event) {
     $(document).off('mouseup', resize_mouseup);
     $(document).off('mousemove', resize_mousemove);
     event.data.target.sheet.handleCollisions(event.data.target);
+    event.data.target.sheet.paper.onGraphUpdate();
 }
 
 function createResizeTool(config) {

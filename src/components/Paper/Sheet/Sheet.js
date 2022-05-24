@@ -56,12 +56,15 @@ export default class Sheet {
     }
 
     importCells(cells) {
+        console.log("Import CELLS !!!!!!!!!!!!!!",cells, cells.length);
+        this.graph.clear();
+        if (cells === "[]") return;
+        console.trace();
         const clones =  cells.map(cell => {
             cell = cell.clone();
             cell.sheet = this;
             return cell;
         })
-        this.graph.clear();
         this.graph.resetCells(clones);
 
         for(let cell of clones) {
