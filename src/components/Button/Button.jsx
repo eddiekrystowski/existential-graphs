@@ -10,7 +10,7 @@ export default class Button extends React.Component {
     
     render() {
         return (
-            <button className='button' onClick={this.props.onClick}>
+            <button className={'button ' + (this.props.active ? 'button-active' : '')} onClick={this.props.onClick}>
                 <div className='tooltip-text'>{this.props.tooltip_text}</div>
                 <FontAwesomeIcon icon={this.props.icon} className='button-icon'/>
                 <p>{this.props.text}</p>

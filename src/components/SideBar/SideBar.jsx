@@ -17,6 +17,7 @@ export default class SideBar extends React.Component {
                 create: [
                     {
                         text: 'Add Premise',
+                        action: deiteration,
                         onClick: () => {
                             console.log('Adding premise...')
                         },
@@ -25,6 +26,7 @@ export default class SideBar extends React.Component {
                     },
                     {
                         text: 'Cut',
+                        action: deiteration,
                         onClick: () => {
                             console.log('Cutting...');
                         },
@@ -35,6 +37,7 @@ export default class SideBar extends React.Component {
                 proof: [
                     {
                         text: 'Insertion',
+                        action: inferenceInsertion,
                         onClick: () => {
                             this.props.handleActionChange(inferenceInsertion);
                             console.log('Loading insertion into action...');
@@ -44,6 +47,7 @@ export default class SideBar extends React.Component {
                     },
                     {
                         text: 'Erasure',
+                        action: inferenceErasure,
                         onClick: () => {
                             this.props.handleActionChange(inferenceErasure);
                             console.log('Performing erasure...');
@@ -53,6 +57,7 @@ export default class SideBar extends React.Component {
                     },
                     {
                         text: 'Insert Double Cut',
+                        action: insertDoubleCut,
                         onClick: () => {
                             this.props.handleActionChange(insertDoubleCut);
                             console.log('Inserting double cut...');
@@ -62,6 +67,7 @@ export default class SideBar extends React.Component {
                     },
                     {
                         text: 'Delete Double Cut',
+                        action: deleteDoubleCut,
                         onClick: () => {
                             this.props.handleActionChange(deleteDoubleCut);
                             console.log('Deleting double cut...');
@@ -71,6 +77,7 @@ export default class SideBar extends React.Component {
                     },
                     {
                         text: 'Iteration',
+                        action: iteration,
                         onClick: () => {
                             this.props.handleActionChange(iteration);
                             console.log('Performing iteration...');
@@ -80,6 +87,7 @@ export default class SideBar extends React.Component {
                     },
                     {
                         text: 'Deiteration',
+                        action: deiteration,
                         onClick: () => {
                             this.props.handleActionChange(deiteration);
                             console.log('Performing deiteration...');
@@ -105,9 +113,13 @@ export default class SideBar extends React.Component {
         return (
             <div className="menu-bar" style={{backgroundColor: this.state.color.background[this.props.mode] , color: this.state.color.text[this.props.mode]}}>
                 <div id="side-wrapper" >
-                    <h2 >{this.props.mode.charAt(0).toUpperCase() + this.props.mode.slice(1)} Mode</h2>
-                    <Button text="Switch Mode" onClick={this.props.onStateSwitch} icon={faExchangeAlt} tooltip_text={'Toggles to ' + (this.props.mode === 'proof' ? 'create' : 'proof') + ' mode'} ></Button>
-                    <ButtonGroup buttons={this.state.buttons[this.props.mode]} mode={this.props.mode}/>
+                    <div id="mode-header">
+                        <h2>{this.props.mode.charAt(0).toUpperCase() + this.props.mode.slice(1)} Mode</h2>
+                        <Button text="Switch Mode" onClick={this.props.onStateSwitch} icon={faExchangeAlt} tooltip_text={'Toggles to ' + (this.props.mode === 'proof' ? 'create' : 'proof') + ' mode'} ></Button>
+                    </div>
+
+                    <ButtonGroup buttons={this.state.buttons[this.props.mode]} mode={this.props.mode} action={this.props.action}/>
+                    {console.log(this.props.action)}
                 </div>
             </div>
         ); 

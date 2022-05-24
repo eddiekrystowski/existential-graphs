@@ -1,15 +1,41 @@
 .button {
-    height: 6rem;
-    width: 6rem;
+    height: 6.25rem;
+    width: 6.25rem;
     display: flexbox;
     align-items: center;
     justify-content: center;
     position: relative;
+    background-color: #fff;
+    border: 0px solid #fff;
+    border-radius: 3px;
+    border-style: none;
+    box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+    padding: 0.25em;
+    padding-top: 0.5em;
 }
 
+.button:hover {
+  background-color: #d3d3d3;
+  cursor: pointer;
+  color : crimson;
+  transition: color 0.1s linear;
+}
+
+.button:active {
+  transition: all 25ms linear;
+  transform: translateY(4px);
+  box-shadow: none;
+}
+.button-active {
+  border: 2px solid crimson;
+  outline: none;
+}
+
+
+
 .button .button-icon {
-    width: 3.5em;
-    height: 3.5em;
+    width: 3.25em;
+    height: 3.25em;
     justify-content: center;
     margin: 0%;
 }
@@ -40,6 +66,7 @@
     transition-property: opacity;
     transition-delay: 1000ms;
     transition-duration: 300ms;
+    pointer-events: none;
   }
   
   /* Tooltip arrow */
@@ -52,6 +79,8 @@
     border-width: 5px;
     border-style: solid;
     border-color: #555 transparent transparent transparent;
+
+    pointer-events: none;
   }
   
   /* Show the tooltip text when you mouse over the tooltip container */
@@ -59,3 +88,14 @@
     visibility: visible;
     opacity: 1;
   }
+
+  @keyframes tooltip {
+  80% {
+    opacity: 0;
+    visibility: hidden;
+  }
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
