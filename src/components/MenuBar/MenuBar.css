@@ -39,8 +39,18 @@
 }
 
 
-.mute-active {
+.muted {
   color: red;
+  width: 4vw;
+  height: 4vw;
+
+}
+
+.unmuted {
+  color: white;
+  width: 4vw;
+  height: 4vw;
+
 }
 
 
