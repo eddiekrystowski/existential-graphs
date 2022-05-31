@@ -49,10 +49,10 @@ export default function MenuBar(props) {
     //menu items that float right on the menu bar
     right: [
       {
-        text: 'Unmute',
+        text: props.muted  ? 'Unmute' : 'Mute',
         label: 'Toggle Sound',
         classString: 'mute-active',
-        img: './MenuIcons/export.png',
+        img: props.muted  ? 'muted' : 'unmuted',
         onClick: props.handleMuteToggle,
         custom_style: {
           marginLeft: '5vw'
