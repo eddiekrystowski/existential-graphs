@@ -18,6 +18,10 @@ export default class App extends React.Component {
 
     componentDidMount() {
         console.log('WORKSPACE', this.workspace);
+        this.getGraphForExport = () => {
+            console.log('EXPORT: ', this.workspace.current); 
+            return this.workspace.current.mainPaper.current.sheet.graph; 
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -51,10 +55,19 @@ export default class App extends React.Component {
         this.sound.play();
     }
 
+    getGraphForExport = () => {
+        
+    }
+
     render() {
         return (
             <div id="app" className="app">
-                <MenuBar id="header" muted={this.state.muted} handleMuteToggle={this.handleMuteToggle}/>
+                <MenuBar 
+                    id="header" 
+                    muted={this.state.muted} 
+                    handleMuteToggle={this.handleMuteToggle}
+                    getGraphForExport={this.getGraphForExport}
+                />
                 <Workspace paper_id="main-paper" ref={this.workspace} handlePlayAudio={this.handlePlayAudio}></Workspace>
             </div>
         );

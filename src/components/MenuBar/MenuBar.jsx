@@ -39,7 +39,7 @@ export default function MenuBar(props) {
       {
         text: 'Export',
         img: './MenuIcons/export.png',
-        onClick: exportEG,
+        onClick: exportEG.bind(this, props.getGraphForExport()),
         custom_style: {
           marginLeft: '5vw'
         }
@@ -74,7 +74,7 @@ export default function MenuBar(props) {
   //    - have importEG return a new graph?
   //      ex. Paper.graph = importEG();
   function exportEG(graph) {
-    console.log('Exporting...');
+    console.log('Exporting...', props.getGraphForExport());
     let graphJSON = graph.toJSON();
     const file = new Blob([JSON.stringify(graphJSON)], { type: 'application/json'});
       const a = document.createElement("a");

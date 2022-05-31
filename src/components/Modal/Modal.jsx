@@ -5,7 +5,6 @@ import './Modal.css'
 export default class Modal extends React.Component {
     render() {
         if (!this.props.show) {
-            console.log('early');
             return null;
         }
         console.log('rendering...');
