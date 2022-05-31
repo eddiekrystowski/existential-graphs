@@ -103,7 +103,7 @@ export default class Sheet {
     // because in the future it would be beneficial to at least have a "entire graph update" be possible, which would be very simple to 
     // do if they are all bundled up.
     handleCollisions(cell, clean=true) {
-        console.log("=================== HANDLE COLLISIONS =========================")
+        //console.log("=================== HANDLE COLLISIONS =========================")
         //This function takes a Cell as input and, using its position
         // makes any necessary changes to the internal representation of
         // the diagram (parent / child structure (embedding)) to reflect what the user
@@ -146,14 +146,14 @@ export default class Sheet {
 
     pack(cell) {
         let root = this.findRoot(cell);
-        console.log("ROOT EMBEDS", root.getEmbeddedCells())
+        //console.log("ROOT EMBEDS", root.getEmbeddedCells())
         this.pack_rec(root);
     }
 
     pack_rec(cell) {
         //let level = cell.attributes.attrs.level;
         let siblings = cell.getEmbeddedCells()
-        console.log("siblings", siblings)
+        //console.log("siblings", siblings)
         if (siblings.length === 0) {
             return;
         }

@@ -76,6 +76,86 @@ export default class Paper extends React.Component {
         $(this.paperRoot.current).css('display', 'none');
     }
 
+    export() {
+        // delete graph.changed;
+        let graphJSON = this.sheet.graph.toJSON();
+        for(let i = 0; i < graphJSON.cells.length; i++) {
+            delete graphJSON.cells[i].sheet;
+        }
+
+        console.log(graphJSON);
+        const file = new Blob([JSON.stringify(graphJSON, null, 2)], { type: 'application/json'});
+        const a = document.createElement("a");
+        let url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = 'graph.json';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
+    }
+
+
+    import() {
+        console.log('Importing to PAPER...');
+        const input = document.createElement("input");
+        input.type = "file";
+        // choosing the file
+        input.onchange = (ev) => {
+            console.log("THIS", this)
+            const file = ev.target.files[0];
+            if (file.type !== "application/json") {
+                alert("File must be of .JSON type");
+                return;
+            }
+            // read the file
+            const reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
+            reader.onload = (readerEvent) => {
+                const content = readerEvent.target.result;
+                const erase = window.confirm("Erase your current workspace and import graph?");
+                if (erase) {
+                    // graph.clear();
+                    // const dataObj = JSON.parse(content);
+                    // graph.fromJSON(dataObj);
+                    //props.setGraphDataOnImport(content);
+
+                    const dataObj = JSON.parse(content);
+                    this.parseJSON(dataObj.cells);
+                }
+            };
+        };
+        input.click();
+    }
+
+    parseJSON(cells) {
+        //console.log("CELLS:", cells)
+        const ids = {};
+        let i = 0;
+        while (cells.length > 0) {
+            const cell = cells.shift();
+            const type = cell.type;
+
+            if (cell.parent && !ids.hasOwnProperty(cell.parent)) {
+                //console.log('has parent, skipping for now...')
+                cells.push(cell);
+                continue;
+            }
+
+            if (type === "dia.Element.Cut") {
+                this.sheet.addCut(cell);
+                ids[cell.id] = true;
+            }
+            else if (type === "dia.Element.Premise") {
+                this.sheet.addPremise(cell);
+                ids[cell.id] = true;
+            }
+            i++;
+        }
+    }
+
     //assume that if there is no workspace associated then we are in create mode
     getMode() {
         return this.props.mode || 'create';
