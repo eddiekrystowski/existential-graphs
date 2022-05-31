@@ -240,7 +240,8 @@ export default class Paper extends React.Component {
             }
             //eslint-disable-next-line
             //let new_rect = new Premise().create(config)
-            this.sheet.addPremise(config);
+            if (event.shiftKey) this.sheet.addPremise(config);//this.sheet.forcePremise(config);
+            else { this.sheet.addPremise(config); }
             this.canInsertPremise = false;
             this.previousPremiseCode = code;
         }

@@ -44,6 +44,15 @@ export default class Sheet {
         return premise;
     }
 
+    forcePremise(config, fast=false) {
+        console.log("selected_premise: ", this.paper.selected_premise);
+        if (!this.paper.selected_premise || this.paper.selected_premise.type !== "dia.Element.Cut") return this.addPremise(config);
+        const premise = (new Premise()).create(config, this, fast);
+        this.paper.selected_premise.embed(premise);
+        //this.cleanOverlaps();
+        this.onGraphUpdate()
+    }
+
     addCut(config, collisions=true) {
         const cut = (new Cut()).create(config, this, collisions);
         if (collisions) this.handleCollisions(cut);
