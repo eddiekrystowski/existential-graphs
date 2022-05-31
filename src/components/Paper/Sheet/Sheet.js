@@ -36,66 +36,12 @@ export default class Sheet {
     addPremise(config, mute, fast=false) {
         const premise = (new Premise()).create(config, this, fast);
         this.handleCollisions(premise);
+
         // Play snip sound
         let pop = new Audio(Pop); 
         this.handlePlayAudio(pop);
         this.paper.onGraphUpdate();
         return premise;
-    }
-
-    forcePremise(config, fast=false) {
-        const parent = this.getCellAtMouse();
-        console.log("TEST PARENT : ", parent)
-        if (parent === null || parent.attributes.type !== "dia.Element.Cut") return this.addPremise(config);
-        const premise = (new Premise()).create(config, this, fast);
-        parent.embed(premise) 
-        //need to resize cut to fit premise
-        const premise_bbox = premise.getBoundingBox();
-        const parent_bbox = parent.getBoundingBox();
-        console.log("premise: ", premise_bbox);
-        console.log("parent: ", parent_bbox);
-        if (!contains(parent.getBoundingBox(), premise.getBoundingBox())) {
-            if (premise_bbox.x <= parent_bbox.x) {
-                const diff = parent_bbox.x + parent_bbox.width - (premise_bbox.x + premise_bbox.width) - 10;
-                this.treeMove(parent, {x: premise_bbox.x -10, y: parent_bbox.y});
-                parent.attr("rect/width", parent.attributes.attrs.rect.width + diff);
-            } 
-            
-            if (premise_bbox.x + premise_bbox.width >= parent_bbox.x + parent_bbox.width) {
-                const diff = premise_bbox.x + premise_bbox.width - (parent_bbox.x + parent_bbox.width);
-                parent.attr("rect/width", parent.attributes.attrs.rect.width + diff);
-            }
-
-            if (premise_bbox.y <= parent_bbox.y) {
-                const diff = parent_bbox.y + parent_bbox.height - (premise_bbox.y + premise_bbox.height) - 10;
-                this.treeMove(parent, {x: parent_bbox.x, y: premise_bbox.y - 10});
-                parent.attr("rect/height", parent.attributes.attrs.rect.height + diff);
-            }
-            
-            if (premise_bbox.y + premise_bbox.height >= parent_bbox.y + parent_bbox.height){
-                const diff = premise_bbox.y + premise_bbox.height - (parent_bbox.y + parent_bbox.height) + 10;
-                parent.attr("rect/height", parent.attributes.attrs.rect.height + diff);
-            }
-
-        }
-
-        this.handleCollisions(premise);
-        
-        return premise;
-    }
-    // returns cell under mouse with the highest z value;
-    getCellAtMouse() {
-        console.log("mouse pos", this.paper.getRelativeMousePos());
-        const mouse_pos = this.paper.getRelativeMousePos()
-        const cells = this.graph.getCells().filter(cell =>  mouse_pos.x <= cell.attributes.position.x + cell.attributes.attrs.rect.width
-                                                            && mouse_pos.x >= cell.attributes.position.x
-                                                            && mouse_pos.y <= cell.attributes.position.y + cell.attributes.attrs.rect.height
-                                                            && mouse_pos.y >= cell.attributes.position.y); 
-        console.log("getCellAtMouse : \n CELLS: ", cells);
-        if (cells.length === 0) return null;
-        const cell = cells.reduce((max, cell) => max.attributes.z > cell.attributes.z ? max : cell);
-        console.log("HIGHEST CELL: ", cell)
-        return cell;
     }
 
     addCut(config, collisions=true) {
@@ -108,6 +54,64 @@ export default class Sheet {
         this.paper.onGraphUpdate();
         return cut;
     }
+
+     forcePremise(config, fast=false) {
+        const parent = this.getCellAtMouse();
+        console.log("TEST PARENT : ", parent)
+        if (parent === null || parent.attributes.type !== "dia.Element.Cut") return this.addPremise(config);
+        const premise = (new Premise()).create(config, this, fast);
+        parent.embed(premise) 
+        //need to resize cut to fit premise
+        const premise_bbox = premise.getBoundingBox();
+        const parent_bbox = parent.getBoundingBox();
+        console.log("premise: ", premise_bbox);
+        console.log("parent: ", parent_bbox);
+        if (!contains(parent.getBoundingBox(), premise.getBoundingBox())) {
+            //check if premise is to the left of parent
+            if (premise_bbox.x <= parent_bbox.x) {
+                const diff = parent_bbox.x - premise_bbox.x - 10;
+                this.treeMove(parent, {x: premise_bbox.x -10, y: parent_bbox.y});
+                parent.attr("rect/width", parent.attributes.attrs.rect.width + diff);
+            } 
+            //check if premise is to the right of parent
+            if (premise_bbox.x + premise_bbox.width >= parent_bbox.x + parent_bbox.width) {
+                const diff = premise_bbox.x + premise_bbox.width - (parent_bbox.x + parent_bbox.width);
+                parent.attr("rect/width", parent.attributes.attrs.rect.width + diff);
+            }
+            // check if premise is above parent
+            if (premise_bbox.y <= parent_bbox.y) {
+                const diff = parent_bbox.y - premise_bbox.y - 10;
+                this.treeMove(parent, {x: parent_bbox.x, y: premise_bbox.y - 10});
+                parent.attr("rect/height", parent.attributes.attrs.rect.height + diff);
+            }
+            //check if premise is below parent
+            if (premise_bbox.y + premise_bbox.height >= parent_bbox.y + parent_bbox.height){
+                const diff = premise_bbox.y + premise_bbox.height - (parent_bbox.y + parent_bbox.height) + 10;
+                parent.attr("rect/height", parent.attributes.attrs.rect.height + diff);
+            }
+
+        }
+        
+                this.handleCollisions(premise);
+                
+                return premise;
+           }
+            // returns cell under mouse with the highest z value;
+            getCellAtMouse() {
+                console.log("mouse pos", this.paper.getRelativeMousePos());
+                const mouse_pos = this.paper.getRelativeMousePos()
+                const cells = this.graph.getCells().filter(cell =>  mouse_pos.x <= cell.attributes.position.x + cell.attributes.attrs.rect.width
+                                                                    && mouse_pos.x >= cell.attributes.position.x
+                                                                    && mouse_pos.y <= cell.attributes.position.y + cell.attributes.attrs.rect.height
+                                                                   && mouse_pos.y >= cell.attributes.position.y); 
+               console.log("getCellAtMouse : \n CELLS: ", cells);
+                if (cells.length === 0) return null;
+                const cell = cells.reduce((max, cell) => max.attributes.z > cell.attributes.z ? max : cell);
+                console.log("HIGHEST CELL: ", cell)
+                return cell;
+            }
+
+
 
     importCells(cells) {
         this.graph.clear();

@@ -202,10 +202,9 @@ export default class Paper extends React.Component {
             return;
         }
 
-        /* FIX ME: very inconsistent behavior with this.  */
         if(this.getMode() === 'create'){
             if (E.keys[16]) {
-                //this.jpaper.setInteractivity(false);
+                this.jpaper.setInteractivity(false);
             }
         }
 
@@ -241,7 +240,7 @@ export default class Paper extends React.Component {
             }
             //eslint-disable-next-line
             //let new_rect = new Premise().create(config)
-            if (event.shiftKey) this.sheet.forcePremise(config);//this.sheet.forcePremise(config);
+            if (event.shiftKey) this.sheet.forcePremise(config);
             else { this.sheet.addPremise(config); }
             this.canInsertPremise = false;
             this.previousPremiseCode = code;
