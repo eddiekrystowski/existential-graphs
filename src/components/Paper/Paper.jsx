@@ -210,8 +210,14 @@ export default class Paper extends React.Component {
 
         //backspace (delete premise or cut)
         if (event.keyCode === 8) {
-            if (this.selected_premise) {
-                let delete_noise = new Audio(Delete); 
+            if (!this.selected_premise) return;
+            let delete_noise = new Audio(Delete);
+            if (event.shiftKey) {
+                //obliterate
+                this.props.handlePlayAudio(delete_noise);
+                this.selected_premise.obliterate();
+            } else  {
+                //single deletion
                 if (this.selected_premise.attributes.type === "dia.Element.Premise") {
                     this.selected_premise.destroy()
                     this.props.handlePlayAudio(delete_noise);

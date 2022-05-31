@@ -143,6 +143,14 @@ export class Cut extends joint.dia.Element {
 
         this.sheet.paper.handleDeleteCell();
     }
+    //Destroys itself and all decendants
+    obliterate() {
+        //  If non-empty cell, destroy all children
+        let children = this.attributes.embeds;
+        if (children) children.forEach(child => {this.sheet.graph.getCell(child).obliterate()});
+        //  Then destroy self
+        this.destroy();
+  }
 
     active() {
         //cut is being interacted with (ie grabbing, dragging or moving etc)
