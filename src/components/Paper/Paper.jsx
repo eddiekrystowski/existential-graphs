@@ -83,7 +83,7 @@ export default class Paper extends React.Component {
             delete graphJSON.cells[i].sheet;
         }
 
-        console.log(graphJSON);
+        //console.log(graphJSON);
         const file = new Blob([JSON.stringify(graphJSON, null, 2)], { type: 'application/json'});
         const a = document.createElement("a");
         let url = URL.createObjectURL(file);
@@ -99,12 +99,10 @@ export default class Paper extends React.Component {
 
 
     import() {
-        console.log('Importing to PAPER...');
         const input = document.createElement("input");
         input.type = "file";
         // choosing the file
         input.onchange = (ev) => {
-            console.log("THIS", this)
             const file = ev.target.files[0];
             if (file.type !== "application/json") {
                 alert("File must be of .JSON type");
@@ -133,7 +131,6 @@ export default class Paper extends React.Component {
     parseJSON(cells) {
         //console.log("CELLS:", cells)
         const ids = {};
-        let i = 0;
         while (cells.length > 0) {
             const cell = cells.shift();
             const type = cell.type;
@@ -152,7 +149,6 @@ export default class Paper extends React.Component {
                 this.sheet.addPremise(cell);
                 ids[cell.id] = true;
             }
-            i++;
         }
     }
 

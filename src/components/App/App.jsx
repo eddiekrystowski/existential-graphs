@@ -18,10 +18,6 @@ export default class App extends React.Component {
 
     componentDidMount() {
         console.log('WORKSPACE', this.workspace);
-        this.getGraphForExport = () => {
-            console.log('EXPORT: ', this.workspace.current); 
-            return this.workspace.current.mainPaper.current.sheet.graph; 
-        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -56,7 +52,6 @@ export default class App extends React.Component {
     }
 
     getGraphForExport = () => {
-        console.log('EXPORT: ', this.workspace.current); 
         return this.workspace.current.mainPaper.current.sheet.graph; 
     }
 
@@ -78,7 +73,6 @@ export default class App extends React.Component {
             }
         }   
 
-        console.log("AFTER: ", dataObj.cells);
         graph.fromJSON(dataObj);
     }
 
