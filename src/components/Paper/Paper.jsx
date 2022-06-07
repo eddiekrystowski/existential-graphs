@@ -139,7 +139,8 @@ export default class Paper extends React.Component {
 
     parseJSON(cells) {
         //console.log("CELLS:", cells)
-        const ids = {};
+        if (cells === null) return;
+        const ids = {}; 
         while (cells.length > 0) {
             const cell = cells.shift();
             const type = cell.type;
@@ -160,6 +161,24 @@ export default class Paper extends React.Component {
             }
         }
     }
+
+        /**
+     * Force an array of cells into a Cut (target) even if they do not fit by resizing and moving 
+     * the target and its children / neighbors
+     * @param {Cell[]} cells 
+     * @param {Cut} target
+     */
+         forceParseCells(cells, target) {
+            if (cells === null) return;
+            if (target === null || target.type != "dia.Element.Cut") return;
+
+            
+    
+            // We have a non empty array of cells to insert into a cut
+            
+    
+    
+        }
 
     //assume that if there is no workspace associated then we are in create mode
     getMode() {
