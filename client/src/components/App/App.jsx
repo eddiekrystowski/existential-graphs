@@ -1,8 +1,11 @@
 import React from 'react';
+import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
 
 import '../../index.css'; 
 import MenuBar from '../MenuBar/MenuBar.jsx';
 import Workspace from '../Workspace/Workspace.jsx';
+import Navbar from '../Navbar/Navbar.jsx';
+import Dashboard from '../Dashboard/Dashboard';
 import $ from 'jquery'
 
 
@@ -54,9 +57,24 @@ export default class App extends React.Component {
     render() {
         return (
             <div id="app" className="app">
-                <MenuBar id="header" muted={this.state.muted} handleMuteToggle={this.handleMuteToggle}/>
-                <Workspace paper_id="main-paper" ref={this.workspace} handlePlayAudio={this.handlePlayAudio}></Workspace>
-            </div>
+                <BrowserRouter>
+                    {/* <Navbar/> */}
+                    <br/>
+                    <Routes>
+                        <Route path="/" exact element={<Dashboard/>} />
+                        <Route path="/create" exact element={
+                            <Workspace 
+                                paper_id="main-paper" 
+                                ref={this.workspace} 
+                                handlePlayAudio={this.handlePlayAudio}>
+                            </Workspace>
+                        } />
+                    </Routes>
+
+                    {/* <MenuBar id="header" muted={this.state.muted} handleMuteToggle={this.handleMuteToggle}/>
+                    <Workspace paper_id="main-paper" ref={this.workspace} handlePlayAudio={this.handlePlayAudio}></Workspace> */}
+                </BrowserRouter>
+                  </div>
         );
     }
 }
