@@ -125,7 +125,7 @@ export class Cut extends joint.dia.Element {
                 cut.sheet.treeResize(cut, cut.attributes.attrs.rect.width / 2);
             }
         }
-        console.log(cut);
+        //console.log(cut);
         return cut;
     }
 
