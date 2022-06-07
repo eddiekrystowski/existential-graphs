@@ -55,11 +55,11 @@ export default class Sheet {
         return cut;
     }
 
-     forcePremise(config, fast=false) {
-        const parent = this.getCellAtMouse();
+     forcePremise(config, target=null) {
+        const parent = (target === null) ? this.getCellAtMouse() : target;
         console.log("TEST PARENT : ", parent)
         if (parent === null || parent.attributes.type !== "dia.Element.Cut") return this.addPremise(config);
-        const premise = (new Premise()).create(config, this, fast);
+        const premise = (new Premise()).create(config, this, false);
         parent.embed(premise) 
         //need to resize cut to fit premise
         const premise_bbox = premise.getBoundingBox();

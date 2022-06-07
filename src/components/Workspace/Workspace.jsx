@@ -71,18 +71,35 @@ export default class Workspace extends React.Component {
         });
     }
 
-    handleOpenModal = (mousePosition) => {
+    handleOpenModal = (mousePosition, model=null) => {
         this.setState({
             showModal: true
         })
         this.insertPosition = Object.assign({}, mousePosition);
+        this.insertModel = Object.assign({}, model);
     }
 
     handleModalInsert = (position) => {
-        console.log('inserting...', position);
-        this.proofPaper.current.sheet.importFromJSON(this.modalPaper.current.sheet.exportAsJSON());
+        console.log('inserting...', this.insertModel);
+        if (this.insertModel === null) this.proofPaper.current.sheet.importFromJSON(this.modalPaper.current.sheet.exportAsJSON());
+        else {
+            const cells = this.modalPaper.current.sheet.graph.getCells();
+            if (cells === "[]") return;
+            const clones =  cells.map(cell => {
+                cell = cell.clone();
+                cell.sheet = this;
+                return cell;
+            })
+            this.graph.resetCells(clones);
+
+        for(let cell of clones) {
+            this.handleCollisions(cell, false)
+        }
+
+        }
         this.handleModalExit();
     }
+
 
     render() {
 
