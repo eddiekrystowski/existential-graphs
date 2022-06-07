@@ -97,8 +97,13 @@ export default class Paper extends React.Component {
         }, 0);
     }
 
-
-    import() {
+    /**
+     * 
+     * @param {bool} clear - whether to prompt the user about clearing the graph. 
+     *                      If true, the user is prompted to confirm whether they wish to empty the graph on import
+     *                      if false, the graph is not cleared on import
+     */
+    import(clear) {
         const input = document.createElement("input");
         input.type = "file";
         // choosing the file
@@ -113,13 +118,17 @@ export default class Paper extends React.Component {
             reader.readAsText(file, 'UTF-8');
             reader.onload = (readerEvent) => {
                 const content = readerEvent.target.result;
-                const erase = window.confirm("Erase your current workspace and import graph?");
-                if (erase) {
-                    this.sheet.graph.clear();
-                    // const dataObj = JSON.parse(content);
-                    // graph.fromJSON(dataObj);
-                    //props.setGraphDataOnImport(content);
+                if (clear) {
+                    if (window.confirm("Erase your current workspace and import graph?")) {
+                        this.sheet.graph.clear();
+                        // const dataObj = JSON.parse(content);
+                        // graph.fromJSON(dataObj);
+                        //props.setGraphDataOnImport(content);
 
+                        const dataObj = JSON.parse(content);
+                        this.parseJSON(dataObj.cells);
+                    }
+                } else {
                     const dataObj = JSON.parse(content);
                     this.parseJSON(dataObj.cells);
                 }

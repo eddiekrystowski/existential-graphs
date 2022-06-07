@@ -66,28 +66,29 @@ export default class Sheet {
         const parent_bbox = parent.getBoundingBox();
         console.log("premise: ", premise_bbox);
         console.log("parent: ", parent_bbox);
+        const buffer = 10;
         if (!contains(parent.getBoundingBox(), premise.getBoundingBox())) {
             //check if premise is to the left of parent
             if (premise_bbox.x <= parent_bbox.x) {
-                const diff = parent_bbox.x - premise_bbox.x - 10;
-                this.treeMove(parent, {x: premise_bbox.x -10, y: parent_bbox.y});
+                const diff = parent_bbox.x - premise_bbox.x - buffer;
+                this.treeMove(parent, {x: premise_bbox.x - buffer, y: parent_bbox.y});
                 parent.attr("rect/width", parent.attributes.attrs.rect.width + diff);
             } 
             //check if premise is to the right of parent
             if (premise_bbox.x + premise_bbox.width >= parent_bbox.x + parent_bbox.width) {
                 const diff = premise_bbox.x + premise_bbox.width - (parent_bbox.x + parent_bbox.width);
-                parent.attr("rect/width", parent.attributes.attrs.rect.width + diff);
+                parent.attr("rect/width", parent.attributes.attrs.rect.width + diff + buffer);
             }
             // check if premise is above parent
             if (premise_bbox.y <= parent_bbox.y) {
-                const diff = parent_bbox.y - premise_bbox.y - 10;
-                this.treeMove(parent, {x: parent_bbox.x, y: premise_bbox.y - 10});
+                const diff = parent_bbox.y - premise_bbox.y - buffer;
+                this.treeMove(parent, {x: parent_bbox.x, y: premise_bbox.y - buffer});
                 parent.attr("rect/height", parent.attributes.attrs.rect.height + diff);
             }
             //check if premise is below parent
             if (premise_bbox.y + premise_bbox.height >= parent_bbox.y + parent_bbox.height){
                 const diff = premise_bbox.y + premise_bbox.height - (parent_bbox.y + parent_bbox.height) + 10;
-                parent.attr("rect/height", parent.attributes.attrs.rect.height + diff);
+                parent.attr("rect/height", parent.attributes.attrs.rect.height + diff + buffer);
             }
 
         }
