@@ -1,6 +1,6 @@
 .button {
-    height: 6.25rem;
-    width: 6.25rem;
+    height: 6vw;
+    width: 6vw;
     display: flexbox;
     align-items: center;
     justify-content: center;
@@ -10,8 +10,8 @@
     border-radius: 3px;
     border-style: none;
     box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
-    padding: 0.25em;
-    padding-top: 0.5em;
+    font-size: 0.96vw;
+    margin: 0;
 }
 
 .button:hover {
@@ -34,14 +34,15 @@
 
 
 .button .button-icon {
-    width: 3.25em;
-    height: 3.25em;
+    width: 3.12vw;
+    height: 3.12vw;
     justify-content: center;
     margin: 0%;
 }
 
 .button p {
-    height: 2em;
+  font-size: 0.96vw;
+  margin: 0%;
 }
 
 /* Tooltip text */

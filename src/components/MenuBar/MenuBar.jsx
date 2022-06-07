@@ -31,7 +31,7 @@ export default function MenuBar(props) {
       {
         text: 'Import',
         img: './MenuIcons/import.png',
-        onClick: importEG,
+        onClick: props.importMainGraph,
         custom_style: {
           marginLeft: '10vw'
         }
@@ -39,7 +39,7 @@ export default function MenuBar(props) {
       {
         text: 'Export',
         img: './MenuIcons/export.png',
-        onClick: exportEG,
+        onClick: props.exportMainGraph,
         custom_style: {
           marginLeft: '5vw'
         }
@@ -49,10 +49,10 @@ export default function MenuBar(props) {
     //menu items that float right on the menu bar
     right: [
       {
-        text: 'Unmute',
+        text: props.muted  ? 'Muted' : 'Unmuted',
         label: 'Toggle Sound',
-        classString: 'mute-active',
-        img: './MenuIcons/export.png',
+        classString: props.muted  ? 'muted' : 'unmuted',
+        img: props.muted  ? 'muted' : 'unmuted',
         onClick: props.handleMuteToggle,
         custom_style: {
           marginLeft: '5vw'
@@ -60,67 +60,21 @@ export default function MenuBar(props) {
       },
       {
         text: 'Settings',
-        img: './MenuIcons/export.png',
+        img: 'settings',
         onClick: () => {},
         custom_style: {
-          marginLeft: '5vw'
+          marginLeft: '5vw',
+          height: '4vw',
+          width: '4vw',
         }
       }
     ]
   }
   
     //Funtions for the above MenuItems
-  //TODO: MAKE IMPORT/EXPORT WORK FOR NEW MULTI-GRAPH SYSTEM
-  //    - have importEG return a new graph?
-  //      ex. Paper.graph = importEG();
-  function exportEG(graph) {
-    console.log('Exporting...');
-    let graphJSON = graph.toJSON();
-    const file = new Blob([JSON.stringify(graphJSON)], { type: 'application/json'});
-      const a = document.createElement("a");
-      let url = URL.createObjectURL(file);
-      a.href = url;
-      a.download = 'graph.json';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function () {
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-      }, 0);
-  }
-  
-  // FIXME: graph arg is here just so linter is happy, see above TODO about fixing this
-  // for multi graph system
-  // We also have to consider... should this function make a paper? or just set graph of of existing paper...
-  // return Graph class (components/Paper/Graph/Graph.js)
-  function importEG(graph) {
-    console.log('Importing...');
-    const input = document.createElement("input");
-      input.type = "file";
-      // choosing the file
-      input.onchange = function (ev) {
-          const file = ev.target.files[0];
-          if (file.type !== "application/json") {
-              alert("File must be of .JSON type");
-              return;
-          }
-          // read the file
-          const reader = new FileReader();
-          reader.readAsText(file, 'UTF-8');
-          reader.onload = function (readerEvent) {
-              const content = readerEvent.target.result;
-              const erase = window.confirm("Erase your current workspace and import graph?");
-              if (erase) {
-                  graph.clear();
-                  const dataObj = JSON.parse(content);
-                  graph.fromJSON(dataObj);
-                  
-              }
-          };
-      };
-      input.click();
-  }
-  
+    //all were moved... keeping comment here for now in case we add more
+    // later we can put them here
+
   return (
     <div className="header-bar">
       <div className="header-bar-left">
