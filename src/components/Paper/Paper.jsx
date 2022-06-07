@@ -115,7 +115,7 @@ export default class Paper extends React.Component {
                 const content = readerEvent.target.result;
                 const erase = window.confirm("Erase your current workspace and import graph?");
                 if (erase) {
-                    // graph.clear();
+                    graph.clear();
                     // const dataObj = JSON.parse(content);
                     // graph.fromJSON(dataObj);
                     //props.setGraphDataOnImport(content);
