@@ -58,7 +58,7 @@ export default class App extends React.Component {
         return (
             <div id="app" className="app">
                 <BrowserRouter>
-                    {/* <Navbar/> */}
+                    <Navbar/>
                     <br/>
                     <Routes>
                         <Route path="/" exact element={<Dashboard/>} />
@@ -74,7 +74,7 @@ export default class App extends React.Component {
                     {/* <MenuBar id="header" muted={this.state.muted} handleMuteToggle={this.handleMuteToggle}/>
                     <Workspace paper_id="main-paper" ref={this.workspace} handlePlayAudio={this.handlePlayAudio}></Workspace> */}
                 </BrowserRouter>
-                  </div>
+            </div>
         );
     }
 }
