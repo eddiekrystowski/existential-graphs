@@ -55,7 +55,7 @@ export default class Sheet {
         return cut;
     }
 
-     forcePremise(config, target=null) {
+    forcePremise(config, target=null) {
         const parent = (target === null) ? this.getCellAtMouse() : target;
         console.log("TEST PARENT : ", parent)
         if (parent === null || parent.attributes.type !== "dia.Element.Cut") return this.addPremise(config);
@@ -452,7 +452,6 @@ export default class Sheet {
     colorByLevel(node, color_config = DEFAULT_BACKGROUND_COLORS) {
         //find root of node's tree
         let root = this.findRoot(node);
-        root.attr("level", 0)
     
         if (root.attributes.type === "dia.Element.Premise") {
             root.attr('rect/fill', color_config.premise);
@@ -488,7 +487,12 @@ export default class Sheet {
     }
     
     treeMove(root, position) {
-        let offset = {
+        if (root === null || root === undefined) {
+            console.error("root is " + root + "for treeMove()")
+            return;
+        }
+        console.log("ROOT: ", root)
+        const offset = {
             x: position.x - root.attributes.position.x,
             y: position.y - root.attributes.position.y
         }
@@ -497,7 +501,9 @@ export default class Sheet {
         while (next.length > 0) {
             current = next;
             next = [];
+            console.log("current: ", current)
             for (const node of current) {
+                console.log("node: ", node)
                 next.push(...node.getEmbeddedCells());
                 //node.move({x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
                 //safeMove(node, {x: node.attributes.position.x + offset.x, y: node.attributes.position.y + offset.y})
