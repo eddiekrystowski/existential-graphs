@@ -147,6 +147,7 @@ export default class Workspace extends React.Component {
                     handleActionChange={this.handleActionChange}
                     handleOpenModal={this.handleOpenModal}
                     handlePlayAudio={this.props.handlePlayAudio}
+                    isMainPaper={true}
                     ref={this.mainPaper}
                 >
                 </Paper>

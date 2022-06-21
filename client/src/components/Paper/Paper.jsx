@@ -59,7 +59,7 @@ export default class Paper extends React.Component {
         this.history.current.push(this.sheet.exportAsJSON());
 
         const graphName = window.location.search.substring(7);
-        if (graphName !== '') {
+        if (graphName !== '' && this.props.isMainPaper) {
             const localGraphData = JSON.parse(localStorage.getItem('graphs'));
             const dataObj = localGraphData[graphName];
             this.parseJSON(dataObj.graphJSON.cells);
