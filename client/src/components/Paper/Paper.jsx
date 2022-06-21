@@ -8,11 +8,15 @@ import Delete from '../../sounds/delete.wav';
 import Sheet from './Sheet/Sheet.js';
 import History from './History/History.jsx'
 
+import { Cut } from '../../shapes/Cut/Cut';
+import { Premise } from '../../shapes/Premise/Premise';
 import './Paper.css';   
 import UtilBar from './UtilBar/UtilBar.jsx';
 import UtilBarItem from './UtilBar/UtilBarItem.jsx';
 import './UtilBar/UtilBar.css';
 import { faHistory } from '@fortawesome/free-solid-svg-icons';
+import { getCellsBoundingBox } from '../../util/collisions.js';
+import { contains } from '../../util/collisions'
 
 const PAPER_SIZE = { width: 4000, height: 4000 };
 
@@ -76,6 +80,210 @@ export default class Paper extends React.Component {
         $(this.paperRoot.current).css('display', 'none');
     }
 
+    export() {
+        // delete graph.changed;
+        let graphJSON = this.sheet.graph.toJSON();
+        for(let i = 0; i < graphJSON.cells.length; i++) {
+            delete graphJSON.cells[i].sheet;
+        }
+ 
+        //console.log(graphJSON);
+        const file = new Blob([JSON.stringify(graphJSON, null, 2)], { type: 'application/json'});
+        const a = document.createElement("a");
+        let url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = 'graph.json';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
+    }
+
+    /**
+     * 
+     * @param {bool} clear - whether to prompt the user about clearing the graph. 
+     *                      If true, the user is prompted to confirm whether they wish to empty the graph on import
+     *                      if false, the graph is not cleared on import
+     */
+    import(clear) {
+        const input = document.createElement("input");
+        input.type = "file";
+        // choosing the file
+        input.onchange = (ev) => {
+            const file = ev.target.files[0];
+            if (file.type !== "application/json") {
+                alert("File must be of .JSON type");
+                return;
+            }
+            // read the file
+            const reader = new FileReader();
+            reader.readAsText(file, 'UTF-8');
+            reader.onload = (readerEvent) => {
+                const content = readerEvent.target.result;
+                if (clear) {
+                    if (window.confirm("Erase your current workspace and import graph?")) {
+                        this.sheet.graph.clear();
+                        // const dataObj = JSON.parse(content);
+                        // graph.fromJSON(dataObj);
+                        //props.setGraphDataOnImport(content);
+
+                        const dataObj = JSON.parse(content);
+                        this.parseJSON(dataObj.cells);
+                    }
+                } else {
+                    const dataObj = JSON.parse(content);
+                    this.parseJSON(dataObj.cells);
+                }
+            };
+        };
+        input.click();
+    }
+
+    parseJSON(cells) {
+        //console.log("CELLS:", cells)
+        if (cells === null) return;
+        const ids = {}; 
+        while (cells.length > 0) {
+            const cell = cells.shift();
+            const type = cell.type;
+
+            if (cell.parent && !ids.hasOwnProperty(cell.parent)) {
+                //console.log('has parent, skipping for now...')
+                cells.push(cell);
+                continue;
+            }
+            if (type === "dia.Element.Cut") {
+                this.sheet.addCut(cell);
+                ids[cell.id] = true;
+            }
+            else if (type === "dia.Element.Premise") {
+                this.sheet.addPremise(cell);
+                ids[cell.id] = true;
+            }
+        }
+    }
+
+        /**
+     * Force an array of cells into a Cut (target) even if they do not fit by resizing and moving 
+     * the target and its children / neighbors
+     * @param {Cell[]} cells 
+     * @param {Cut} target
+     */
+    forceParseCells(cells, cellsbbox, target) {
+        console.clear()
+        console.log("forcing cells: ",cells)
+        console.log("to target: ", target)
+        if (cells === null) return;
+        if (target === null || target.attributes.type !== "dia.Element.Cut") return;
+
+        // We have a non empty array of cells to insert into a cut
+        //create a temporary root cut to insert all cells into
+        const config = {
+            size: {
+                width: cellsbbox.width + 10,
+                height: cellsbbox.height + 10
+            },
+            position: {
+                x: cellsbbox.x-10,
+                y: cellsbbox.y-10
+            },
+            attrs: {
+                rect: {
+                    width: cellsbbox.width + 10,
+                    height: cellsbbox.height + 10
+                }
+            }
+        }
+        const cut = (new Cut({
+            markup: '<rect/><text/>',
+            position: {
+                ...config.position
+            },
+            size: {
+                ...config.size
+            },
+            attrs: {
+                rect: {
+                    ...config.attrs.rect
+                },
+                text: {
+                    ...config.attrs.text
+                },
+                level: 0
+            },
+            // set custom attributes here:
+            sheet: this.sheet
+        })).create(config, this.sheet)
+        // put the cut inside the target 
+        target.embed(cut);
+        const target_bbox = target.getBoundingBox();
+        const cut_bbox = cut.getBoundingBox();
+        const buffer = 10;
+        if (!contains(target_bbox, cut_bbox)) {
+            //check if premise is to the left of parent
+            if (cut_bbox.x <= target_bbox.x) {
+                const diff = target_bbox.x - cut_bbox.x - buffer;
+                target.position(cut_bbox.x - buffer, target_bbox.y);
+                target.attr("rect/width", target.attributes.attrs.rect.width + diff);
+            } 
+            //check if premise is to the right of parent
+            if (cut_bbox.x + cut_bbox.width >= target_bbox.x + target_bbox.width) {
+                const diff = cut_bbox.x + cut_bbox.width - (target_bbox.x + target_bbox.width);
+                target.attr("rect/width", target.attributes.attrs.rect.width + diff + buffer);
+            }
+            // check if premise is above parent
+            if (cut_bbox.y <= target_bbox.y) {
+                const diff = target_bbox.y - cut_bbox.y - buffer;
+                target.position(target_bbox.x, cut_bbox.y - buffer);
+                target.attr("rect/height", target.attributes.attrs.rect.height + diff);
+            }
+            //check if premise is below parent
+            if (cut_bbox.y + cut_bbox.height >= target_bbox.y + target_bbox.height){
+                const diff = cut_bbox.y + cut_bbox.height - (target_bbox.y + target_bbox.height) + 10;
+                target.attr("rect/height", target.attributes.attrs.rect.height + diff + buffer);
+            }
+        }
+        console.log("GHOST CUT: ", cut)
+        this.sheet.handleCollisions(cut)
+
+        //update position of cells based on where cut ends up
+        console.log("updating cells",cells);
+
+        for (const cell of cells) {
+            console.log("updating cell position:",cell.position)
+            cell.position = {
+                x: cut.attributes.position.x + (cell.position.x-cellsbbox.x + 5), 
+                y: cut.attributes.position.y + (cell.position.y-cellsbbox.y + 5)
+            }
+        }
+        
+        const ids = {}; 
+        while (cells.length > 0) {
+            const cell = cells.shift();
+            const type = cell.type;
+
+            if (cell.parent && !ids.hasOwnProperty(cell.parent)) {
+                //console.log('has parent, skipping for now...')
+                cells.push(cell);
+                continue;
+            }
+
+            if (type === "dia.Element.Cut") {
+                const new_cut =  this.sheet.addCut(cell);
+                ids[cell.id] = true;
+            }
+            else if (type === "dia.Element.Premise") {
+                const new_premise = this.sheet.addPremise(cell);
+                ids[cell.id] = true;
+            }
+        }
+
+        cut.destroy()
+
+    }
+
     //assume that if there is no workspace associated then we are in create mode
     getMode() {
         return this.props.mode || 'create';
@@ -119,9 +327,9 @@ export default class Paper extends React.Component {
         // First, unembed the cell that has just been grabbed by the user.
         this.jpaper.on('cell:pointerdown', (cellView, evt, x, y) => {
             
-            console.log(cellView)
+           // console.log(cellView)
             let cell = cellView.model;
-            console.log("cell", cell)
+            //console.log("cell", cell)
 
             if (!cell.get('embeds') || cell.get('embeds').length === 0) {
                 // Show the dragged element above all the other cells (except when the
@@ -190,7 +398,7 @@ export default class Paper extends React.Component {
     }
 
     onClick = () => {
-        console.log('clicked', this);
+        //console.log('clicked', this);
     }
 
     onKeyUp = (event) => {
@@ -246,7 +454,8 @@ export default class Paper extends React.Component {
             }
             //eslint-disable-next-line
             //let new_rect = new Premise().create(config)
-            this.sheet.addPremise(config);
+            if (event.shiftKey) this.sheet.forcePremise(config);
+            else { this.sheet.addPremise(config); }
             this.canInsertPremise = false;
             this.previousPremiseCode = code;
         }

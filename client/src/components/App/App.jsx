@@ -54,6 +54,31 @@ export default class App extends React.Component {
         this.sound.play();
     }
 
+    getGraphForExport = () => {
+        return this.workspace.current.mainPaper.current.sheet.graph; 
+    }
+
+    exportMainGraph = () => {
+        this.workspace.current.mainPaper.current.export();
+    }
+
+    importMainGraph = () => {
+        this.workspace.current.mainPaper.current.import();
+    }
+
+    setGraphDataOnImport = (data) => {
+        const graph = this.workspace.current.mainPaper.current.sheet.graph; 
+        graph.clear();
+        const dataObj = JSON.parse(data);
+        for (let i = 0; i < dataObj.cells.length; i++) {
+            if (dataObj.cells[i].type === "dia.Element.Cut") {
+                dataObj.cells[i].sheet = this.workspace.current.mainPaper.current.sheet;
+            }
+        }   
+
+        graph.fromJSON(dataObj);
+    }
+
     render() {
         return (
             <div id="app" className="app">
