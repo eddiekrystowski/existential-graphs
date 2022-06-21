@@ -24,7 +24,7 @@ export default class HistoryItem extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         if(this.props.num === this.props.total -1 ){
             this.sheet.importCells(this.props.cells);
-            this.jpaper.scaleContentToFit();
+            this.jpaper.scaleContentToFit({fittingBBox: {x: 0, y: 0, width: 200, height: 200}, maxScaleX: 0.5, maxScaleY: 0.5});
         }
     }
 
@@ -40,7 +40,7 @@ export default class HistoryItem extends React.Component {
         });
 
         this.sheet.importCells(this.props.cells);
-        this.jpaper.scaleContentToFit();
+        this.jpaper.scaleContentToFit({fittingBBox: {x: 0, y: 0, width: 200, height: 200}, maxScaleX: 0.5, maxScaleY: 0.5} );
         this.jpaper.updateViews();
 
         this.jpaper.setInteractivity(false);
