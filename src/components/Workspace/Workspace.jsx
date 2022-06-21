@@ -3,6 +3,8 @@ import Paper from '../Paper/Paper';
 import SideBar from '../SideBar/SideBar';
 import Modal from '../Modal/Modal.jsx';
 
+import { getCellsBoundingBox } from '../../util/collisions'
+
 import './Workspace.css'
 
 new Event('load-modal');
@@ -71,18 +73,30 @@ export default class Workspace extends React.Component {
         });
     }
 
-    handleOpenModal = (mousePosition) => {
+    handleOpenModal = (mousePosition, model=null) => {
         this.setState({
             showModal: true
         })
         this.insertPosition = Object.assign({}, mousePosition);
+        this.insertModel = model
+        console.log("model: ",model)
+        console.log("this.insertModel: ", this.insertModel)
     }
 
     handleModalInsert = (position) => {
-        console.log('inserting...', position);
-        this.proofPaper.current.sheet.importFromJSON(this.modalPaper.current.sheet.exportAsJSON());
+        console.log('inserting...', this.insertModel);
+        if (this.insertModel === null) alert(1)//this.proofPaper.current.sheet.importFromJSON(this.modalPaper.current.sheet.exportAsJSON());
+        if (this.modalPaper.current.sheet.graph.getCells().length === 0) this.handleModalExit(); // no cells to import
+        else {
+            console.log(":0")
+            const cells = JSON.parse(this.modalPaper.current.sheet.exportAsJSON());
+            const cellsbbox = getCellsBoundingBox(this.modalPaper.current.sheet.graph.getCells())
+            console.log(cells)
+            this.proofPaper.current.forceParseCells(cells, cellsbbox, this.insertModel)
+        }
         this.handleModalExit();
     }
+
 
     render() {
 

@@ -6,7 +6,7 @@ export const inferenceInsertion = function(sheet, model, mousePosition) {
   if(model.__proto__.constructor.name === "Cut" && (model.attributes.level) % 2 === 0) return;
   console.log('opening modal...')
   const paper = sheet.paper;
-  paper.props.handleOpenModal(mousePosition);
+  paper.props.handleOpenModal(mousePosition, model);
 }
 
 export const inferenceErasure = function(sheet, model) {
