@@ -122,7 +122,7 @@ export class Cut extends joint.dia.Element {
             }
             cut.embed(child)
             if (hasparent) {
-                cut.sheet.treeResize(cut, cut.attributes.attrs.rect.width / 2);
+                cut.sheet.treeResize(cut, 40);
             }
         }
         //console.log(cut);
