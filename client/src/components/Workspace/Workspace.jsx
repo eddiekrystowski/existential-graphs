@@ -84,6 +84,11 @@ export default class Workspace extends React.Component {
         this.handleModalExit();
     }
 
+    handleSaveLocally = () => {
+        console.log('workspace saving locally...');
+        
+    }
+
     render() {
 
         const buttons = [
@@ -105,6 +110,7 @@ export default class Workspace extends React.Component {
                     mode={this.state.mode} 
                     onStateSwitch={this.handleStateSwitch.bind(this)} 
                     handleActionChange={this.handleActionChange.bind(this)}
+                    handleSaveLocally={this.handleSaveLocally}
                     action={this.state.action}
                 >
                 </SideBar>

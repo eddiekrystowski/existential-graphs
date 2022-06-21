@@ -7,7 +7,7 @@ import './SideBar.css';
 import { deiteration, deleteDoubleCut, inferenceErasure, inferenceInsertion, insertDoubleCut, iteration } from '../../util/proof-util';
 
 //  Import all of the FontAwesome icons
-import { faExchangeAlt, faPlus, faMinus, faVectorSquare, faClone, faMinusSquare, faPlusSquare, faEraser} from '@fortawesome/free-solid-svg-icons'
+import { faExchangeAlt, faPlus, faMinus, faVectorSquare, faClone, faMinusSquare, faPlusSquare, faEraser, faSave} from '@fortawesome/free-solid-svg-icons'
 
 export default class SideBar extends React.Component {
     constructor(props) {
@@ -16,7 +16,7 @@ export default class SideBar extends React.Component {
             buttons: {
                 create: [
                     {
-                        text: 'Add Premise',
+                        text: 'Add Atomic',
                         action: deiteration,
                         onClick: () => {
                             console.log('Adding premise...')
@@ -95,6 +95,16 @@ export default class SideBar extends React.Component {
                         icon : faEraser,
                         tooltip_text : 'Remove any premise an even number of layers deeper by clicking on the premise you wish to remove.'
                     }
+                ],
+                both: [
+                    {
+                        text: 'Save Locally',
+                        action: () => null,
+                        onClick: this.props.handleSaveLocally,
+                        icon: faSave,
+                        tooltip_text: 'Save this graph locally.'
+
+                    }
                 ]
             },
             color : {
@@ -119,6 +129,7 @@ export default class SideBar extends React.Component {
                     </div>
 
                     <ButtonGroup buttons={this.state.buttons[this.props.mode]} mode={this.props.mode} action={this.props.action}/>
+                    <ButtonGroup buttons={this.state.buttons.both}/>
                 </div>
             </div>
         ); 

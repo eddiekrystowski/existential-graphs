@@ -10,7 +10,7 @@ export default class Navbar extends Component {
         <Link to="/" className="navbar-brand">EG</Link>
         <div className="navbar-left">
               <Link to="/create" className="nav-link">Create</Link>
-              <Link to="/create" className="nav-link">Proof</Link>
+              <Link to="/proof" className="nav-link">Proof</Link>
         </div>
       </nav>
     );
