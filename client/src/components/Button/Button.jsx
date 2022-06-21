@@ -25,7 +25,7 @@ Button.propTypes = {
     /** Function to be exicuted when the button is pressed */
     onClick : PropTypes.func,
     /** Icon title on FontAwesome */
-    icon : PropTypes.string,
+    icon : PropTypes.object,
     /** Tooltip text */
     tooltip_text : PropTypes.string,
 }

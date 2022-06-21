@@ -98,8 +98,20 @@ export default class Workspace extends React.Component {
     }
 
     handleSaveLocally = () => {
-        console.log('workspace saving locally...');
-        
+        const graphJSON = this.mainPaper.current.export();
+
+        let localGraphs = JSON.parse(localStorage.getItem("graphs"));
+        if (localGraphs === null) localGraphs = {};
+
+        let i = 0;
+        while (localGraphs.hasOwnProperty(`Graph${i}`)) { i++}
+        const graphName = `Graph${i}`;
+        localGraphs[graphName] = {
+            graphJSON: graphJSON,
+            lastModified: new Date()
+        }
+
+        localStorage.setItem('graphs', JSON.stringify(localGraphs));
     }
 
     render() {

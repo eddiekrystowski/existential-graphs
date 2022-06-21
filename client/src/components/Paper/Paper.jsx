@@ -57,6 +57,13 @@ export default class Paper extends React.Component {
         
         this.setPaperEvents();
         this.history.current.push(this.sheet.exportAsJSON());
+
+        const graphName = window.location.search.substring(7);
+        if (graphName !== '') {
+            const localGraphData = JSON.parse(localStorage.getItem('graphs'));
+            const dataObj = localGraphData[graphName];
+            this.parseJSON(dataObj.graphJSON.cells);
+        }
     }
 
     handleHistoryJump = (cells) => {
@@ -80,13 +87,8 @@ export default class Paper extends React.Component {
         $(this.paperRoot.current).css('display', 'none');
     }
 
-    export() {
-        // delete graph.changed;
-        let graphJSON = this.sheet.graph.toJSON();
-        for(let i = 0; i < graphJSON.cells.length; i++) {
-            delete graphJSON.cells[i].sheet;
-        }
- 
+    exportAsFile() {
+        const graphJSON = this.export()
         //console.log(graphJSON);
         const file = new Blob([JSON.stringify(graphJSON, null, 2)], { type: 'application/json'});
         const a = document.createElement("a");
@@ -99,6 +101,16 @@ export default class Paper extends React.Component {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }, 0);
+    }
+
+    export() {
+        // delete graph.changed;
+        let graphJSON = this.sheet.graph.toJSON();
+        for(let i = 0; i < graphJSON.cells.length; i++) {
+            delete graphJSON.cells[i].sheet;
+        }
+
+        return graphJSON;
     }
 
     /**

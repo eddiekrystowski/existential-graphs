@@ -59,7 +59,7 @@ export default class App extends React.Component {
     }
 
     exportMainGraph = () => {
-        this.workspace.current.mainPaper.current.export();
+        this.workspace.current.mainPaper.current.exportAsFile();
     }
 
     importMainGraph = () => {
