@@ -5,3 +5,28 @@
     height: 100%;
     background-color: aliceblue;
 }
+
+#dashboard-body {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    background-color: aliceblue;
+}
+
+#dashboard-left-bar {
+    display:flex;
+    flex-direction: column;
+    width: 15%;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: center;
+
+    /* border-right: 1px solid black; */
+}
+
+#dashboard-left-item {
+    display: block;
+    border-radius: 12%;
+    width: 70%;
+    background-color: azure;
+}

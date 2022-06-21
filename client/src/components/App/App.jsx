@@ -59,7 +59,6 @@ export default class App extends React.Component {
             <div id="app" className="app">
                 <BrowserRouter>
                     <Navbar/>
-                    <br/>
                     <Routes>
                         <Route path="/" exact element={<Dashboard/>} />
                         <Route path="/create" exact element={
