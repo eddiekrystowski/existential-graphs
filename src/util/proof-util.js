@@ -31,15 +31,14 @@ export const insertDoubleCut = function(sheet, model, mousePosition={}) {
     let size = {}
     if (!model && mousePosition) {
         position = mousePosition;
-        size = { width: 80, height: 80 }
     }
     else if (model){
         position = model.get('position');
-        size = { width: model.attr('rect/width'), height: model.attr('rect/height') }
     }
     else {
         throw new Error('Bad arguments');
     }
+    size = { width: 80, height: 80 }
     const multipliers = [0.8, 0.25];
     let new_cuts = []
     for(let i = 0; i < multipliers.length; i++) { 
