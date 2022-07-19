@@ -7,9 +7,11 @@
     "@fortawesome/free-regular-svg-icons": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.18",
+    "@headlessui/react": "^1.6.6",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "axios": "^0.27.2",
     "backbone": "^1.4.0",
     "jointjs": "^3.4.1",
     "jquery": "^3.6.0",
@@ -22,9 +24,11 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "concurrently \"npm:watch-*\"",
+    "watch-react": "react-app-rewired start",
+    "watch-css": "npx tailwindcss -i input.css -o ./src/index.css --watch",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -44,5 +48,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "concurrently": "^7.2.2",
+    "react-app-rewire-alias": "^1.1.7",
+    "react-app-rewired": "^2.2.1",
+    "tailwindcss": "^3.1.6"
   }
 }

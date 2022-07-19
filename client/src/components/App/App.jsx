@@ -1,73 +1,73 @@
 import React from 'react';
+import { useState, useEffect, useRef  } from 'react';
 import {BrowserRouter, Route, Router, Routes} from "react-router-dom";
 
-import '../../index.css'; 
-import MenuBar from '../MenuBar/MenuBar.jsx';
-import Workspace from '../Workspace/Workspace.jsx';
-import Navbar from '../Navbar/Navbar.jsx';
-import Dashboard from '../Dashboard/Dashboard';
-import $ from 'jquery'
+import "../../main.css"; // Tawilwind stylesheet
+//import Workspace from '../Workspace/Workspace.jsx';
+import Header from '@components/Header/Header.jsx';
+import Dashboard from '@views/Dashboard/Dashboard';
+import Create from '@views/Create/Create';
+import Login from '../../views/Login/Login';
+//import Proof from '@view/Proof';
+import $ from 'jquery';
 
 
-export default class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.workspace = React.createRef();
-        this.sound = null;
-        this.state = {
-            muted: true
-        }
-    }
+export default function App(props) {
+    const workspace = useRef(null);
 
-    componentDidMount() {
-        console.log('WORKSPACE', this.workspace);
-    }
+    const [muted, setMuted] = useState(true);
+    const [sound, setSound] = useState(null);
 
-    componentDidUpdate(prevProps, prevState) {
-        if (this.state.muted && this.sound) {
-            this.sound.pause();
-            this.sound.currentTime = 0;
-        }
-    }
-
-    handleMuteToggle = () => {
-        this.setState({
-            muted: !this.state.muted
-        });
-
-        const mute_button = getMenuItem("Toggle Sound");
-        const mute_button_label = mute_button.find('.menu-item-label');
-        mute_button.toggleClass('mute-active');
-
-        if (mute_button.hasClass('mute-active')) {
-            mute_button_label.html('Unmute');
-        }
-        else {
-            mute_button_label.html('Mute');
-        }
+    //initial render
+    useEffect(() => {
         
+    }, []);
+
+
+    //pause sound if muted
+    useEffect(() => {
+        if(muted && sound != null) {
+            sound.pause();
+            sound.currentTime = 0;
+        }
+    }, [muted, sound]);
+
+    const handleMuteToggle  = () => {
+        setMuted(() => !muted);
+
+        // const mute_button = getMenuItem("Toggle Sound");
+        // const mute_button_label = mute_button.find('.menu-item-label');
+        // mute_button.toggleClass('mute-active');
+
+        // if (mute_button.hasClass('mute-active')) {
+        //     mute_button_label.html('Unmute');
+        // }
+        // else {
+        //     mute_button_label.html('Mute');
+        // }
     }
 
-    handlePlayAudio = (audio) => {
-        if (this.state.muted) return;
-        this.sound = audio;
-        this.sound.play();
+    const handlePlayAudio = (audio) => {
+        if (muted) return;
+        setSound(() => audio);
+        audio.play();
     }
 
-    getGraphForExport = () => {
-        return this.workspace.current.mainPaper.current.sheet.graph; 
+    /*
+    const getGraphForExport = () => {
+        return workspace.current.mainPaper.current.sheet.graph; 
     }
 
-    exportMainGraph = () => {
-        this.workspace.current.mainPaper.current.exportAsFile();
+    const exportMainGraph = () => {
+        workspace.current.mainPaper.current.exportAsFile();
     }
 
-    importMainGraph = () => {
-        this.workspace.current.mainPaper.current.import();
+    const importMainGraph = () => {
+        workspace.current.mainPaper.current.import();
     }
 
-    setGraphDataOnImport = (data) => {
-        const graph = this.workspace.current.mainPaper.current.sheet.graph; 
+    const setGraphDataOnImport = (data) => {
+        const graph = workspace.current.mainPaper.current.sheet.graph; 
         graph.clear();
         const dataObj = JSON.parse(data);
         for (let i = 0; i < dataObj.cells.length; i++) {
@@ -78,29 +78,32 @@ export default class App extends React.Component {
 
         graph.fromJSON(dataObj);
     }
+    */
 
-    render() {
-        return (
-            <div id="app" className="app">
-                <BrowserRouter>
-                    <Navbar/>
-                    <Routes>
-                        <Route path="/" exact element={<Dashboard/>} />
-                        <Route path="/create" exact element={
-                            <Workspace 
-                                paper_id="main-paper" 
-                                ref={this.workspace} 
-                                handlePlayAudio={this.handlePlayAudio}>
-                            </Workspace>
-                        } />
-                    </Routes>
+    return (
+        <div id="app" className="app text-black dark:text-white bg-white dark:bg-slate-700">
+            <BrowserRouter>
+                <Header muted={muted} handleMuteToggle={handleMuteToggle}/>
+                <Routes>
+                    <Route path="/" element={
+                        <Dashboard/>
+                    } />
+                    <Route path="/create/:id" element={
+                        <Create handlePlayAudio={handlePlayAudio}/>
+                    } />
+                    <Route path="/proof" element={
+                        <Create handlePlayAudio={handlePlayAudio}/>
+                    } />
+                    <Route path="/login" element={
+                        <Login/>
+                    } />
+                </Routes>
 
-                    {/* <MenuBar id="header" muted={this.state.muted} handleMuteToggle={this.handleMuteToggle}/>
-                    <Workspace paper_id="main-paper" ref={this.workspace} handlePlayAudio={this.handlePlayAudio}></Workspace> */}
-                </BrowserRouter>
-            </div>
-        );
-    }
+                {/* <MenuBar id="header" muted={this.state.muted} handleMuteToggle={this.handleMuteToggle}/>
+                <Workspace paper_id="main-paper" ref={this.workspace} handlePlayAudio={this.handlePlayAudio}></Workspace> */}
+            </BrowserRouter>
+        </div>
+    );
 }
 
 
