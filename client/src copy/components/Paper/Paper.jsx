@@ -27,7 +27,7 @@ export default class Paper extends React.Component {
         this.jpaper = null;
         this.paper_element = null;
         this.paperRoot = React.createRef();
-        
+
         this.selected_premise = null;
         this.saved_template = null;
         this.temp_cut = null;
@@ -177,7 +177,7 @@ export default class Paper extends React.Component {
         }
     }
 
-        /**
+    /**
      * Force an array of cells into a Cut (target) even if they do not fit by resizing and moving 
      * the target and its children / neighbors
      * @param {Cell[]} cells 

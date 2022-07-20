@@ -77,7 +77,7 @@ export default function Profile( props ) {
             <p>Login</p>
           </button>
         </NavLink>
-        <NavLink to="/login">
+        <NavLink to="/signup">
           <button className=" w-32 h-10 bg-blue-500 active:bg-blue-600 rounded-md">
             Register
           </button>

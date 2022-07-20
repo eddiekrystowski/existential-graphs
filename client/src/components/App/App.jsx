@@ -10,6 +10,7 @@ import Create from '@views/Create/Create';
 import Login from '../../views/Login/Login';
 //import Proof from '@view/Proof';
 import $ from 'jquery';
+import Signup from '../../views/Signup/Signup';
 
 
 export default function App(props) {
@@ -96,6 +97,9 @@ export default function App(props) {
                     } />
                     <Route path="/login" element={
                         <Login/>
+                    } />
+                    <Route path="/signup" element={
+                        <Signup/>
                     } />
                 </Routes>
 

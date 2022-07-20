@@ -14,7 +14,8 @@ export default function Navbar( props ) {
     //if signed in
     // await axios.get(...)
     //else
-    const id = generateGraphID();
+    const id = await generateGraphID();
+    console.log('id', id)
     addToLocalGraphData(id, {});
     navigate(`/create/${id}`);
   }

@@ -6,9 +6,6 @@ import { Menu } from '@headlessui/react';
 
 export default function Toolbar( props ) {
 
-    function handleImport() {}
-    function handleExport() {}
-
     function handleGraphNameLoseFocus(e) {
         e.target.value = e.target.value.trim();
         if (!e.target.value) e.target.value = "Untitled Graph";
@@ -26,25 +23,25 @@ export default function Toolbar( props ) {
             />
           </div>
           <div className='flex flex-row gap-4'>
-          <ToolbarItem name="File">
-              <div className="py-1">
-                  <ToolbarItemOption action={handleImport}>Import</ToolbarItemOption>
-                  <ToolbarItemOption>Export</ToolbarItemOption>
-                  <ToolbarItemOption>Save</ToolbarItemOption>
-              </div>
-          </ToolbarItem>
-          <ToolbarItem name="Edit">
-              <div className="py-1">
-                  <ToolbarItemOption>Clear Graph</ToolbarItemOption>
-              </div>
-          </ToolbarItem>
-          <ToolbarItem name="Lemma">
-              <div className="py-1">
-                  <ToolbarItemOption>Insert Lemma</ToolbarItemOption>
-                  <ToolbarItemOption>Save Lemma</ToolbarItemOption>
-                  <ToolbarItemOption>View Lemmas</ToolbarItemOption>
-              </div>
-          </ToolbarItem>
+            <ToolbarItem name="File">
+                <div className="py-1">
+                    <ToolbarItemOption>Import</ToolbarItemOption>
+                    <ToolbarItemOption>Export</ToolbarItemOption>
+                    <ToolbarItemOption>Save</ToolbarItemOption>
+                </div>
+            </ToolbarItem>
+            <ToolbarItem name="Edit">
+                <div className="py-1">
+                    <ToolbarItemOption>Clear Graph</ToolbarItemOption>
+                </div>
+            </ToolbarItem>
+            <ToolbarItem name="Lemma">
+                <div className="py-1">
+                    <ToolbarItemOption>Insert Lemma</ToolbarItemOption>
+                    <ToolbarItemOption>Save Lemma</ToolbarItemOption>
+                    <ToolbarItemOption>View Lemmas</ToolbarItemOption>
+                </div>
+            </ToolbarItem>
           </div>
       </div>
       

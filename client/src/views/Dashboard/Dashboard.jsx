@@ -37,8 +37,9 @@ export default function Dashboard(props) {
       <div id="dashboard-root" className=' bg-white dark:bg-slate-700'>
         <div id="dashboard-body">
           <div id="dashboard-left-bar">
-            <Link to="graphs" className="nav-link dashboard-left-item">Graphs</Link>
-            <Link to="graphs" className="nav-link dashboard-left-item">Lemmas</Link>
+            <Link to="graphs" className="nav-link h-15 py-4 px-6 flex justify-center text-center bg-blue-500 w-4/5 rounded-lg text-white font-sans font-semibold text-2xl active:bg-blue-600 shadow-md shadow-slate-600 active:shadow-none transition">Graphs</Link>
+            <br />
+            <Link to="graphs" className="nav-link h-15 py-4 px-6 flex justify-center text-center bg-blue-500 w-4/5 rounded-lg text-white font-sans font-semibold text-2xl active:bg-blue-600 shadow-md shadow-slate-600 active:shadow-none transition">Lemmas</Link>
           </div>
           <div id="dashboard-main">
             <div id="graph-table">
