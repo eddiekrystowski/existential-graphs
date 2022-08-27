@@ -1,0 +1,20 @@
+
+.paper-wrapper {
+    grid-area: paper;
+    overflow: scroll;
+}
+
+.paper-root {
+    overflow: hidden;
+    position: relative;
+    display: flex;
+}
+
+
+.joint-paper:focus {
+    outline: none;
+}
+
+.joint-paper {
+    background-color: white;
+}

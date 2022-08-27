@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html, body, #root, .app {
+  margin: 0px;
+  padding: 0px;
+  height: 100%;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  /* grid-template-areas: 
+      'header header header'
+      'side   paper  paper'
+      'side   paper  paper'; */
+  /* grid-template-rows: 10vh auto auto;
+  grid-template-columns: 15vw auto auto; */
+}
+
+.visually-hidden {
+  position: absolute !important;
+  left:     -10000px !important;
+  top:      auto !important;
+  width:    1px !important;
+  height:   1px !important;
+  overflow: hidden !important;
+}
