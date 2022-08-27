@@ -16,13 +16,17 @@ export default class SideBar extends React.Component {
             buttons: {
                 create: [
                     {
+<<<<<<< HEAD:client/src copy/components/SideBar/SideBar.jsx
                         text: 'Add Atomic',
+=======
+                        text: 'Add Atomic Claim',
+>>>>>>> master:src/components/SideBar/SideBar.jsx
                         action: deiteration,
                         onClick: () => {
                             console.log('Adding premise...')
                         },
                         icon : faPlus,
-                        tooltip_text : 'Add a premise by hovering over the sheet and pressing a letter on your keyboard.'
+                        tooltip_text : 'Add an atomic claim by hovering over the sheet and pressing a letter on your keyboard.'
                     },
                     {
                         text: 'Cut',
@@ -83,7 +87,7 @@ export default class SideBar extends React.Component {
                             console.log('Performing iteration...');
                         },
                         icon : faClone,
-                        tooltip_text : 'Clone any premise an even number of layers layers deeper by first clicking on the premise and then the desired location.'
+                        tooltip_text : 'Clone any atomic claim an even number of layers layers deeper by first clicking on the atomic claim and then the desired location.'
                     },
                     {
                         text: 'Deiteration',
@@ -93,7 +97,7 @@ export default class SideBar extends React.Component {
                             console.log('Performing deiteration...');
                         },
                         icon : faEraser,
-                        tooltip_text : 'Remove any premise an even number of layers deeper by clicking on the premise you wish to remove.'
+                        tooltip_text : 'Remove any atomic claim an even number of layers deeper by clicking on the atomic claim you wish to remove.'
                     }
                 ],
                 both: [
