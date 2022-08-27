@@ -62,7 +62,8 @@ export default class Sheet {
         // the diagram (parent / child structure (embedding)) to reflect what the user
         // sees on the paper
         let cellbbox = cell.getBoundingBox();
-    
+        
+        console.log(this);
         let potential_parents = this.findPotentialParents(cellbbox);
         let parent = findSmallestCell(potential_parents);
     
