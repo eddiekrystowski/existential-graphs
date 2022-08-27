@@ -100,7 +100,7 @@ export default class Atomic extends joint.dia.Element {
 
     destroy() {
         this.remove();
-        this.sheet.paper.handleDeleteCell();
+        //this.sheet.paper.handleDeleteCell();
       }
   
       obliterate() {
