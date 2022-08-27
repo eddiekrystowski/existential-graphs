@@ -14,6 +14,8 @@ export default function Dashboard(props) {
     const now = new Date();
     let dateString = "";
 
+    const name = localGraphData[graph].name;
+
 
     if (date.getDay() === now.getDay()) {
       dateString = date.toLocaleTimeString([], {hour: 'numeric', minute: '2-digit'});
@@ -26,7 +28,7 @@ export default function Dashboard(props) {
     /* TODO: NEED to make this into react component!! Waiting for refactor pr after this one*/
     graphs.push(
       <Link to={{ pathname: `/create/${graph}` }} key={graph} className='graph-table-item'>
-        <span className='graph-table-field'>{graph}</span>
+        <span className='graph-table-field'>{name}</span>
         <span className='graph-table-field'>{dateString}</span>
       </Link>
     )

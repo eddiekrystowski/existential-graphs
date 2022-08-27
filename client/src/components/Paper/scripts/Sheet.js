@@ -415,4 +415,63 @@ export default class Sheet {
         }
     }
 
+    forcePremise(config, target=null) {
+        const parent = (target === null) ? this.getCellAtMouse() : target;
+        //console.log("TEST PARENT : ", parent)
+        if (parent === null || parent.attributes.type !== "dia.Element.Cut") return this.addAtomic(config);
+        const atomic = (new Atomic()).create(config, this, false);
+        parent.embed(atomic) 
+        //need to resize cut to fit premise
+        const atomic_bbox = atomic.getBoundingBox();
+        const parent_bbox = atomic.getBoundingBox();
+        //console.log("premise: ", premise_bbox);
+        //console.log("parent: ", parent_bbox);
+        const buffer = 10;
+        if (!contains(parent.getBoundingBox(), atomic.getBoundingBox())) {
+            //check if premise is to the left of parent
+            if (atomic_bbox.x <= parent_bbox.x) {
+                const diff = parent_bbox.x - atomic_bbox.x - buffer;
+                this.treeMove(parent, {x: atomic_bbox.x - buffer, y: parent_bbox.y});
+                parent.attr("rect/width", parent.attributes.attrs.rect.width + diff);
+            } 
+            //check if premise is to the right of parent
+            if (atomic_bbox.x + atomic_bbox.width >= parent_bbox.x + parent_bbox.width) {
+                const diff = atomic_bbox.x + atomic_bbox.width - (parent_bbox.x + parent_bbox.width);
+                parent.attr("rect/width", parent.attributes.attrs.rect.width + diff + buffer);
+            }
+            // check if premise is above parent
+            if (atomic_bbox.y <= parent_bbox.y) {
+                const diff = parent_bbox.y - atomic_bbox.y - buffer;
+                this.treeMove(parent, {x: parent_bbox.x, y: atomic_bbox.y - buffer});
+                parent.attr("rect/height", parent.attributes.attrs.rect.height + diff);
+            }
+            //check if premise is below parent
+            if (atomic_bbox.y + atomic_bbox.height >= parent_bbox.y + parent_bbox.height){
+                const diff = atomic_bbox.y + atomic_bbox.height - (parent_bbox.y + parent_bbox.height) + 10;
+                parent.attr("rect/height", parent.attributes.attrs.rect.height + diff + buffer);
+            }
+
+        }
+        
+        this.handleCollisions(atomic);
+        
+        return atomic;
+    }
+
+
+    // returns cell under mouse with the highest z value;
+    getCellAtMouse() {
+        //console.log("mouse pos", this.paper.getRelativeMousePos());
+        const mouse_pos = this.paper.getRelativeMousePos()
+        const cells = this.graph.getCells().filter(cell =>  mouse_pos.x <= cell.attributes.position.x + cell.attributes.attrs.rect.width
+                                                        && mouse_pos.x >= cell.attributes.position.x
+                                                        && mouse_pos.y <= cell.attributes.position.y + cell.attributes.attrs.rect.height
+                                                        && mouse_pos.y >= cell.attributes.position.y); 
+        //console.log("getCellAtMouse : \n CELLS: ", cells);
+        if (cells.length === 0) return null;
+        const cell = cells.reduce((max, cell) => max.attributes.z > cell.attributes.z ? max : cell);
+        //console.log("HIGHEST CELL: ", cell)
+        return cell;
+    }
+
 }

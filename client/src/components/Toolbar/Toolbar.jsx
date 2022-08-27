@@ -6,19 +6,22 @@ import { Menu } from '@headlessui/react';
 
 export default function Toolbar( props ) {
 
+
+
     function handleGraphNameLoseFocus(e) {
         e.target.value = e.target.value.trim();
         if (!e.target.value) e.target.value = "Untitled Graph";
+        props.handleGraphNameUpdate(e.target.value);
     }
   
     return (
-      <div className='w-screen h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono pt-2 '>
+      <div className='z-9 w-screen h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono pt-2 '>
           <div>    
             <input 
               onBlur={handleGraphNameLoseFocus} 
               placeholder="Untitled Graph" 
               type="text" 
-              defaultValue="Untitled Graph" 
+              defaultValue={props.graphName}
               className="outline-none bg-transparent border-none hover:ring-1 hover:ring-black font-semibold text-xl font-sans"
             />
           </div>
@@ -27,7 +30,7 @@ export default function Toolbar( props ) {
                 <div className="py-1">
                     <ToolbarItemOption>Import</ToolbarItemOption>
                     <ToolbarItemOption>Export</ToolbarItemOption>
-                    <ToolbarItemOption>Save</ToolbarItemOption>
+                    <ToolbarItemOption action={props.handleSaveGraph}>Save</ToolbarItemOption>
                 </div>
             </ToolbarItem>
             <ToolbarItem name="Edit">

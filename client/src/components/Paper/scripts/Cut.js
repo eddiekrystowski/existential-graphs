@@ -140,7 +140,7 @@ export default class Cut extends joint.dia.Element {
             this.sheet.handleCollisions(parent);
         }
 
-        this.sheet.paper.handleDeleteCell();
+        //this.sheet.paper.handleDeleteCell();
     }
     //Destroys itself and all decendants
     obliterate() {

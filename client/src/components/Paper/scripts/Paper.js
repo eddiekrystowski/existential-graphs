@@ -1,6 +1,6 @@
 import * as joint from 'jointjs';
 import Sheet from './Sheet.js';
-import { getSafeCellAddOrder, getMousePosition, keyCodeIsActive, getMouseIsDown, contains } from '@util';
+import { getSafeCellAddOrder, getMousePosition, keyCodeIsActive, getMouseIsDown, getLocalGraphByID, contains } from '@util';
 import Cut from './Cut.js';
 import $ from 'jquery';
 import _ from 'lodash';
@@ -8,6 +8,7 @@ import _ from 'lodash';
 const PAPER_SIZE = { width: 4000, height: 4000 };
 export default class Paper {
     constructor(dom_id, graph_id) {
+        console.log('LOADING GRAPH', graph_id)
         this.sheet = new Sheet(this, graph_id);
         this.dom_element = document.getElementById(dom_id);
         this.jpaper = new joint.dia.Paper({
@@ -18,6 +19,10 @@ export default class Paper {
             preventContextMenu: false,
             clickThreshold: 1
         });
+
+        console.log(getLocalGraphByID(graph_id))
+        const order = getSafeCellAddOrder(getLocalGraphByID(graph_id).graphJSON.cells);
+        this.addCellsInOrder(order);
         
         this.setPaperEvents();
 
@@ -185,12 +190,13 @@ export default class Paper {
     }
 
     addCellsInOrder(order) {
+        console.log('adding in order', order)
         for (let [cellType, cell] of order) {
             if(cellType === 'cut') {
                 this.sheet.addCut(cell);
             }
             else if (cellType === 'atomic') {
-                this.sheet.addPremise(cell);
+                this.sheet.addAtomic(cell);
             }
         }
     }

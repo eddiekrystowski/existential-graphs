@@ -1,6 +1,7 @@
 import "../../../main.css"; // Tawilwind stylesheet
 import { NavLink, useNavigate } from 'react-router-dom' //  For navagation links
 import { generateGraphID, addToLocalGraphData } from "@util";
+import { data } from "jquery";
 
 /**
  * Component for site navagation.
@@ -16,7 +17,7 @@ export default function Navbar( props ) {
     //else
     const id = await generateGraphID();
     console.log('id', id)
-    addToLocalGraphData(id, {});
+    addToLocalGraphData(id, {cells:{}}, 'Untitled Graph');
     navigate(`/create/${id}`);
   }
 

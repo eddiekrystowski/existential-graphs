@@ -9,6 +9,7 @@
     if (cells === null) return null;
     const order = [];
     const ids = {}; 
+    console.log(cells)
     while (cells.length > 0) {
         const cell = cells.shift();
         const type = cell.type;

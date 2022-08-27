@@ -10,6 +10,7 @@
     display: flex;
 }
 
+
 .joint-paper:focus {
     outline: none;
 }
