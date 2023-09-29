@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import  CreatePaper  from '@components/Paper/scripts/CreatePaper';
-import '@components/Paper/scripts/Paper.css'
+import  CreatePaper  from '@scripts/CreatePaper';
+import '@scripts/Paper.css'
 
 export default function CreatePaperComponent(props) {
     

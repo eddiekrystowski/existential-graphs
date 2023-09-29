@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Toolbar from '@components/Toolbar/Toolbar.jsx';
 import { CreatePaperComponent } from '@components/Paper';
-import  CreatePaper  from '@components/Paper/scripts/CreatePaper';
+import  CreatePaper  from '@scripts/CreatePaper';
 
 import { create } from 'lodash';
 import { addToLocalGraphData, getLocalGraphByID } from '../../util/util';
