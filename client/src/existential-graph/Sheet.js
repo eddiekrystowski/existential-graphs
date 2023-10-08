@@ -1,8 +1,8 @@
 import { getLocalGraphByID, findSmallestCell, color, getCellsBoundingBox, contains, intersects, overlapsCells, 
          cellInArray } from '@util';
 import * as joint from 'jointjs'
-import Atomic from './Atomic';
-import Cut from './Cut';
+import Atomic from './shapes/Atomic';
+import Cut from './shapes/Cut';
 
 const NSAtomic = joint.dia.Element.define('nameSpace.Atomic',Atomic);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);

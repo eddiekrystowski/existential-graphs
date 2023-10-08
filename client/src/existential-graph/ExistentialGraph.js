@@ -5,13 +5,29 @@ import Cut from './Cut.js';
 import $ from 'jquery';
 import _ from 'lodash';
 
+/**
+ * @class Existential Graph
+ * This class is a wrapper around the joint paper, which is the svg canvas that is rendered / the user interacts with.
+ * The joint paper reflects the graph defined by an associated joint Graph, which is contained in the Sheet class.
+ */
+
+const STATE = {
+    NO_ACTION: -1,
+    CREATE: 0,
+    PROOF_BASE: 1,
+    INSERT_SUBGRAPH: 2,
+    ERASE_SUBGRAPH: 3,
+    INSERT_DBL_CUT: 4,
+    ERASE_DBL_CUT: 5,
+}
 const PAPER_SIZE = { width: 4000, height: 4000 };
-export default class Paper {
+
+export default class ExistentialGraph {
     constructor(dom_id, graph_id) {
         console.log('LOADING GRAPH', graph_id)
         this.sheet = new Sheet(this, graph_id);
         this.dom_element = document.getElementById(dom_id);
-        this.jpaper = new joint.dia.Paper({
+        this.paper = new joint.dia.Paper({
             el: this.dom_element,
             model: this.sheet.graph,
             width: PAPER_SIZE.width,
@@ -20,17 +36,31 @@ export default class Paper {
             clickThreshold: 1
         });
 
-        console.log(getLocalGraphByID(graph_id))
+        //default state on creation is NO_ACTION until the graph is initialized
+        this.state = STATE.NO_ACTION;
+
+        //console.log(getLocalGraphByID(graph_id))
         const order = getSafeCellAddOrder(getLocalGraphByID(graph_id).graphJSON.cells);
         this.addCellsInOrder(order);
         
+        // Paper events are callback functions defined on the joint paper that are 
+        // triggered by user input (i.e. keystrokes, clicking, dragging, etc)
         this.setPaperEvents();
 
-        this.canInsertPremise = true;
+        //this.canInsertPremise = true;
+        // TODO: what does this mean? 
         this.previousPremiseCode = -1;
+
+        //the selected premise is the Atomic/Cut that the user is currently interacting / last interacted with
         this.selected_premise = null;
 
+        //The temporary cut is used for:
+        // The cut seen when creating a cut through dragging.
+        // When inserting a subgraph with more than one root elements, all elements are placed in a temporary
+        // cut and inserted to ensure that the level order is preserved, then the temp cut is deleted.
         this.temp_cut = null;
+
+
         this.initial_cut_pos = {x: 0, y: 0};
 
         $(`#${dom_id}`).hover(function() {
@@ -40,13 +70,16 @@ export default class Paper {
         }, function() {
             this.blur();
         });
+
+        //default state after setup is CREATE mode
+        this.state = STATE.CREATE;
         
     }
 
     setPaperEvents(){
         // paper events
-        //arrow functions are required to keep proper context binding
-        this.jpaper.on("element:mouseenter", ( cellView, evt) =>{
+        // arrow functions are required to keep proper context binding
+        this.paper.on("element:mouseenter", ( cellView, evt ) => {
             let model = cellView.model
             let modelView = model.findView(this.jpaper);
             modelView.showTools()
@@ -55,7 +88,7 @@ export default class Paper {
             this.selected_premise = model
         });
 
-        this.jpaper.on("element:mouseleave", ( cellView, evt) =>{
+        this.paper.on("element:mouseleave", ( cellView, evt ) =>{
             let model = cellView.model
             let modelView = model.findView(this.jpaper);
             if(!modelView) return;
@@ -66,11 +99,8 @@ export default class Paper {
         })
 
         // First, unembed the cell that has just been grabbed by the user.
-        this.jpaper.on('cell:pointerdown', (cellView, evt, x, y) => {
-            
-           // console.log(cellView)
+        this.paper.on('cell:pointerdown', (cellView, evt, x, y) => { 
             let cell = cellView.model;
-            //console.log("cell", cell)
 
             if (!cell.get('embeds') || cell.get('embeds').length === 0) {
                 // Show the dragged element above all the other cells (except when the
@@ -87,7 +117,7 @@ export default class Paper {
 
         // When the dragged cell is dropped over another cell, let it become a child of the
         // element below.
-        this.jpaper.on('cell:pointerup', (cellView, evt, x, y) => {
+        this.paper.on('cell:pointerup', (cellView, evt, x, y) => {
 
             let cell = cellView.model;
             
