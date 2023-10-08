@@ -15,7 +15,7 @@ const DEFAULT_BACKGROUND_COLORS = {
 }
 
 
-export default class Sheet {
+export default class GraphController {
     constructor(parent_paper, graph_id) {
         this.paper = parent_paper;
 
@@ -473,6 +473,125 @@ export default class Sheet {
         const cell = cells.reduce((max, cell) => max.attributes.z > cell.attributes.z ? max : cell);
         //console.log("HIGHEST CELL: ", cell)
         return cell;
+    }
+
+    /**
+     * Force an array of cells into a Cut (target) even if they do not fit by resizing and moving 
+     * the target and its children / neighbors
+     * @param {Cell[]} cells 
+     * @param {Cut} target
+     */
+    forceParseCells(cells, cellsbbox, target) {
+        console.clear()
+        console.log("forcing cells: ",cells)
+        console.log("to target: ", target)
+        if (cells === null) return;
+        if (target === null || target.attributes.type !== "dia.Element.Cut") return;
+
+        // We have a non empty array of cells to insert into a cut
+        //create a temporary root cut to insert all cells into
+        const config = {
+            size: {
+                width: cellsbbox.width + 10,
+                height: cellsbbox.height + 10
+            },
+            position: {
+                x: cellsbbox.x-10,
+                y: cellsbbox.y-10
+            },
+            attrs: {
+                rect: {
+                    width: cellsbbox.width + 10,
+                    height: cellsbbox.height + 10
+                }
+            }
+        }
+        const cut = (new Cut({
+            markup: '<rect/><text/>',
+            position: {
+                ...config.position
+            },
+            size: {
+                ...config.size
+            },
+            attrs: {
+                rect: {
+                    ...config.attrs.rect
+                },
+                text: {
+                    ...config.attrs.text
+                },
+                level: 0
+            },
+            // set custom attributes here:
+            sheet: this
+        })).create(config, this)
+        // put the cut inside the target 
+        target.embed(cut);
+        const target_bbox = target.getBoundingBox();
+        const cut_bbox = cut.getBoundingBox();
+        const buffer = 10;
+        if (!contains(target_bbox, cut_bbox)) {
+            //check if premise is to the left of parent
+            if (cut_bbox.x <= target_bbox.x) {
+                const diff = target_bbox.x - cut_bbox.x - buffer;
+                target.position(cut_bbox.x - buffer, target_bbox.y);
+                target.attr("rect/width", target.attributes.attrs.rect.width + diff);
+            } 
+            //check if premise is to the right of parent
+            if (cut_bbox.x + cut_bbox.width >= target_bbox.x + target_bbox.width) {
+                const diff = cut_bbox.x + cut_bbox.width - (target_bbox.x + target_bbox.width);
+                target.attr("rect/width", target.attributes.attrs.rect.width + diff + buffer);
+            }
+            // check if premise is above parent
+            if (cut_bbox.y <= target_bbox.y) {
+                const diff = target_bbox.y - cut_bbox.y - buffer;
+                target.position(target_bbox.x, cut_bbox.y - buffer);
+                target.attr("rect/height", target.attributes.attrs.rect.height + diff);
+            }
+            //check if premise is below parent
+            if (cut_bbox.y + cut_bbox.height >= target_bbox.y + target_bbox.height){
+                const diff = cut_bbox.y + cut_bbox.height - (target_bbox.y + target_bbox.height) + 10;
+                target.attr("rect/height", target.attributes.attrs.rect.height + diff + buffer);
+            }
+        }
+        console.log("GHOST CUT: ", cut)
+        this.handleCollisions(cut)
+
+        //update position of cells based on where cut ends up
+        console.log("updating cells",cells);
+
+        for (const cell of cells) {
+            console.log("updating cell position:",cell.position)
+            cell.position = {
+                x: cut.attributes.position.x + (cell.position.x-cellsbbox.x + 5), 
+                y: cut.attributes.position.y + (cell.position.y-cellsbbox.y + 5)
+            }
+        }
+        
+        const ids = {}; 
+        while (cells.length > 0) {
+            const cell = cells.shift();
+            const type = cell.type;
+
+            if (cell.parent && !ids.hasOwnProperty(cell.parent)) {
+                //console.log('has parent, skipping for now...')
+                cells.push(cell);
+                continue;
+            }
+
+            if (type === "dia.Element.Cut") {
+                const new_cut =  this.addCut(cell);
+                ids[cell.id] = true;
+            }
+            else if (type === "dia.Element.Atomic") {
+                const new_atomic = this.addAtomic(cell);
+                ids[cell.id] = true;
+            }
+        }
+
+        cut.destroy()
+
     }
 
 }
