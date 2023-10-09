@@ -131,7 +131,7 @@ export default class Atomic extends joint.dia.Element {
       //TODO: see Cut.addTools()
       addTools(element) {
         //element view is in charge of rendering the elements on the paper
-        let elementView = element.findView(element.sheet.paper.jpaper);
+        let elementView = element.findView(element.sheet.paper.paper);
         //clear any old tools
         elementView.removeTools();
         // boundary tool shows boundaries of element

@@ -1,7 +1,7 @@
 import * as joint from 'jointjs';
-import Sheet from './GraphController.js';
+import GraphController from './GraphController.js';
 import { getSafeCellAddOrder, getMousePosition, keyCodeIsActive, getMouseIsDown, getLocalGraphByID, contains } from '@util';
-import Cut from './Cut.js';
+import Cut from './shapes/Cut.js';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -25,7 +25,7 @@ const PAPER_SIZE = { width: 4000, height: 4000 };
 export default class ExistentialGraph {
     constructor(dom_id, graph_id) {
         console.log('LOADING GRAPH', graph_id)
-        this.sheet = new Sheet(this, graph_id);
+        this.sheet = new GraphController(this, graph_id);
         this.dom_element = document.getElementById(dom_id);
         this.paper = new joint.dia.Paper({
             el: this.dom_element,
@@ -47,7 +47,7 @@ export default class ExistentialGraph {
         // triggered by user input (i.e. keystrokes, clicking, dragging, etc)
         this.setPaperEvents();
 
-        //this.canInsertPremise = true;
+        this.canInsertPremise = true;
         // TODO: what does this mean? 
         this.previousPremiseCode = -1;
 
@@ -81,7 +81,7 @@ export default class ExistentialGraph {
         // arrow functions are required to keep proper context binding
         this.paper.on("element:mouseenter", ( cellView, evt ) => {
             let model = cellView.model
-            let modelView = model.findView(this.jpaper);
+            let modelView = model.findView(this.paper);
             modelView.showTools()
             model.attr("rect/stroke", "red")
             model.attr("text/fill", "red")
@@ -90,7 +90,7 @@ export default class ExistentialGraph {
 
         this.paper.on("element:mouseleave", ( cellView, evt ) =>{
             let model = cellView.model
-            let modelView = model.findView(this.jpaper);
+            let modelView = model.findView(this.paper);
             if(!modelView) return;
             modelView.hideTools()
             model.attr("rect/stroke", "black")
@@ -388,7 +388,7 @@ export default class ExistentialGraph {
             this.sheet.addCut(config);
         }
     
-        this.jpaper.setInteractivity(true);
+        this.paper.setInteractivity(true);
         this.temp_cut = null;
     }
 
