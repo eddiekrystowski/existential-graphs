@@ -1,9 +1,7 @@
 import Item from "./Item";
 
-export class Queue
-{
-    constructor()
-    {
+export class LinkedList {
+    constructor() {
         this.head = new Item("head")
         this.tail = new Item("tail");
         this.head.next = this.tail;

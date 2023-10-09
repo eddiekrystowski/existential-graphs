@@ -1,4 +1,4 @@
-import { Queue } from "./Queue";
+import { LinkedList } from "./LinkedList";
 
 /**
  *  A series of phyiscal changes to the graph. 
@@ -6,7 +6,7 @@ import { Queue } from "./Queue";
 
 class History {
     constructor() {
-        this.history = new Queue();
+        this.history = new LinkedList();
     }
 
     undo()
