@@ -671,4 +671,50 @@ export default class GraphController {
         }
     }
 
+    addCutAsParent(child) {
+        const cut = (new Cut()).create(config, this, false);
+
+    }
+
+    insertDoubleCut = function(sheet, model, mousePosition={}) {
+        let position = {};
+        let size = {}
+        if (!model && mousePosition) {
+            position = mousePosition;
+            size = { width: 80, height: 80 }
+        }
+        else if (model){
+            position = model.get('position');
+            size = { width: model.attr('rect/width'), height: model.attr('rect/height') }
+        }
+        else {
+            throw new Error('Bad arguments');
+        }
+        const multipliers = [0.8, 0.25];
+        let new_cuts = []
+        for(let i = 0; i < multipliers.length; i++) { 
+            new_cuts.push(sheet.addCut({
+                position:  {
+                x: position.x - (size.width * multipliers[i]/2),
+                y: position.y - (size.height * multipliers[i]/2)
+                },
+                attrs: {
+                    rect: {
+                        width: size.width * (1 + multipliers[i]),
+                        height: size.height * (1 + multipliers[i])
+                    }
+                }
+            }, false));
+        } 
+        new_cuts[0].embed(new_cuts[1])
+        this.colorByLevel(new_cuts[0])
+        let selected_premise = this.paper.selected_premise;
+        if (selected_premise && selected_premise.attributes.type === "dia.Element.Cut") {
+        selected_premise.embed(new_cuts[0]);
+        this.colorByLevel(selected_premise)
+        this.pack(selected_premise)
+        }
+        this.handleCollisions(new_cuts[0]) 
+    }
+
 }
