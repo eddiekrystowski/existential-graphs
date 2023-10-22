@@ -3,10 +3,9 @@ import "@root/main.css"; // Tawilwind stylesheet
 import ToolbarItem from './ToolbarItem/ToolbarItem';
 import ToolbarItemOption from './ToolbarItemOption/ToolbarItemOption';
 import { Menu } from '@headlessui/react';
+import GraphTool from './GraphTool/GraphTool';
 
 export default function Toolbar( props ) {
-
-
 
     function handleGraphNameLoseFocus(e) {
         e.target.value = e.target.value.trim();
@@ -52,31 +51,11 @@ export default function Toolbar( props ) {
             
             {/* Graph tools */}
             <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-row px-2 font-mono'>
-                <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono'>
-                    <button className='inline-block min-h-[2rem] min-w-[2rem] bg-slate-600'>
-                    </button>
-                    <span className='h-min'>Cut</span>
-                </div>
-                <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono'>
-                    <button className='inline-block min-h-[2rem] min-w-[2rem] bg-slate-600'>
-                    </button>
-                    <span className='h-min'>Insert Double Cut</span>
-                </div>
-                <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono'>
-                    <button className='inline-block min-h-[2rem] min-w-[2rem] bg-slate-600'>
-                    </button>
-                    <span className='h-min'>Erase Double Cut</span>
-                </div>
-                <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono'>
-                    <button className='inline-block min-h-[2rem] min-w-[2rem] bg-slate-600'>
-                    </button>
-                    <span className='h-min'>Insert Subgraph</span>
-                </div>
-                <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono'>
-                    <button className='inline-block min-h-[2rem] min-w-[2rem] bg-slate-600'>
-                    </button>
-                    <span className='h-min'>Erase Subgraph</span>
-                </div>
+                <GraphTool onClick={() => props.handleSetGraphTool('cut')}>Cut</GraphTool>
+                <GraphTool onClick={() => props.handleSetGraphTool('insert_double_cut')}>Insert Double Cut</GraphTool>
+                <GraphTool onClick={() => props.handleSetGraphTool('erase_double_cut')}>Erase Double Cut</GraphTool>
+                <GraphTool onClick={() => props.handleSetGraphTool('insert_subgraph')}>Insert Subgraph</GraphTool>
+                <GraphTool onClick={() => props.handleSetGraphTool('erase_subgraph')}>Erase Subgraph</GraphTool>
             </div>
         </div>
     );

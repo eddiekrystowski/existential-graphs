@@ -60,6 +60,9 @@ export default class ExistentialGraph {
         // cut and inserted to ensure that the level order is preserved, then the temp cut is deleted.
         this.temp_cut = null;
 
+        // Name of action selected by toolbar graph tool buttons
+        this.graphTool = null;
+
 
         this.initial_cut_pos = {x: 0, y: 0};
 
@@ -137,33 +140,6 @@ export default class ExistentialGraph {
         // this.sheet.graph.on('add', () => {
         //     this.onGraphUpdate();
         // });
-
-        //PAPER UNDO AND REDO EVENTS
-        if (false) {
-            // $(this.dom_element).on('keydown', (event) => {
-            //     if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
-            //         const new_state = this.history.current.undo();
-            //         this.selected_premise = null;
-            //         //only update graph if new state exists
-            //         //undo will return false if can't undo anymore
-            //         if (new_state) {
-            //             this.history.current.lock();
-            //             this.sheet.importCells(new_state);
-            //             this.history.current.unlock();
-            //         }
-            //     }
-            //     if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && event.shiftKey) {
-            //         const new_state = this.history.current.redo();
-            //         //only update graph if new state exists
-            //         //redo will return false if can't redo anymore
-            //         if (new_state) {
-            //             this.history.current.lock();
-            //             this.sheet.importCells(new_state);
-            //             this.history.current.unlock();
-            //         }
-            //     }
-            // });
-        }
         
     }
 
@@ -336,6 +312,9 @@ export default class ExistentialGraph {
     }
 
     onMouseDown = (event) => {
+
+        if (this.graphTool) return;
+
         //console.log('mousedown', this);
         if (keyCodeIsActive(16) /*&& this.getMode() === 'create'*/) {
             this.initial_cut_pos = this.getRelativeMousePos();
@@ -353,21 +332,62 @@ export default class ExistentialGraph {
     }
 
     onMouseUp = () => {
-        //console.log('mouseup', this);
-        if (false/*this.getMode() === 'proof'*/) {
-            //this.history.current.startBatch();
-            if (!this.selected_premise && this.props.action && this.props.action.name === 'insertDoubleCut') {
-                const mouse_adjusted = this.getRelativeMousePos();
-                this.props.action(this.sheet, null, mouse_adjusted);
-                this.props.handleClearAction();
+
+        if (this.graphTool) {
+            console.log('executing ', this.graphTool);
+
+            if (this.graphTool === 'cut') {
+                let config = {
+                    position: this.getRelativeMousePos()
+                }
+                if (this.selected_premise) {
+                    config["child"] = this.selected_premise;
+                    this.sheet.addCut(config);
+                } else {
+                    this.sheet.addCut(config);
+                }
             }
-            if (!this.selected_premise && this.props.action && this.props.action.name === 'bound iterationend') {
-                const mouse_adjusted = this.getRelativeMousePos();
-                this.props.action(this.sheet, null, mouse_adjusted);
-                this.props.handleClearAction();
+            else if (this.graphTool === 'insert_double_cut') {
+                let config = {
+                    position: this.getRelativeMousePos()
+                }
+
+                let cut1;
+                if (this.selected_premise) {
+                    config["child"] = this.selected_premise;
+                    cut1 = this.sheet.addCut(config);
+                } else {
+                    cut1 = this.sheet.addCut(config);
+                }
+                
+                config["child"] = cut1;
+                this.sheet.addCut(config);
+
             }
-            //this.history.current.endBatch();
+            else if (this.graphTool === 'erase_double_cut') {
+                let config = {
+                    position: this.getRelativeMousePos()
+                }
+                this.sheet.erase_double_cut(config);
+            }
+            else if (this.graphTool === 'insert_subgraph') {
+                let config = {
+                    position: this.getRelativeMousePos()
+                }
+                this.sheet.insert_subgraph(config);
+            }
+            else if (this.graphTool === 'erase_subgraph') {
+                let config = {
+                    position: this.getRelativeMousePos()
+                }
+                this.sheet.erase_subgraph(config);
+            }
+
+
+            this.graphTool = null;
+            return
         }
+
         if (this.temp_cut /*&& this.getMode() === 'create'*/) {
             const position = _.clone(this.temp_cut.get('position'));
             const size = _.clone({width: this.temp_cut.attr('rect/width'), height: this.temp_cut.attr('rect/height')});
