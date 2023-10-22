@@ -738,4 +738,14 @@ export default class GraphController {
         }
     }
 
+    deleteSubgraph(root, deleteRoot=true) {
+        //destroy recursively, starting at the leaves to not lose reference
+        //to the rest of the tree by deleting the root first
+        let children = root.getEmbeddedCells()
+        for (const child in children) {
+            this.deleteSubgraph(child)
+        }
+        root.destroy()
+    }
+
 }
