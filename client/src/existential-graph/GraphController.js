@@ -717,4 +717,25 @@ export default class GraphController {
         this.handleCollisions(new_cuts[0]) 
     }
 
+    deleteDoubleCut = function(sheet, model) {
+        console.log("MODEL: ", model);
+        const graph = sheet.graph;
+        if(model.__proto__.constructor.name === "Cut" && model.attributes.embeds?.length === 1 && 
+            graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name === "Cut") {
+            const children = graph.getCell(model.attributes.embeds[0]).attributes.embeds;
+            graph.getCell(model.attributes.embeds[0]).destroy();
+            model.destroy();
+            if(model.attributes.parent) {
+            sheet.handleCollisions(graph.getCell(model.attributes.parent));
+            }
+            else {
+            children?.forEach(element => {
+                if(graph.getCell(element).__proto__.constructor.name === "Cut") {
+                    sheet.handleCollisions(graph.getCell(element))
+                }
+            });
+            }
+        }
+    }
+
 }
