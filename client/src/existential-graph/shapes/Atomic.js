@@ -40,7 +40,8 @@ export default class Atomic extends joint.dia.Element {
             type: "dia.Element.Atomic",
             attrs: {
                 rect: ATOMIC_DEFAULTS.attrs.rect,
-                text: ATOMIC_DEFAULTS.attrs.text
+                text: ATOMIC_DEFAULTS.attrs.text,
+                locked: false
             }
         }
     }
@@ -103,54 +104,74 @@ export default class Atomic extends joint.dia.Element {
         //this.sheet.paper.handleDeleteCell();
       }
   
-      obliterate() {
-        this.destroy();
-      }
-    
-      active() {
-        return;
-      }
-  
-      inactive(){
-        return;
-      }
-  
-      getBoundingBox() {
-        return  {
-                  width: this.attributes.attrs.rect.width,
-                  height: this.attributes.attrs.rect.height,
-                  x: this.attributes.position.x,
-                  y: this.attributes.position.y
-                }
-      }
-  
-      getArea() {
-        return this.attributes.attrs.rect.width * this.attributes.attrs.rect.height;
-      }
-  
-      //TODO: see Cut.addTools()
-      addTools(element) {
-        //element view is in charge of rendering the elements on the paper
-        let elementView = element.findView(element.sheet.paper.paper);
-        //clear any old tools
-        elementView.removeTools();
-        // boundary tool shows boundaries of element
-        let boundaryTool = new joint.elementTools.Boundary();
-    
-        let rect_tools = [boundaryTool];
-    
-        let toolsView = new joint.dia.ToolsView({
-            tools: rect_tools
-        });
-    
-        elementView.addTools(toolsView);
-        //start with tools hidden
-        elementView.hideTools();
-        // element.on("change:position", function (eventView) {
-        //     element.toFront();
-        // });
-        // --- end of paper events -----
+    obliterate() {
+      this.destroy();
     }
+  
+    active() {
+      return;
+    }
+
+    inactive(){
+      return;
+    }
+
+    getBoundingBox() {
+      return  {
+                width: this.attributes.attrs.rect.width,
+                height: this.attributes.attrs.rect.height,
+                x: this.attributes.position.x,
+                y: this.attributes.position.y
+              }
+    }
+
+    getArea() {
+      return this.attributes.attrs.rect.width * this.attributes.attrs.rect.height;
+    }
+
+    enableTools() {
+        let elementView = element.findView(element.sheet.paper.paper);
+        elementView.showTools();
+    }
+    
+    disableTools() {
+        let elementView = element.findView(element.sheet.paper.paper);
+        elementView.hideTools();
+    }
+
+    lock() {
+      this.set('locked', true)
+      this.disableTools()
+    }
+
+    unlock () {
+      this.set('locked', false)
+      this.enableTools()
+    }
+  
+    //TODO: see Cut.addTools()
+    addTools(element) {
+      //element view is in charge of rendering the elements on the paper
+      let elementView = element.findView(element.sheet.paper.paper);
+      //clear any old tools
+      elementView.removeTools();
+      // boundary tool shows boundaries of element
+      let boundaryTool = new joint.elementTools.Boundary();
+  
+      let rect_tools = [boundaryTool];
+  
+      let toolsView = new joint.dia.ToolsView({
+          tools: rect_tools
+      });
+  
+      elementView.addTools(toolsView);
+      //start with tools hidden
+      elementView.hideTools();
+      // element.on("change:position", function (eventView) {
+      //     element.toFront();
+      // });
+      // --- end of paper events -----
+  }
 }
 
 

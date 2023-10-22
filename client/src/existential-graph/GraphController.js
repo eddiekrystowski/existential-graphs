@@ -594,4 +594,81 @@ export default class GraphController {
 
     }
 
+    lockAllCells() {
+        const cells = this.graph.getCells()
+
+        for (let cell of cells) {
+            cell.lock()
+        }
+    }
+
+    unlockAllCells() {
+        const cells = this.graph.getCells()
+
+        for (let cell of cells) {
+            cell.unlock()
+        }
+    }
+
+    lockSubgraph(root, includeRoot=true) {
+        if (includeRoot) {
+            root.lock()
+        }
+
+        let children = root.getEmbeddedCells();
+        while (children.length > 0) {
+            let new_children = []
+            for (let child of children) {
+                new_children.push(...child.getEmbeddedCells());
+                child.lock();
+            }
+            children = new_children
+        }  
+    }
+
+    unlockSubgraph(root) {
+        root.unlock()
+        let children = root.getEmbeddedCells();
+        while (children.length > 0) {
+            let new_children = []
+            for (let child of children) {
+                new_children.push(...child.getEmbeddedCells());
+                child.unlock();
+            }
+            children = new_children
+        } 
+    }
+
+    //insertion mode disables editing all elements except for those on the same level with the target cut
+    enableInsertMode(targetCut) {
+        const type = targetCut.type
+
+        if (type == "dia.Element.Premise") {
+            //error : can not activate insert mode on a premise
+            return null;
+        }
+
+        //start by locking all cells
+        this.lockAllCells()
+
+        //remove joint tools from cells
+
+
+        //unlock children of target cut
+        const children = targetCut.getEmbeddedCells()
+        for (const child of children) {
+            child.unlock()
+        }
+    }
+
+    //insertion mode disables editing all elements except for those on the same level with the target cut
+    disableInsertMode() {
+        //unlock all cells
+        const cells = this.graph.getCells();
+
+        for (const cell of cells) {
+            cell.unlock()
+        }
+    }
+
 }
