@@ -594,4 +594,158 @@ export default class GraphController {
 
     }
 
+    lockAllCells() {
+        const cells = this.graph.getCells()
+
+        for (let cell of cells) {
+            cell.lock()
+        }
+    }
+
+    unlockAllCells() {
+        const cells = this.graph.getCells()
+
+        for (let cell of cells) {
+            cell.unlock()
+        }
+    }
+
+    lockSubgraph(root, includeRoot=true) {
+        if (includeRoot) {
+            root.lock()
+        }
+
+        let children = root.getEmbeddedCells();
+        while (children.length > 0) {
+            let new_children = []
+            for (let child of children) {
+                new_children.push(...child.getEmbeddedCells());
+                child.lock();
+            }
+            children = new_children
+        }  
+    }
+
+    unlockSubgraph(root) {
+        root.unlock()
+        let children = root.getEmbeddedCells();
+        while (children.length > 0) {
+            let new_children = []
+            for (let child of children) {
+                new_children.push(...child.getEmbeddedCells());
+                child.unlock();
+            }
+            children = new_children
+        } 
+    }
+
+    //insertion mode disables editing all elements except for those on the same level with the target cut
+    enableInsertMode(targetCut) {
+        const type = targetCut.type
+
+        if (type == "dia.Element.Premise") {
+            //error : can not activate insert mode on a premise
+            return null;
+        }
+
+        //start by locking all cells
+        this.lockAllCells()
+
+        //remove joint tools from cells
+
+
+        //unlock children of target cut
+        const children = targetCut.getEmbeddedCells()
+        for (const child of children) {
+            child.unlock()
+        }
+    }
+
+    //insertion mode disables editing all elements except for those on the same level with the target cut
+    disableInsertMode() {
+        //unlock all cells
+        const cells = this.graph.getCells();
+
+        for (const cell of cells) {
+            cell.unlock()
+        }
+    }
+
+    addCutAsParent(child) {
+        const cut = (new Cut()).create(config, this, false);
+
+    }
+
+    insertDoubleCut = function(sheet, model, mousePosition={}) {
+        let position = {};
+        let size = {}
+        if (!model && mousePosition) {
+            position = mousePosition;
+            size = { width: 80, height: 80 }
+        }
+        else if (model){
+            position = model.get('position');
+            size = { width: model.attr('rect/width'), height: model.attr('rect/height') }
+        }
+        else {
+            throw new Error('Bad arguments');
+        }
+        const multipliers = [0.8, 0.25];
+        let new_cuts = []
+        for(let i = 0; i < multipliers.length; i++) { 
+            new_cuts.push(sheet.addCut({
+                position:  {
+                x: position.x - (size.width * multipliers[i]/2),
+                y: position.y - (size.height * multipliers[i]/2)
+                },
+                attrs: {
+                    rect: {
+                        width: size.width * (1 + multipliers[i]),
+                        height: size.height * (1 + multipliers[i])
+                    }
+                }
+            }, false));
+        } 
+        new_cuts[0].embed(new_cuts[1])
+        this.colorByLevel(new_cuts[0])
+        let selected_premise = this.paper.selected_premise;
+        if (selected_premise && selected_premise.attributes.type === "dia.Element.Cut") {
+        selected_premise.embed(new_cuts[0]);
+        this.colorByLevel(selected_premise)
+        this.pack(selected_premise)
+        }
+        this.handleCollisions(new_cuts[0]) 
+    }
+
+    deleteDoubleCut = function(sheet, model) {
+        console.log("MODEL: ", model);
+        const graph = sheet.graph;
+        if(model.__proto__.constructor.name === "Cut" && model.attributes.embeds?.length === 1 && 
+            graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name === "Cut") {
+            const children = graph.getCell(model.attributes.embeds[0]).attributes.embeds;
+            graph.getCell(model.attributes.embeds[0]).destroy();
+            model.destroy();
+            if(model.attributes.parent) {
+            sheet.handleCollisions(graph.getCell(model.attributes.parent));
+            }
+            else {
+            children?.forEach(element => {
+                if(graph.getCell(element).__proto__.constructor.name === "Cut") {
+                    sheet.handleCollisions(graph.getCell(element))
+                }
+            });
+            }
+        }
+    }
+
+    deleteSubgraph(root, deleteRoot=true) {
+        //destroy recursively, starting at the leaves to not lose reference
+        //to the rest of the tree by deleting the root first
+        let children = root.getEmbeddedCells()
+        for (const child in children) {
+            this.deleteSubgraph(child)
+        }
+        root.destroy()
+    }
+
 }

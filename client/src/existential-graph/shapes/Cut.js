@@ -43,7 +43,8 @@ export default class Cut extends joint.dia.Element {
             type: "dia.Element.Cut",
             attrs: {
                 rect: CUT_DEFAULTS.attrs.rect,
-                text: CUT_DEFAULTS.attrs.text
+                text: CUT_DEFAULTS.attrs.text,
+                locked: false
             }
         }
     }
@@ -245,6 +246,27 @@ export default class Cut extends joint.dia.Element {
         // });
         // --- end of paper events -----
     }
+
+    enableTools() {
+        let elementView = element.findView(element.sheet.paper.paper);
+        elementView.showTools();
+    }
+    
+    disableTools() {
+        let elementView = element.findView(element.sheet.paper.paper);
+        elementView.hideTools();
+    }
+
+    lock() {
+        this.set('locked', true)
+        this.disableTools()
+    }
+
+    unlock () {
+        this.set('locked', false)
+        this.enableTools()
+    }
+
 }
 
 

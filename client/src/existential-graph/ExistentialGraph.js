@@ -33,7 +33,16 @@ export default class ExistentialGraph {
             width: PAPER_SIZE.width,
             height: PAPER_SIZE.height,
             preventContextMenu: false,
-            clickThreshold: 1
+            clickThreshold: 1,
+            interactive: function(cellView) {
+                if (cellView.model.get("locked")) {
+                    return {
+                        //locking disables moving the element
+                        elementMove: false
+                    }
+                };
+                return true;
+            }
         });
 
         //default state on creation is NO_ACTION until the graph is initialized
@@ -154,7 +163,7 @@ export default class ExistentialGraph {
             y: mouse_pos.y - this.dom_element.getBoundingClientRect().top
         };
     }
-
+    
 
     /**
      * 
