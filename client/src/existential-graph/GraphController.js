@@ -743,11 +743,7 @@ export default class GraphController {
         this.handleCollisions(new_cuts[0]) 
     }
 
-<<<<<<< HEAD
     deleteDoubleCut(model) {
-=======
-    deleteDoubleCut = function(model) {
->>>>>>> 08c8e70578eaa5981dd06effa18dcbd7830e7ddd
         console.log("MODEL: ", model);
         if(model.__proto__.constructor.name === "Cut" && model.attributes.embeds?.length === 1 && 
             this.graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name === "Cut") {
@@ -755,11 +751,7 @@ export default class GraphController {
             this.graph.getCell(model.attributes.embeds[0]).destroy();
             model.destroy();
             if(model.attributes.parent) {
-<<<<<<< HEAD
                 this.handleCollisions(this.graph.getCell(model.attributes.parent));
-=======
-            this.handleCollisions(this.graph.getCell(model.attributes.parent));
->>>>>>> 08c8e70578eaa5981dd06effa18dcbd7830e7ddd
             }
             else {
             children?.forEach(element => {

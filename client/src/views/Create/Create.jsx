@@ -13,6 +13,7 @@ export default function Create(props) {
     console.log('default name', getLocalGraphByID(id).name);
     const [graphName, setGraphName] = useState(getLocalGraphByID(id).name);
     const [eg, setExistentialGraph] = useState(null);
+    const [graphTool, setGraphTool] = useState('');
 
     useEffect(() => {
       setExistentialGraph(new ExistentialGraph('main-paper', id));
@@ -33,6 +34,7 @@ export default function Create(props) {
     const handleSetGraphTool = (graphTool) => {
       console.log('set graph tool:', graphTool);
       eg.graphTool = graphTool;
+      setGraphTool(graphTool);
     }
 
 
@@ -44,6 +46,7 @@ export default function Create(props) {
             handleGraphNameUpdate={handleGraphNameUpdate}
             handleSaveGraph={handleSaveGraph}
             handleSetGraphTool={handleSetGraphTool}
+            graphTool={graphTool}
           />
           <CreatePaperComponent
             paper={eg}
