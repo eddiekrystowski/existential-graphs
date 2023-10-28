@@ -12,10 +12,8 @@ export let color = {
             default: {
                 color: "#ffffff00"
             }
-        }
-    },
-    disabled: {
-        background: {
+        },
+        disabled: {
             odd: {
                 inactive: "#f2f8fc",
                 active: "#f2f8fcE0"
