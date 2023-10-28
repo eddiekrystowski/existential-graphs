@@ -357,39 +357,16 @@ export default class ExistentialGraph {
                 }
             }
             else if (this.graphTool === 'insert_double_cut') {
-                let config = {
-                    position: this.getRelativeMousePos()
-                }
-
-                let cut1;
-                if (this.selected_premise) {
-                    config["child"] = this.selected_premise;
-                    cut1 = this.sheet.addCut(config);
-                } else {
-                    cut1 = this.sheet.addCut(config);
-                }
-                
-                config["child"] = cut1;
-                this.sheet.addCut(config);
-
+                this.sheet.insertDoubleCut(this.selected_premise, this.getRelativeMousePos())
             }
             else if (this.graphTool === 'erase_double_cut') {
-                let config = {
-                    position: this.getRelativeMousePos()
-                }
-                this.sheet.erase_double_cut(config);
+                this.sheet.deleteDoubleCut(this.selected_premise);
             }
             else if (this.graphTool === 'insert_subgraph') {
-                let config = {
-                    position: this.getRelativeMousePos()
-                }
-                this.sheet.insert_subgraph(config);
+                this.sheet.enableInsertMode(this.selected_premise);
             }
             else if (this.graphTool === 'erase_subgraph') {
-                let config = {
-                    position: this.getRelativeMousePos()
-                }
-                this.sheet.erase_subgraph(config);
+                this.sheet.deleteSubgraph(this.selected_premise);
             }
 
 
@@ -422,18 +399,14 @@ export default class ExistentialGraph {
     }
 
     onMouseMove = () => {
-        //console.log('mousemove', this);
-        if(true/*this.getMode() === 'create'*/){
-            //console.log(E.isMouseDown);
-            if (getMouseIsDown() && keyCodeIsActive(16) && this.temp_cut) {
-                const mouse_adjusted = this.getRelativeMousePos();
-                this.temp_cut.set('position', {
-                    x: Math.min(mouse_adjusted.x, this.initial_cut_pos.x),
-                    y: Math.min(mouse_adjusted.y, this.initial_cut_pos.y)
-                });
-                this.temp_cut.attr('rect/width', Math.abs(mouse_adjusted.x - this.initial_cut_pos.x));
-                this.temp_cut.attr('rect/height', Math.abs(mouse_adjusted.y - this.initial_cut_pos.y));
-            }
+        if (getMouseIsDown() && keyCodeIsActive(16) && this.temp_cut) {
+            const mouse_adjusted = this.getRelativeMousePos();
+            this.temp_cut.set('position', {
+                x: Math.min(mouse_adjusted.x, this.initial_cut_pos.x),
+                y: Math.min(mouse_adjusted.y, this.initial_cut_pos.y)
+            });
+            this.temp_cut.attr('rect/width', Math.abs(mouse_adjusted.x - this.initial_cut_pos.x));
+            this.temp_cut.attr('rect/height', Math.abs(mouse_adjusted.y - this.initial_cut_pos.y));
         }
     }
 }
