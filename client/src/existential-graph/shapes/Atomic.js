@@ -130,13 +130,13 @@ export default class Atomic extends joint.dia.Element {
     }
 
     enableTools() {
-        let elementView = element.findView(element.sheet.paper.paper);
-        elementView.showTools();
+        let elementView = this.findView(this.sheet.paper.paper);
+        this.showTools();
     }
     
     disableTools() {
-        let elementView = element.findView(element.sheet.paper.paper);
-        elementView.hideTools();
+        let elementView = this.findView(this.sheet.paper.paper);
+        this.hideTools();
     }
 
     lock() {

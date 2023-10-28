@@ -682,7 +682,7 @@ export default class GraphController {
         }
 
         //set color to active for target and children
-        this.colorCells(DEFAULT_BACKGROUND_COLORS, [target, ...children])
+        this.colorCells(DEFAULT_BACKGROUND_COLORS, [targetCut, ...children])
     }
 
     //insertion mode disables editing all elements except for those on the same level with the target cut
@@ -698,12 +698,11 @@ export default class GraphController {
         this.colorCells(DEFAULT_BACKGROUND_COLORS)
     }
 
-    addCutAsParent(child) {
+    addCutAsParent(config) {
         const cut = (new Cut()).create(config, this, false);
-
     }
 
-    insertDoubleCut = function(sheet, model, mousePosition={}) {
+    insertDoubleCut = function(model, mousePosition={}) {
         let position = {};
         let size = {}
         if (!model && mousePosition) {
@@ -720,7 +719,7 @@ export default class GraphController {
         const multipliers = [0.8, 0.25];
         let new_cuts = []
         for(let i = 0; i < multipliers.length; i++) { 
-            new_cuts.push(sheet.addCut({
+            new_cuts.push(this.addCut({
                 position:  {
                 x: position.x - (size.width * multipliers[i]/2),
                 y: position.y - (size.height * multipliers[i]/2)
@@ -744,7 +743,11 @@ export default class GraphController {
         this.handleCollisions(new_cuts[0]) 
     }
 
+<<<<<<< HEAD
+    deleteDoubleCut(model) {
+=======
     deleteDoubleCut = function(model) {
+>>>>>>> 08c8e70578eaa5981dd06effa18dcbd7830e7ddd
         console.log("MODEL: ", model);
         if(model.__proto__.constructor.name === "Cut" && model.attributes.embeds?.length === 1 && 
             this.graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name === "Cut") {
@@ -752,7 +755,11 @@ export default class GraphController {
             this.graph.getCell(model.attributes.embeds[0]).destroy();
             model.destroy();
             if(model.attributes.parent) {
+<<<<<<< HEAD
+                this.handleCollisions(this.graph.getCell(model.attributes.parent));
+=======
             this.handleCollisions(this.graph.getCell(model.attributes.parent));
+>>>>>>> 08c8e70578eaa5981dd06effa18dcbd7830e7ddd
             }
             else {
             children?.forEach(element => {

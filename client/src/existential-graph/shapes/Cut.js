@@ -252,12 +252,12 @@ export default class Cut extends joint.dia.Element {
     }
 
     enableTools() {
-        let elementView = element.findView(element.sheet.paper.paper);
+        let elementView = this.findView(this.sheet.paper.paper);
         elementView.showTools();
     }
     
     disableTools() {
-        let elementView = element.findView(element.sheet.paper.paper);
+        let elementView = this.findView(this.sheet.paper.paper);
         elementView.hideTools();
     }
 
