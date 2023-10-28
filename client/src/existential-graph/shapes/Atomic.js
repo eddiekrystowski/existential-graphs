@@ -148,6 +148,10 @@ export default class Atomic extends joint.dia.Element {
       this.set('locked', false)
       this.enableTools()
     }
+
+    setColor(color) {
+      this.attr("rect/fill", color)
+    }
   
     //TODO: see Cut.addTools()
     addTools(element) {

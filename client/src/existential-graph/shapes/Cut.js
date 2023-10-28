@@ -175,6 +175,10 @@ export default class Cut extends joint.dia.Element {
         return this.attributes.attrs.rect.width * this.attributes.attrs.rect.height;
     }
 
+    setColor(color) {
+        this.attr("rect/fill", color)
+    }
+
     // move(position, timestep = 1000, frames = 500) {
     //     let difference = {
     //       x: position.x - this.attributes.position.x,

@@ -14,6 +14,11 @@ const DEFAULT_BACKGROUND_COLORS = {
     atomic: color.shapes.background.default.color
 }
 
+const DISABLED_BACKGROUND_COLORS = {
+    even: color.shapes.disabled.even.inactive,
+    odd: color.shapes.disabled.odd.inactive,
+    atomic: color.shapes.disabled.default.color
+}
 
 export default class GraphController {
     constructor(parent_paper, graph_id) {
@@ -639,6 +644,20 @@ export default class GraphController {
         } 
     }
 
+    colorCells(color_config, cells=[]) {
+        // if no cells are provided, color all cells
+        if (cells.length === 0) {
+            cells = this.graph.getCells()
+        }
+
+        for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i]
+            const level = cell.attributes.attrs.level
+            const color = (level % 2 === 0) ? color_config.even.color : color_config.odd.color
+            cell.setColor(color)
+        }
+    }
+
     //insertion mode disables editing all elements except for those on the same level with the target cut
     enableInsertMode(targetCut) {
         const type = targetCut.type
@@ -652,13 +671,18 @@ export default class GraphController {
         this.lockAllCells()
 
         //remove joint tools from cells
-
+        
+        //color all cells with disabled colors
+        this.colorCells(DISABLED_BACKGROUND_COLORS)
 
         //unlock children of target cut
         const children = targetCut.getEmbeddedCells()
         for (const child of children) {
             child.unlock()
         }
+
+        //set color to active for target and children
+        this.colorCells(DEFAULT_BACKGROUND_COLORS, [target, ...children])
     }
 
     //insertion mode disables editing all elements except for those on the same level with the target cut
