@@ -693,6 +693,9 @@ export default class GraphController {
         for (const cell of cells) {
             cell.unlock()
         }
+
+        //color all cells with default colors
+        this.colorCells(DEFAULT_BACKGROUND_COLORS)
     }
 
     addCutAsParent(child) {
