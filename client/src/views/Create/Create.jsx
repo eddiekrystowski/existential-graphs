@@ -32,6 +32,11 @@ export default function Create(props) {
     }
 
     const handleSetGraphTool = (graphTool) => {
+      if (graphTool === 'auto_disable_insert') {
+        graphTool = null;
+        eg.sheet.disableInsertMode();
+        eg.steps.push('disable_insert_mode');
+      }
       console.log('set graph tool:', graphTool);
       eg.graphTool = graphTool;
       setGraphTool(graphTool);

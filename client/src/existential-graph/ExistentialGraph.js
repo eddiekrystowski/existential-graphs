@@ -74,6 +74,7 @@ export default class ExistentialGraph {
 
         // Name of action selected by toolbar graph tool buttons
         this.graphTool = null;
+        this.steps = [];
 
 
         this.initial_cut_pos = {x: 0, y: 0};
@@ -354,6 +355,7 @@ export default class ExistentialGraph {
             console.log('executing ', this.graphTool);
 
             if (this.graphTool === 'cut') {
+                this.steps.push('cut')
                 let config = {
                     position: this.getRelativeMousePos()
                 }
@@ -366,16 +368,26 @@ export default class ExistentialGraph {
             }
             else if (this.graphTool === 'insert_double_cut') {
                 this.sheet.insertDoubleCut(this.selected_premise, this.getRelativeMousePos())
+                this.steps.push('insert_double_cut')
             }
             else if (this.graphTool === 'erase_double_cut') {
                 this.sheet.deleteDoubleCut(this.selected_premise);
+                this.steps.push('erase_double_cut')
             }
             else if (this.graphTool === 'insert_subgraph') {
                 console.log('test')
                 this.sheet.enableInsertMode(this.selected_premise);
+                this.steps.push('insert_subgraph')
             }
             else if (this.graphTool === 'erase_subgraph') {
                 this.sheet.deleteSubgraph(this.selected_premise);
+                this.steps.push('erase_subgraph')
+            }
+            else if (this.graphTool === 'copy_subgraph') {
+                this.copySubgraph(this.selected_premise);
+            }
+            else if (this.graphTool === 'paste_subgraph') {
+                this.pasteSubgraph(this.selected_premise, this.getRelativeMousePos());
             }
 
 
