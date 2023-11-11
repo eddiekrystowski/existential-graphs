@@ -140,12 +140,12 @@ export default class Atomic extends joint.dia.Element {
     }
 
     lock() {
-      this.set('locked', true)
+      this.attr('locked', true)
       this.disableTools()
     }
 
     unlock () {
-      this.set('locked', false)
+      this.attr('locked', false)
       this.enableTools()
     }
 

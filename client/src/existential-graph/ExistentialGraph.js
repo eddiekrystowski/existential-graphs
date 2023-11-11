@@ -45,6 +45,8 @@ export default class ExistentialGraph {
                 return true;
             }
         });
+        
+        console.log("JOINT PAPER ", this.paper)
 
         //default state on creation is NO_ACTION until the graph is initialized
         this.state = STATE.NO_ACTION;
@@ -113,6 +115,7 @@ export default class ExistentialGraph {
 
         // First, unembed the cell that has just been grabbed by the user.
         this.paper.on('cell:pointerdown', (cellView, evt, x, y) => { 
+            console.log("cell pointer down", this.paper)
             let cell = cellView.model;
 
             if (cell.attr('locked') === true) {
@@ -400,7 +403,17 @@ export default class ExistentialGraph {
             this.sheet.addCut(config);
         }
     
-        this.paper.setInteractivity(true);
+        this.paper.setInteractivity(
+            function(cellView) {
+                console.log('attr', cellView.model.attr('locked'))
+                if (cellView.model.attr("locked")) {
+                    return {
+                        //locking disables moving the element
+                        elementMove: false
+                    }
+                };
+                return true;
+            });
         this.temp_cut = null;
     }
 
