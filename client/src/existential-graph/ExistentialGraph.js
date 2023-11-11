@@ -88,7 +88,8 @@ export default class ExistentialGraph {
 
         //default state after setup is CREATE mode
         this.state = STATE.CREATE;
-        
+
+        this.clipboard = null
     }
 
     setPaperEvents(){
@@ -210,6 +211,16 @@ export default class ExistentialGraph {
             };
         };
         input.click();
+    }
+
+    copySubgraph(target) {
+        //save target root to clipboard
+        this.clipboard = target;
+    }
+
+    pasteSubgraph(target, mouse_pos) {
+        if (this.clipboard === null) return;
+        this.sheet.addSubgraph(this.clipboard, mouse_pos, target)
     }
 
     addCellsInOrder(order) {
