@@ -294,7 +294,7 @@ export default class GraphController {
     }
 
     subgraphToGraph(node, clone, subgraph, parent=null) {
-        clone.sheet = this;
+        clone.graphController = this;
         clone.addTo(this.graph);
         if (parent != null) {
             parent.embed(clone);
