@@ -68,7 +68,6 @@ export default class GraphController {
         // sees on the paper
         let cellbbox = cell.getBoundingBox();
         
-        console.log(this);
         let potential_parents = this.findPotentialParents(cellbbox);
         let parent = findSmallestCell(potential_parents);
     
@@ -604,6 +603,7 @@ export default class GraphController {
 
         for (let cell of cells) {
             cell.lock()
+            console.log('cell', cell)
         }
     }
 

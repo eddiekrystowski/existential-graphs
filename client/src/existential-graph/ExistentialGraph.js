@@ -35,7 +35,8 @@ export default class ExistentialGraph {
             preventContextMenu: false,
             clickThreshold: 1,
             interactive: function(cellView) {
-                if (cellView.model.get("locked")) {
+                console.log('attr', cellView.model.attr('locked'))
+                if (cellView.model.attr("locked")) {
                     return {
                         //locking disables moving the element
                         elementMove: false
@@ -113,6 +114,10 @@ export default class ExistentialGraph {
         // First, unembed the cell that has just been grabbed by the user.
         this.paper.on('cell:pointerdown', (cellView, evt, x, y) => { 
             let cell = cellView.model;
+
+            if (cell.attr('locked') === true) {
+                console.log('this cell is locked!')
+            }
 
             if (!cell.get('embeds') || cell.get('embeds').length === 0) {
                 // Show the dragged element above all the other cells (except when the
@@ -363,6 +368,7 @@ export default class ExistentialGraph {
                 this.sheet.deleteDoubleCut(this.selected_premise);
             }
             else if (this.graphTool === 'insert_subgraph') {
+                console.log('test')
                 this.sheet.enableInsertMode(this.selected_premise);
             }
             else if (this.graphTool === 'erase_subgraph') {

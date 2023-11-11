@@ -262,12 +262,14 @@ export default class Cut extends joint.dia.Element {
     }
 
     lock() {
-        this.set('locked', true)
+        console.log('locked')
+        this.attr('locked', true)
         this.disableTools()
     }
 
     unlock () {
-        this.set('locked', false)
+        console.log('unlocked')
+        this.attr('locked', false)
         this.enableTools()
     }
 
