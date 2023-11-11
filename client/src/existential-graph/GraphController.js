@@ -87,6 +87,10 @@ export default class GraphController {
         } else {
             let elements_inside = this.findElementsInside(cellbbox)
             for (const element of elements_inside) {
+                //do not add children to locked element
+                if (cell.isLocked()) {
+                    break;
+                }
                 if (element.get("parent") || element.id === cell.id) {
                     continue;
                 }

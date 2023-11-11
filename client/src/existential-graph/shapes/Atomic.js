@@ -149,6 +149,10 @@ export default class Atomic extends joint.dia.Element {
       this.enableTools()
     }
 
+    isLocked() {
+      return this.attr("locked")
+    }
+
     setColor(color) {
       this.attr("rect/fill", color)
     }
