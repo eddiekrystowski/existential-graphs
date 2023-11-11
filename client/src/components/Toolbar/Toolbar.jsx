@@ -53,33 +53,47 @@ export default function Toolbar( props ) {
             <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-row px-2 font-mono'>
                 <GraphTool 
                     selected={props.graphTool === 'cut'}
-                    onClick={() => props.handleSetGraphTool('cut')}
+                    onClick={() => props.graphTool === 'cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('cut')}
                 >
                     Cut
                 </GraphTool>
                 <GraphTool 
                     selected={props.graphTool === 'insert_double_cut'}
-                    onClick={() => props.handleSetGraphTool('insert_double_cut')}
+                    onClick={() => props.graphTool === 'insert_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('insert_double_cut')}
                 >
                     Insert Double Cut
                 </GraphTool>
                 <GraphTool
                     selected={props.graphTool === 'erase_double_cut'}
-                    onClick={() => props.handleSetGraphTool('erase_double_cut')}
+                    onClick={() => props.graphTool === 'erase_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_double_cut')}
                 >
                     Erase Double Cut
                 </GraphTool>
                 <GraphTool
                     selected={props.graphTool === 'insert_subgraph'}
-                    onClick={() => props.handleSetGraphTool('insert_subgraph')}
+                    onClick={() => props.graphTool === 'insert_subgraph' 
+                                    ? props.handleSetGraphTool('auto_disable_insert') 
+                                    : props.handleSetGraphTool('insert_subgraph')}
                 >
                     Insert Subgraph
                 </GraphTool>
                 <GraphTool
                     selected={props.graphTool === 'erase_subgraph'}
-                    onClick={() => props.handleSetGraphTool('erase_subgraph')}
+                    onClick={() => props.graphTool === 'erase_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_subgraph')}
                 >
                     Erase Subgraph
+                </GraphTool>
+                <GraphTool
+                    selected={props.graphTool === 'copy_subgraph'}
+                    onClick={() => props.graphTool === 'copy_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('copy_subgraph')}
+                >
+                    Copy Subgraph
+                </GraphTool>
+                <GraphTool
+                    selected={props.graphTool === 'paste_subgraph'}
+                    onClick={() => props.graphTool === 'paste_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('paste_subgraph')}
+                >
+                    Paste Subgraph
                 </GraphTool>
             </div>
         </div>
