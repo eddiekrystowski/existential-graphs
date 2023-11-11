@@ -130,6 +130,7 @@ export default class Cut extends joint.dia.Element {
     }
 
     destroy() {
+        if (this.isLocked()) return;
         //check if cut has parents or children, if so children become new children of parent;
         let parent = this.getParentCell();
         let children = this.getEmbeddedCells()
