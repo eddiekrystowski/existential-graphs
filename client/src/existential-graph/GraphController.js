@@ -22,7 +22,7 @@ const DISABLED_BACKGROUND_COLORS = {
 
 export default class GraphController {
     constructor(parent_paper, graph_id) {
-        this.paper = parent_paper;
+        this.existential_graph = parent_paper;
         this.graph_id = graph_id;
 
         const graphData = getLocalGraphByID(graph_id);
@@ -472,7 +472,7 @@ export default class GraphController {
     // returns cell under mouse with the highest z value;
     getCellAtMouse() {
         //console.log("mouse pos", this.paper.getRelativeMousePos());
-        const mouse_pos = this.paper.getRelativeMousePos()
+        const mouse_pos = this.existential_graph.getRelativeMousePos()
         const cells = this.graph.getCells().filter(cell =>  mouse_pos.x <= cell.attributes.position.x + cell.attributes.attrs.rect.width
                                                         && mouse_pos.x >= cell.attributes.position.x
                                                         && mouse_pos.y <= cell.attributes.position.y + cell.attributes.attrs.rect.height
