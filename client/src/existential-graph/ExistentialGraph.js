@@ -26,11 +26,11 @@ const PAPER_SIZE = { width: 4000, height: 4000 };
 export default class ExistentialGraph {
     constructor(dom_id, graph_id) {
         console.log('LOADING GRAPH', graph_id)
-        this.sheet = new GraphController(this, graph_id);
+        this.graphController = new GraphController(this, graph_id);
         this.dom_element = document.getElementById(dom_id);
         this.paper = new joint.dia.Paper({
             el: this.dom_element,
-            model: this.sheet.graph,
+            model: this.graphController.graph,
             width: PAPER_SIZE.width,
             height: PAPER_SIZE.height,
             preventContextMenu: false,
@@ -92,7 +92,8 @@ export default class ExistentialGraph {
 
         //default state after setup is CREATE mode
         this.state = STATE.CREATE;
-        
+
+        this.clipboard = null
     }
 
     setPaperEvents(){
@@ -133,10 +134,10 @@ export default class ExistentialGraph {
             }
             
             if (cell.get('parent')) {
-                this.sheet.graph.getCell(cell.get('parent')).unembed(cell);
+                this.graphController.graph.getCell(cell.get('parent')).unembed(cell);
             }
             cell.active();
-            this.sheet.treeToFront(this.sheet.findRoot(cell));
+            this.graphController.treeToFront(this.graphController.findRoot(cell));
         });
 
         // When the dragged cell is dropped over another cell, let it become a child of the
@@ -145,22 +146,11 @@ export default class ExistentialGraph {
 
             let cell = cellView.model;
             
-            this.sheet.handleCollisions(cell)
+            this.graphController.handleCollisions(cell)
             cell.inactive();
 
-            // if(!this.props.action) this.onGraphUpdate();
-            // let nextAction;
-            // if (this.props.action) {
-            //     nextAction = this.props.action(this.sheet, cell, this.getRelativeMousePos());
-            // }
-            // if (this.props.handleClearAction && !nextAction) this.props.handleClearAction();
-            // if(nextAction) this.props.handleActionChange(nextAction);
             this.selected_premise = null;
         });
-
-        // this.sheet.graph.on('add', () => {
-        //     this.onGraphUpdate();
-        // });
         
     }
 
@@ -200,7 +190,7 @@ export default class ExistentialGraph {
                 const content = readerEvent.target.result;
                 if (clear) {
                     if (window.confirm("Erase your current workspace and import graph?")) {
-                        this.sheet.graph.clear();
+                        this.graphController.graph.clear();
 
                         const dataObj = JSON.parse(content);
                         const order = getSafeCellAddOrder(dataObj.cells);
@@ -216,14 +206,24 @@ export default class ExistentialGraph {
         input.click();
     }
 
+    copySubgraph(target) {
+        //save target root to clipboard
+        this.clipboard = target;
+    }
+
+    pasteSubgraph(target, mouse_pos) {
+        if (this.clipboard === null) return;
+        this.graphController.addSubgraph([this.clipboard], mouse_pos, target);
+    }
+
     addCellsInOrder(order) {
         console.log('adding in order', order)
         for (let [cellType, cell] of order) {
             if(cellType === 'cut') {
-                this.sheet.addCut(cell);
+                this.graphController.addCut(cell);
             }
             else if (cellType === 'atomic') {
-                this.sheet.addAtomic(cell);
+                this.graphController.addAtomic(cell);
             }
         }
     }
@@ -246,9 +246,9 @@ export default class ExistentialGraph {
 
     exportGraphAsJSON() {
         // delete graph.changed;
-        let graphJSON = this.sheet.graph.toJSON();
+        let graphJSON = this.graphController.graph.toJSON();
         for(let i = 0; i < graphJSON.cells.length; i++) {
-            delete graphJSON.cells[i].sheet;
+            delete graphJSON.cells[i].graphController;
         }
 
         return graphJSON;
@@ -293,8 +293,8 @@ export default class ExistentialGraph {
             console.log('created config', config)
             //eslint-disable-next-line
             //let new_rect = new Premise().create(config)
-            if (event.shiftKey) this.sheet.forcePremise(config);
-            else { this.sheet.addAtomic(config); }
+            if (event.shiftKey) this.graphController.forcePremise(config);
+            else { this.graphController.addAtomic(config); }
             this.canInsertPremise = false;
             this.previousPremiseCode = code;
         }
@@ -306,16 +306,16 @@ export default class ExistentialGraph {
             }
             if (this.selected_premise) {
                 config["child"] = this.selected_premise;
-                this.sheet.addCut(config);
+                this.graphController.addCut(config);
             } else {
-                this.sheet.addCut(config);
+                this.graphController.addCut(config);
             }
         }
     
         if (event.keyCode === 49) {
             //save template
             if (this.selected_premise) {
-                this.saved_template = this.sheet.graph.cloneSubgraph([this.selected_premise], {deep: true});
+                this.saved_template = this.graphController.graph.cloneSubgraph([this.selected_premise], {deep: true});
             }
         }
     
@@ -323,7 +323,7 @@ export default class ExistentialGraph {
             const mouse_adjusted = this.getRelativeMousePos();
             //console.log("position", mouse_adjusted)
             if (this.saved_template) {
-                this.sheet.addSubgraph(this.saved_template, mouse_adjusted, this.selected_premise);
+                this.graphController.addSubgraph(this.saved_template, mouse_adjusted, this.selected_premise);
             }
         }
     }
@@ -345,7 +345,7 @@ export default class ExistentialGraph {
             }
             //this.temp_cut = new Cut().create(config);
             //this.history.current.lock();
-            this.temp_cut = this.sheet.addCut(config);
+            this.temp_cut = this.graphController.addCut(config);
             this.temp_cut.active();
             event.preventDefault();
             console.log("CREATED TEMP CUT", this.temp_cut);
@@ -364,35 +364,30 @@ export default class ExistentialGraph {
                 }
                 if (this.selected_premise) {
                     config["child"] = this.selected_premise;
-                    this.sheet.addCut(config);
+                    this.graphController.addCut(config);
                 } else {
-                    this.sheet.addCut(config);
+                    this.graphController.addCut(config);
                 }
             }
             else if (this.graphTool === 'insert_double_cut') {
-                this.sheet.insertDoubleCut(this.selected_premise, this.getRelativeMousePos())
-                this.steps.push('insert_double_cut')
+                this.graphController.insertDoubleCut(this.selected_premise, this.getRelativeMousePos())
             }
             else if (this.graphTool === 'erase_double_cut') {
-                this.sheet.deleteDoubleCut(this.selected_premise);
-                this.steps.push('erase_double_cut')
+                this.graphController.deleteDoubleCut(this.selected_premise);
             }
             else if (this.graphTool === 'insert_subgraph') {
                 console.log('test')
-                this.sheet.enableInsertMode(this.selected_premise);
-                this.steps.push('insert_subgraph')
+                this.graphController.enableInsertMode(this.selected_premise);
             }
             else if (this.graphTool === 'erase_subgraph') {
-                this.sheet.deleteSubgraph(this.selected_premise);
-                this.steps.push('erase_subgraph')
-            }
+                this.graphController.deleteSubgraph(this.selected_premise);
+            }             
             else if (this.graphTool === 'copy_subgraph') {
                 this.copySubgraph(this.selected_premise);
             }
             else if (this.graphTool === 'paste_subgraph') {
                 this.pasteSubgraph(this.selected_premise, this.getRelativeMousePos());
             }
-
 
             this.graphTool = null;
             return
@@ -415,7 +410,7 @@ export default class ExistentialGraph {
             this.temp_cut.remove();
             //this.history.current.unlock();
             //NOTE: Temp cut must be deleted first or there will be uwnanted conflicts with  collisions
-            this.sheet.addCut(config);
+            this.graphController.addCut(config);
         }
     
         this.paper.setInteractivity(
@@ -441,6 +436,8 @@ export default class ExistentialGraph {
             });
             this.temp_cut.attr('rect/width', Math.abs(mouse_adjusted.x - this.initial_cut_pos.x));
             this.temp_cut.attr('rect/height', Math.abs(mouse_adjusted.y - this.initial_cut_pos.y));
+            this.graphController.handleCollisions(this.temp_cut)
+            this.graphController.cleanOverlaps()
         }
     }
 }
