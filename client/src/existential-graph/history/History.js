@@ -5,8 +5,7 @@ import React from "react";
  * See components/Paper/History/HistoryItems.jsx for the individual timeline components
  */
 export default class History {
-    constructor(props) {
-        super(props);
+    constructor() {
 
         //if MAX_SIZE is exceeded, will start removing from bottom of stack
         this.MAX_SIZE = 1024;
@@ -40,13 +39,13 @@ export default class History {
     }
 
     /**
-     * Call handler function on paper (passed through props) when multiple HistoryItems are 
+     * Call handler function on paper (passed through) when multiple HistoryItems are 
      * skipped at a time (through clicking).
      * @param {int} num index to jump to
      */
     handleJump = (num) => {
         this.state.index = num;
-        this.props.handleHistoryJump(this.getItem(num));
+        //this.props.handleHistoryJump(this.getItem(num));
     }
 
     /**

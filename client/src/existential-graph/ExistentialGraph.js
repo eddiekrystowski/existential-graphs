@@ -4,7 +4,7 @@ import { getSafeCellAddOrder, getMousePosition, keyCodeIsActive, getMouseIsDown,
 import Cut from './shapes/Cut.js';
 import $ from 'jquery';
 import _ from 'lodash';
-import { History } from './history/History.js';
+import  History  from './history/History.js';
 
 /**
  * @class Existential Graph
@@ -55,8 +55,11 @@ export default class ExistentialGraph {
         this.state = STATE.NO_ACTION;
 
         //console.log(getLocalGraphByID(graph_id))
-        const order = getSafeCellAddOrder(getLocalGraphByID(graph_id).graphJSON.cells);
+        const loadedGraphData = getLocalGraphByID(graph_id).graphJSON.cells;
+        const order = getSafeCellAddOrder(loadedGraphData);
         this.addCellsInOrder(order);
+
+        this.history.push(loadedGraphData);
         
         // Paper events are callback functions defined on the joint paper that are 
         // triggered by user input (i.e. keystrokes, clicking, dragging, etc)
@@ -120,7 +123,7 @@ export default class ExistentialGraph {
 
         // First, unembed the cell that has just been grabbed by the user.
         this.paper.on('cell:pointerdown', (cellView, evt, x, y) => { 
-            console.log("cell pointer down", this.paper)
+            //console.log("cell pointer down", this.paper)
             let cell = cellView.model;
 
             if (cell.attr('locked') === true) {
@@ -150,6 +153,36 @@ export default class ExistentialGraph {
             cell.inactive();
 
             this.selected_premise = null;
+        });
+
+        this.graphController.graph.on('change', (cell, opt) => {
+            const cells = this.graphController.graph.getCells();
+            this.history.push(cells);
+        });
+
+        //PAPER UNDO AND REDO EVENTS
+        $(this.dom_element).on('keydown', (event) => {
+            if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
+                const new_state = this.history.current.undo();
+                this.selected_premise = null;
+                //only update graph if new state exists
+                //undo will return false if can't undo anymore
+                if (new_state) {
+                    this.history.current.lock();
+                    this.sheet.importCells(new_state);
+                    this.history.current.unlock();
+                }
+            }
+            if (event.keyCode === 90 && (event.ctrlKey || event.metaKey) && event.shiftKey) {
+                const new_state = this.history.current.redo();
+                //only update graph if new state exists
+                //redo will return false if can't redo anymore
+                if (new_state) {
+                    this.history.current.lock();
+                    this.sheet.importCells(new_state);
+                    this.history.current.unlock();
+                }
+            }
         });
         
     }
