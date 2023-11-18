@@ -433,6 +433,8 @@ export default class ExistentialGraph {
             });
             this.temp_cut.attr('rect/width', Math.abs(mouse_adjusted.x - this.initial_cut_pos.x));
             this.temp_cut.attr('rect/height', Math.abs(mouse_adjusted.y - this.initial_cut_pos.y));
+            this.graphController.handleCollisions(this.temp_cut)
+            this.graphController.cleanOverlaps()
         }
     }
 }
