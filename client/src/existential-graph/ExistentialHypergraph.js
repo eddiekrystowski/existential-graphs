@@ -1,4 +1,4 @@
-import { Queue } from "./LinkedList"
+import { Queue } from "./history/LinkedList"
 
 /**
  * Existential Hypergraphs are directed graphs in which the nodes represent Existential Graphs and the edges represent applications
@@ -6,7 +6,7 @@ import { Queue } from "./LinkedList"
  * 
  * We represent proofs using Existential Hypergraphs
  */
-class ExistentialHypergraph {
+export default class ExistentialHypergraph {
     constructor(rootGraph)
     {
         this.root = rootGraph;

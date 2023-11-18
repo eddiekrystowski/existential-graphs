@@ -24,7 +24,7 @@ const STATE = {
 const PAPER_SIZE = { width: 4000, height: 4000 };
 
 export default class ExistentialGraph {
-    constructor(dom_id, graph_id) {
+    constructor(dom_id, graph_id, hypergraph) {
         console.log('LOADING GRAPH', graph_id)
         this.graphController = new GraphController(this, graph_id);
         this.dom_element = document.getElementById(dom_id);
@@ -48,6 +48,7 @@ export default class ExistentialGraph {
         });
 
         this.history = new History();
+        this.hypergraph = hypergraph;
         
         console.log("JOINT PAPER ", this.paper)
 
@@ -401,25 +402,32 @@ export default class ExistentialGraph {
                 } else {
                     this.graphController.addCut(config);
                 }
+                this.hypergraph.addStep(this.graphController.graph_id, 'cut', this.graphController.graph.getCells());
             }
             else if (this.graphTool === 'insert_double_cut') {
                 this.graphController.insertDoubleCut(this.selected_premise, this.getRelativeMousePos())
+                this.hypergraph.addStep(this.graphController.graph_id, 'insert_double_cut', this.graphController.graph.getCells());
             }
             else if (this.graphTool === 'erase_double_cut') {
                 this.graphController.deleteDoubleCut(this.selected_premise);
+                this.hypergraph.addStep(this.graphController.graph_id, 'erase_double_cut', this.graphController.graph.getCells());
             }
             else if (this.graphTool === 'insert_subgraph') {
                 console.log('test')
                 this.graphController.enableInsertMode(this.selected_premise);
+                this.hypergraph.addStep(this.graphController.graph_id, 'insert_subgraph', this.graphController.graph.getCells());
             }
             else if (this.graphTool === 'erase_subgraph') {
                 this.graphController.deleteSubgraph(this.selected_premise);
+                this.hypergraph.addStep(this.graphController.graph_id, 'erase_subgraph', this.graphController.graph.getCells());
             }             
             else if (this.graphTool === 'copy_subgraph') {
                 this.copySubgraph(this.selected_premise);
+                this.hypergraph.addStep(this.graphController.graph_id, 'copy_subgraph', this.graphController.graph.getCells());
             }
             else if (this.graphTool === 'paste_subgraph') {
                 this.pasteSubgraph(this.selected_premise, this.getRelativeMousePos());
+                this.hypergraph.addStep(this.graphController.graph_id, 'paste_subgraph', this.graphController.graph.getCells());
             }
 
             this.graphTool = null;

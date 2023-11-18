@@ -23,6 +23,7 @@ const DISABLED_BACKGROUND_COLORS = {
 export default class GraphController {
     constructor(parent_paper, graph_id) {
         this.paper = parent_paper;
+        this.graph_id = graph_id;
 
         const graphData = getLocalGraphByID(graph_id);
         console.log(graphData);

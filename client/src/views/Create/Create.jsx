@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import Toolbar from '@components/Toolbar/Toolbar.jsx';
 import { CreatePaperComponent } from '@components/Paper';
 import ExistentialGraph from '../../existential-graph/ExistentialGraph';
+import ExistentialHypergraph from '../../existential-graph/ExistentialHypergraph';
 
 import { addToLocalGraphData, getLocalGraphByID } from '../../util/util';
 
@@ -12,11 +13,12 @@ export default function Create(props) {
     const { id } = useParams();
     console.log('default name', getLocalGraphByID(id).name);
     const [graphName, setGraphName] = useState(getLocalGraphByID(id).name);
+    const [existentialHypergraph, setExistentialHypergraph] = useState(new ExistentialHypergraph());
     const [eg, setExistentialGraph] = useState(null);
     const [graphTool, setGraphTool] = useState('');
 
     useEffect(() => {
-      setExistentialGraph(new ExistentialGraph('main-paper', id));
+      setExistentialGraph(new ExistentialGraph('main-paper', id, existentialHypergraph));
     }, [id]);
 
 
