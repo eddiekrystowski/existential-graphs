@@ -4,6 +4,7 @@ import { getSafeCellAddOrder, getMousePosition, keyCodeIsActive, getMouseIsDown,
 import Cut from './shapes/Cut.js';
 import $ from 'jquery';
 import _ from 'lodash';
+import { History } from './history/History.js';
 
 /**
  * @class Existential Graph
@@ -45,6 +46,8 @@ export default class ExistentialGraph {
                 return true;
             }
         });
+
+        this.history = new History();
         
         console.log("JOINT PAPER ", this.paper)
 
