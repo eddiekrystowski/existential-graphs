@@ -16,11 +16,18 @@ export default function Create(props) {
     const [existentialHypergraph, setExistentialHypergraph] = useState(new ExistentialHypergraph());
     const [eg, setExistentialGraph] = useState(null);
     const [graphTool, setGraphTool] = useState('');
+    const [inProof, setInProof] = useState(false)
 
     useEffect(() => {
       setExistentialGraph(new ExistentialGraph('main-paper', id, existentialHypergraph));
     }, [id]);
 
+    useEffect(() => {
+      if (inProof) {
+        console.log('proof successfully started');
+        setExistentialHypergraph(new ExistentialHypergraph(eg));
+      }
+    }, [inProof]);
 
     const handleSaveGraph = () => {
       console.log('CREATE VIEW SAVING GRAPH', graphName, id);
@@ -44,6 +51,13 @@ export default function Create(props) {
       setGraphTool(graphTool);
     }
 
+    const handleStartProofClicked = () => {
+      console.log('starting proof for graph ' + id);
+      if (!inProof) {
+        setInProof(true);
+      }
+    }
+
 
     return (
         <div id="create-root">
@@ -53,6 +67,7 @@ export default function Create(props) {
             handleGraphNameUpdate={handleGraphNameUpdate}
             handleSaveGraph={handleSaveGraph}
             handleSetGraphTool={handleSetGraphTool}
+            handleStartProofClicked={handleStartProofClicked}
             graphTool={graphTool}
           />
           <CreatePaperComponent

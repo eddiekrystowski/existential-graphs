@@ -12,11 +12,15 @@ export default function Toolbar( props ) {
         if (!e.target.value) e.target.value = "Untitled Graph";
         props.handleGraphNameUpdate(e.target.value);
     }
+
+    function handleStartProofClicked() {
+        props.handleStartProofClicked();
+    }
   
     return (
-        <div className='z-9 w-screen h-max bg-slate-200 dark:bg-slate-500 flex flex-row px-2 font-mono pt-2 '>
+        <div className='z-9 w-screen h-max bg-slate-200 dark:bg-slate-500 flex flex-row justify-between pl-2 pr-12 font-mono pt-2'>
             {/* Left-side file management tools */}
-            <div className='z-9 w-1/4 h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono pt-2 '>
+            <div className='z-9 h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono pt-2 '>
                 <div>    
                     <input 
                         onBlur={handleGraphNameLoseFocus} 
@@ -50,7 +54,7 @@ export default function Toolbar( props ) {
             </div>
             
             {/* Graph tools */}
-            <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-row px-2 font-mono'>
+            <div className='z-9 h-max bg-slate-200 dark:bg-slate-500 flex flex-row px-2 font-mono'>
                 <GraphTool 
                     selected={props.graphTool === 'cut'}
                     onClick={() => props.graphTool === 'cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('cut')}
@@ -96,6 +100,14 @@ export default function Toolbar( props ) {
                     Paste Subgraph
                 </GraphTool>
             </div>
+
+
+            <button 
+                className='bg-slate-400 dark:bg-slate-500 px-2 mb-2 font-mono'
+                onClick={handleStartProofClicked}
+            >
+                Start Proof
+            </button>
         </div>
     );
 }

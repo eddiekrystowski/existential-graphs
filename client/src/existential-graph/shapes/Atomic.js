@@ -55,7 +55,7 @@ export default class Atomic extends joint.dia.Element {
     }]
 
     //custom constructor for shape, should more or less always use this over the default constructor
-    create(config, sheet, fast) {
+    create(config, graphController, fast) {
         const options = _.cloneDeep(ATOMIC_DEFAULTS);
 
         if (config) {
@@ -64,7 +64,7 @@ export default class Atomic extends joint.dia.Element {
           options.attrs.rect = Object.assign(options.attrs.rect, config.attrs && config.attrs.rect);
           options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
-        options.sheet = sheet;
+        options.graphController = graphController;
 
         const premise = new Atomic({
           markup: '<g class="rotatable"><rect/><text/></g>',
@@ -87,9 +87,9 @@ export default class Atomic extends joint.dia.Element {
         });
 
         //have to set this out here since we actually do want a reference to this object, not a copy
-        premise.sheet = options.sheet;
+        premise.graphController = options.graphController;
 
-        premise.addTo(premise.sheet.graph)
+        premise.addTo(premise.graphController.graph)
         console.log('added ?')
       
         //add tools (some events events also)
@@ -132,12 +132,12 @@ export default class Atomic extends joint.dia.Element {
     }
 
     enableTools() {
-        let elementView = this.findView(this.sheet.paper.paper);
+        let elementView = this.findView(this.graphController.paper.paper);
         elementView.showTools();
     }
     
     disableTools() {
-        let elementView = this.findView(this.sheet.paper.paper);
+        let elementView = this.findView(this.graphController.paper.paper);
         elementView.hideTools();
     }
 
@@ -162,7 +162,7 @@ export default class Atomic extends joint.dia.Element {
     //TODO: see Cut.addTools()
     addTools(element) {
       //element view is in charge of rendering the elements on the paper
-      let elementView = element.findView(element.sheet.paper.paper);
+      let elementView = element.findView(element.graphController.existential_graph.paper);
       //clear any old tools
       elementView.removeTools();
       // boundary tool shows boundaries of element

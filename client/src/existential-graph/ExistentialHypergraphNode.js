@@ -2,7 +2,7 @@
 
 export default class ExistentialHypergraphNode {
     constructor(existentialGraph) {
-        this.value = existentialGraph;
+        this.existentialGraph = existentialGraph;
 
         this.parent = null;
         this.next = [];
