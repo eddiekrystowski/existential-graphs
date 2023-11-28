@@ -1,8 +1,13 @@
 
 
+
+
 export default class ExistentialHypergraphNode {
-    constructor(existentialGraph) {
-        this.existentialGraph = existentialGraph;
+    constructor(cells, json) {
+        this.cells = cells;
+        this.json = JSON.parse(JSON.stringify(json));
+
+        console.log('CREATED WITH JSON', this.json);
 
         this.parent = null;
         this.next = [];
@@ -10,11 +15,11 @@ export default class ExistentialHypergraphNode {
         this.verified = false;
     }
 
-    addTransition(rule, destination) {
-        const destinationNode = new ExistentialHypergraphNode(destination);
+    addTransition(rule, cells, json) {
+        const destinationNode = new ExistentialHypergraphNode(cells, json);
         this.next.push({
             rule, 
-            destination: destinationNode
+            destination: destinationNode,
         });
 
         return destinationNode;

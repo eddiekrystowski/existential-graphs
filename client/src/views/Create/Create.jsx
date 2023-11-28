@@ -6,8 +6,11 @@ import { CreatePaperComponent } from '@components/Paper';
 import ExistentialGraph from '../../existential-graph/ExistentialGraph';
 import ExistentialHypergraph from '../../existential-graph/ExistentialHypergraph';
 
+import { getSafeCellAddOrder } from "@util";
+
 import { addToLocalGraphData, getLocalGraphByID } from '../../util/util';
 import ProofView from '../../components/Paper/ProofView/ProofView';
+import ExistentialHypergraphNode from '../../existential-graph/ExistentialHypergraphNode';
 
 const GRAPH_STATE = {
   CREATE: 0,
@@ -28,10 +31,12 @@ export default function Create(props) {
     const { id } = useParams();
     console.log('default name', getLocalGraphByID(id).name);
     const [graphName, setGraphName] = useState(getLocalGraphByID(id).name);
-    const [existentialHypergraph, setExistentialHypergraph] = useState(new ExistentialHypergraph());
+    const [existentialHypergraph, setExistentialHypergraph] = useState(new ExistentialHypergraph(null));
     const [eg, setExistentialGraph] = useState(null);
     const [graphTool, setGraphTool] = useState('');
     const [inProof, setInProof] = useState(false);
+    const [hypergraphIndex, setHypergraphIndex] = useState(0);
+    const [waitingForInsertConfirmation, setWaitingForInsertConfirmation] = useState(false);
 
     useEffect(() => {
       setExistentialGraph(new ExistentialGraph('main-paper', id, existentialHypergraph));
@@ -40,7 +45,7 @@ export default function Create(props) {
     useEffect(() => {
       if (inProof) {
         console.log('proof successfully started');
-        setExistentialHypergraph(new ExistentialHypergraph(eg));
+        setExistentialHypergraph(new ExistentialHypergraph(new ExistentialHypergraphNode(eg.graphController.graph.getCells(), eg.exportGraphAsJSON())));
       }
     }, [inProof]);
 
@@ -49,6 +54,24 @@ export default function Create(props) {
       console.log('eg', eg)
       if (eg) eg.hypergraph = existentialHypergraph;
     }, [existentialHypergraph])
+
+    useEffect(() => {
+      console.log('hindex', hypergraphIndex)
+      console.log(existentialHypergraph.getHypergraphNode(hypergraphIndex));
+      let node = existentialHypergraph.getHypergraphNode(hypergraphIndex);
+      if (node && eg) {
+        const graphJSON = node.json;
+        console.log('json', node.json);
+        const order = getSafeCellAddOrder(JSON.parse(JSON.stringify(graphJSON.cells)));
+        eg.graphController.graph.clear();
+        eg.addCellsInOrder(order);
+      }
+      
+    }, [hypergraphIndex])
+
+    const handleChangeHypergraphIndex = (newIndex) => {
+      setHypergraphIndex(Math.max(0, Math.min(newIndex, existentialHypergraph.toArray().length-1)));
+    }
 
     const handleSaveGraph = () => {
       console.log('CREATE VIEW SAVING GRAPH', graphName, id);
@@ -65,13 +88,20 @@ export default function Create(props) {
       if (graphTool === 'auto_disable_insert') {
         graphTool = null;
         eg.graphController.disableInsertMode();
-        eg.steps.push('disable_insert_mode');
       }
       console.log('set graph tool:', graphTool);
       eg.graphTool = graphTool;
       eg.isProofTool = isProofTool;
       setGraphTool(graphTool);
       eg.onGraphToolUse = () => {
+        if (isProofTool && graphTool !== 'insert_subgraph' && graphTool !== 'confirm_insertion' && graphTool !== 'cancel_insertion') {
+          setHypergraphIndex(hypergraphIndex + 1);
+        }
+        
+        if (graphTool === 'insert_subgraph' && isProofTool && !waitingForInsertConfirmation) {
+          setWaitingForInsertConfirmation(true);
+        }
+        
         setGraphTool(null);
         eg.graphTool = null;
         eg.isProofTool = false;
@@ -79,8 +109,25 @@ export default function Create(props) {
 
       if (graphTool === 'iteration' || graphTool === 'deiteration') {
         console.log('adding (de)iter step');
-        existentialHypergraph.addStep(eg.graphController.graph_id, graphTool, eg.graphController.graph.getCells());
+        existentialHypergraph.addStep(eg.graphController.graph_id, graphTool, eg.exportGraphAsJSON(), eg.graphController.graph.getCells());
         console.log('existential hypergraph', existentialHypergraph);
+        eg.onGraphToolUse();
+        forceUpdate();
+      }
+
+      if (graphTool === 'confirm_insertion') {
+        console.log('confirming insertion');
+        existentialHypergraph.addStep(eg.graphController.graph_id, 'insert_subgraph', eg.exportGraphAsJSON(), eg.graphController.graph.getCells());
+        setWaitingForInsertConfirmation(false);
+        eg.graphController.disableInsertMode();
+        eg.onGraphToolUse();
+        forceUpdate();
+      }
+
+      if (graphTool === 'cancel_insertion') {
+        setHypergraphIndex(hypergraphIndex);
+        setWaitingForInsertConfirmation(false);
+        eg.graphController.disableInsertMode();
         eg.onGraphToolUse();
         forceUpdate();
       }
@@ -110,6 +157,9 @@ export default function Create(props) {
             handleSetGraphTool={handleSetGraphTool}
             handleSetProofTool={handleSetProofTool}
             handleStartProofClicked={handleStartProofClicked}
+            hypergraphIndex={hypergraphIndex}
+            handleChangeHypergraphIndex={handleChangeHypergraphIndex}
+            waitingForInsertConfirmation={waitingForInsertConfirmation}
             graphTool={graphTool}
             inProof={inProof}
           />
@@ -119,7 +169,12 @@ export default function Create(props) {
               dom_id="main-paper" 
               graph_id={id}
             />
-            <ProofView show={inProof} hypergraph={existentialHypergraph}/>
+            <ProofView 
+              show={inProof}
+              hypergraph={existentialHypergraph}
+              index={hypergraphIndex}
+              handleChangeHypergraphIndex={handleChangeHypergraphIndex}
+            />
           </div>
         </div>
 

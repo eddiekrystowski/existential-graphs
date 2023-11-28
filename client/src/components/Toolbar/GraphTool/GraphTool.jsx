@@ -19,7 +19,9 @@ const imageMap = {
   'Copy Subgraph' : copySubgraphPng,
   'Paste Subgraph' : pasteSubgraphPng,
   'Iteration' : iterationPng,
-  'Deiteration' : deiterationPng
+  'Deiteration' : deiterationPng,
+  'Confirm Insertion': insertSubgraphPng,
+  'Cancel Insertion': removeSubgraphPng
 };
 
 /**
@@ -44,7 +46,18 @@ export default function GraphTool(props) {
             <button onClick={props.onClick} className='inline-block min-h-[2rem] min-w-[2rem] m-auto'>
               <img src={imageMap[props.children]} alt={props.children + '.png'}></img>
             </button>
-            <span className={`h-min ${text_color}`}>{props.children}</span>
+            <span className={`h-min ${text_color}`}>
+              { props.requiresConfirmation 
+                ? (
+                  props.waitingOnConfirmation
+                  ? <div className='z-10 flex justify-between w-full mr-2 mb-1 mt-1 min-h-max'>
+                      <button onClick={()=>props.handleConfirm()} className='font-mono text-xs text-green-700 bg-emerald-100 p-1 rounded-xl hover:bg-emerald-200'>Confirm</button>
+                      <button onClick={()=>props.handleCancel()} className='font-mono text-xs text-red-700 bg-red-100 p-1 rounded-xl hover:bg-red-200'>Cancel</button>
+                    </div>
+                  : props.children
+                )
+                : props.children}
+            </span>
     </div>
   );
 }

@@ -769,11 +769,11 @@ export default class GraphController {
             selected_premise.embed(new_cuts[0]);
             this.colorByLevel(selected_premise)
             this.pack(selected_premise)
-        }// else 
-        // {
-        //     new_cuts[1].embed(selected_premise)
-        //     this.pack(selected_premise)
-        // }
+        } else 
+         {
+             new_cuts[1].embed(selected_premise)
+             this.pack(selected_premise)
+         }
         this.handleCollisions(new_cuts[0]) 
     }
 

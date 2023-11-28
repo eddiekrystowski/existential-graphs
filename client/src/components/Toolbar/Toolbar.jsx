@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import "@root/main.css"; // Tawilwind stylesheet
 import ToolbarItem from './ToolbarItem/ToolbarItem';
 import ToolbarItemOption from './ToolbarItemOption/ToolbarItemOption';
@@ -17,6 +17,15 @@ export default function Toolbar( props ) {
         props.handleStartProofClicked();
     }
 
+    function handleConfirm() {
+        //props.handleSetProofTool('auto_disable_insert');
+    }
+
+    function handleCancel() {
+        //props.handleChangeHypergraphIndex(props.hypergraphIndex);
+    }
+
+    //const [waitingForInsertConfirmation, setWaitingForInsertConfirmation] = useState(false);
     
   
     return (
@@ -57,50 +66,76 @@ export default function Toolbar( props ) {
             
             {/* Graph tools */}
             <div className='z-9 h-max bg-slate-200 dark:bg-slate-500 flex flex-row px-2 font-mono relative'>
-                <GraphTool 
-                    selected={props.graphTool === 'cut'}
-                    onClick={() => props.graphTool === 'cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('cut')}
-                >
-                    Cut
-                </GraphTool>
-                <GraphTool 
-                    selected={props.graphTool === 'insert_double_cut'}
-                    onClick={() => props.graphTool === 'insert_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('insert_double_cut')}
-                >
-                    Insert Double Cut
-                </GraphTool>
-                <GraphTool
-                    selected={props.graphTool === 'erase_double_cut'}
-                    onClick={() => props.graphTool === 'erase_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_double_cut')}
-                >
-                    Erase Double Cut
-                </GraphTool>
-                <GraphTool
-                    selected={props.graphTool === 'insert_subgraph'}
-                    onClick={() => props.graphTool === 'insert_subgraph' 
-                                    ? props.handleSetGraphTool('auto_disable_insert') 
-                                    : props.handleSetGraphTool('insert_subgraph')}
-                >
-                    Insert Subgraph
-                </GraphTool>
-                <GraphTool
-                    selected={props.graphTool === 'erase_subgraph'}
-                    onClick={() => props.graphTool === 'erase_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_subgraph')}
-                >
-                    Erase Subgraph
-                </GraphTool>
-                <GraphTool
-                    selected={props.graphTool === 'copy_subgraph'}
-                    onClick={() => props.graphTool === 'copy_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('copy_subgraph')}
-                >
-                    Copy Subgraph
-                </GraphTool>
-                <GraphTool
-                    selected={props.graphTool === 'paste_subgraph'}
-                    onClick={() => props.graphTool === 'paste_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('paste_subgraph')}
-                >
-                    Paste Subgraph
-                </GraphTool>
+
+                {
+                    true && 
+                    <GraphTool 
+                        selected={props.graphTool === 'cut'}
+                        onClick={() => props.graphTool === 'cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('cut')}
+                    >
+                        Cut
+                    </GraphTool>
+                }
+                {
+                    true && 
+                    <GraphTool 
+                        selected={props.graphTool === 'insert_double_cut'}
+                        onClick={() => props.graphTool === 'insert_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('insert_double_cut')}
+                    >
+                        Insert Double Cut
+                    </GraphTool>
+                }
+                {
+                    true && 
+                    <GraphTool
+                        selected={props.graphTool === 'erase_double_cut'}
+                        onClick={() => props.graphTool === 'erase_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_double_cut')}
+                    >
+                        Erase Double Cut
+                    </GraphTool>
+                }
+
+                {
+                    !props.inProof && !props.waitingForInsertConfirmation && 
+                    <GraphTool
+                        selected={props.graphTool === 'insert_subgraph'}
+                        onClick={() => props.graphTool === 'insert_subgraph' 
+                                        ? props.handleSetGraphTool('auto_disable_insert') 
+                                        : props.handleSetGraphTool('insert_subgraph')}
+                    >
+                        Insert Subgraph
+                    </GraphTool>
+                }
+
+                {
+                    !props.inProof && !props.waitingForInsertConfirmation && 
+                    <GraphTool
+                        selected={props.graphTool === 'erase_subgraph'}
+                        onClick={() => props.graphTool === 'erase_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_subgraph')}
+                    >
+                        Erase Subgraph
+                    </GraphTool>
+                }
+
+                {
+                    true && 
+                    <GraphTool
+                        selected={props.graphTool === 'copy_subgraph'}
+                        onClick={() => props.graphTool === 'copy_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('copy_subgraph')}
+                    >
+                        Copy Subgraph
+                    </GraphTool>
+                }
+
+                {
+                    true && 
+                    <GraphTool
+                        selected={props.graphTool === 'paste_subgraph'}
+                        onClick={() => props.graphTool === 'paste_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('paste_subgraph')}
+                    >
+                        Paste Subgraph
+                    </GraphTool>
+                }
 
                 {
                     props.inProof && 
@@ -132,7 +167,7 @@ export default function Toolbar( props ) {
                  */}
 
                 {
-                    props.inProof && 
+                    props.inProof && !props.waitingForInsertConfirmation &&
                     <GraphTool 
                         selected={props.graphTool === 'insert_double_cut'}
                         onClick={() => props.graphTool === 'insert_double_cut' ? props.handleSetProofTool(null) : props.handleSetProofTool('insert_double_cut')}
@@ -142,7 +177,7 @@ export default function Toolbar( props ) {
                 }
 
                 {
-                    props.inProof && 
+                    props.inProof && !props.waitingForInsertConfirmation &&
                     <GraphTool
                         selected={props.graphTool === 'erase_double_cut'}
                         onClick={() => props.graphTool === 'erase_double_cut' ? props.handleSetProofTool(null) : props.handleSetProofTool('erase_double_cut')}
@@ -151,13 +186,19 @@ export default function Toolbar( props ) {
                     </GraphTool>
                 }
                 
-                {
+                {/* {
                     props.inProof && 
                     <GraphTool
                         selected={props.graphTool === 'insert_subgraph'}
-                        onClick={() => props.graphTool === 'insert_subgraph' 
-                                        ? props.handleSetProofTool('auto_disable_insert') 
-                                        : props.handleSetProofTool('insert_subgraph')}
+                        requiresConfirmation={true}
+                        handleConfirm={handleConfirm}
+                        handleCancel={handleCancel}
+                        waitingOnConfirmation={props.waitingForInsertConfirmation}
+                        onClick={() => {
+                            if (props.graphTool !== 'insert_subgraph' && props.graphTool !== 'inserting_subgraph') {
+                                props.handleSetProofTool('insert_subgraph');
+                            }
+                        }}
                     >
                         Insert Subgraph
                     </GraphTool>
@@ -171,11 +212,32 @@ export default function Toolbar( props ) {
                     >
                         Erase Subgraph
                     </GraphTool>
+                } */}
+
+{
+                    props.inProof && !props.waitingForInsertConfirmation && 
+                    <GraphTool
+                        selected={props.graphTool === 'insert_subgraph'}
+                        onClick={() => props.graphTool === 'insert_subgraph' 
+                                        ? props.handleSetProofTool('auto_disable_insert') 
+                                        : props.handleSetProofTool('insert_subgraph')}
+                    >
+                        Insert Subgraph
+                    </GraphTool>
                 }
 
+                {
+                    props.inProof && !props.waitingForInsertConfirmation && 
+                    <GraphTool
+                        selected={props.graphTool === 'erase_subgraph'}
+                        onClick={() => props.graphTool === 'erase_subgraph' ? props.handleSetProofTool(null) : props.handleSetProofTool('erase_subgraph')}
+                    >
+                        Erase Subgraph
+                    </GraphTool>
+                }
 
                 {
-                    props.inProof && 
+                    props.inProof && !props.waitingForInsertConfirmation &&
                     <GraphTool
                         selected={props.graphTool === 'iteration'}
                         onClick={() => props.graphTool === 'iteration' ? props.handleSetProofTool(null) : props.handleSetProofTool('iteration')}
@@ -186,13 +248,33 @@ export default function Toolbar( props ) {
                 }
 
                 {
-                    props.inProof && 
+                    props.inProof && !props.waitingForInsertConfirmation &&
                     <GraphTool
                         selected={props.graphTool === 'deiteration'}
                         onClick={() => props.graphTool === 'deiteration' ? props.handleSetProofTool(null) : props.handleSetProofTool('deiteration')}
                         is_auto={true}
                     >
                         Deiteration
+                    </GraphTool>
+                }
+
+                {
+                    props.inProof && props.waitingForInsertConfirmation &&
+                    <GraphTool
+                        selected={props.graphTool === 'confirm_insertion'}
+                        onClick={() => props.graphTool === 'confirm_insertion' ? props.handleSetProofTool(null) : props.handleSetProofTool('confirm_insertion')}
+                    >
+                        Confirm Insertion
+                    </GraphTool>
+                }
+
+                {
+                    props.inProof && props.waitingForInsertConfirmation &&
+                    <GraphTool
+                        selected={props.graphTool === 'cancel_insertion'}
+                        onClick={() => props.graphTool === 'cancel_insertion' ? props.handleSetProofTool(null) : props.handleSetProofTool('cancel_insertion')}
+                    >
+                        Cancel Insertion
                     </GraphTool>
                 }
                 

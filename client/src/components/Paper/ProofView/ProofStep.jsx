@@ -13,7 +13,10 @@ const ruleMap = {
 
 export default function ProofStep(props) {
     return (
-        <div className="w-full px-6 py-3 text-lg border-b-2 border-slate-400 hover:cursor-pointer hover:bg-slate-300 font-mono ">
+        <div 
+            className={`w-full px-6 py-3 text-lg border-b-2 border-slate-400 hover:cursor-pointer hover:bg-slate-300 font-mono ${props.selected ? 'bg-slate-300' : ''}`}
+            onClick={props.onClick}    
+        >
             { ruleMap[props.rule] ||  '???'}
         </div>
     )

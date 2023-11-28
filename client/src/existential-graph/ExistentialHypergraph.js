@@ -9,16 +9,17 @@ import ExistentialHypergraphNode from "./ExistentialHypergraphNode";
  * We represent proofs using Existential Hypergraphs
  */
 export default class ExistentialHypergraph {
-    constructor(rootGraph)
+    constructor(rootNode)
     {
-        this.root = new ExistentialHypergraphNode(rootGraph);
+        this.root = rootNode;
         this.ptr = this.root;
     }
 
-    addStep(graphId, rule, destination) {
+    addStep(graphId, rule, json, cells) {
         //const hypergraphNode = this.find(graphId);
         //if (hypergraphNode) {
-        this.ptr = this.ptr.addTransition(rule, destination);
+
+        this.ptr = this.ptr.addTransition(rule, cells, json);
         ////}
     }
 
@@ -27,7 +28,7 @@ export default class ExistentialHypergraph {
         let current = this.root;
         const result = [{rule: "Start", verified: true}];
 
-        while (current.next.length) {
+        while (current && current.next.length) {
             result.push({
                 rule: current.next[0].rule,
                 verified: current.next[0].verified
@@ -41,6 +42,25 @@ export default class ExistentialHypergraph {
 
         return result;
 
+    }
+
+
+    getHypergraphNode(index) {
+        let current = this.root;
+
+        let ctr = 0;
+
+        while (current) {
+
+            if (ctr === index) return current;
+            current = (current.next.length) ? current.next[0].destination : null;
+            ctr++;
+            if (ctr > 100000) {
+                break;
+            }
+        }
+
+        return null;
     }
 
     find(graphId) {
