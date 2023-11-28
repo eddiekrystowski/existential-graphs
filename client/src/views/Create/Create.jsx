@@ -14,7 +14,16 @@ const GRAPH_STATE = {
   PROOF: 1
 }
 
+function useForceUpdate(){
+  const [value, setValue] = useState(0); // integer state
+  return () => setValue(value => value + 1); // update state to force render
+  // A function that increment 👆🏻 the previous state like here 
+  // is better than directly setting `setValue(value + 1)`
+}
+
 export default function Create(props) {
+
+    const forceUpdate = useForceUpdate();
 
     const { id } = useParams();
     console.log('default name', getLocalGraphByID(id).name);
@@ -22,7 +31,7 @@ export default function Create(props) {
     const [existentialHypergraph, setExistentialHypergraph] = useState(new ExistentialHypergraph());
     const [eg, setExistentialGraph] = useState(null);
     const [graphTool, setGraphTool] = useState('');
-    const [inProof, setInProof] = useState(false)
+    const [inProof, setInProof] = useState(false);
 
     useEffect(() => {
       setExistentialGraph(new ExistentialGraph('main-paper', id, existentialHypergraph));
@@ -64,7 +73,16 @@ export default function Create(props) {
       setGraphTool(graphTool);
       eg.onGraphToolUse = () => {
         setGraphTool(null);
+        eg.graphTool = null;
         eg.isProofTool = false;
+      }
+
+      if (graphTool === 'iteration' || graphTool === 'deiteration') {
+        console.log('adding (de)iter step');
+        existentialHypergraph.addStep(eg.graphController.graph_id, graphTool, eg.graphController.graph.getCells());
+        console.log('existential hypergraph', existentialHypergraph);
+        eg.onGraphToolUse();
+        forceUpdate();
       }
     }
 

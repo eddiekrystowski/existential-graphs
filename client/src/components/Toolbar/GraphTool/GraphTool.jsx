@@ -33,12 +33,18 @@ Paste Subgraph
 
 export default function GraphTool(props) {
 
+  let text_color = props.selected ? 'text-red-400' : '';
+
+  if (props.is_auto) {
+    text_color = 'hover:text-purple-600 text-blue-600';
+  }
+
   return (
-    <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono hover:cursor-pointer hover:bg-slate-300'>
+    <div className='z-9 w-max h-max bg-slate-200 dark:bg-slate-500 flex flex-col px-2 font-mono hover:cursor-pointer hover:bg-slate-300 '>
             <button onClick={props.onClick} className='inline-block min-h-[2rem] min-w-[2rem] m-auto'>
               <img src={imageMap[props.children]} alt={props.children + '.png'}></img>
             </button>
-            <span className={`h-min ${props.selected ? 'text-red-400' : ''}`}>{props.children}</span>
+            <span className={`h-min ${text_color}`}>{props.children}</span>
     </div>
   );
 }

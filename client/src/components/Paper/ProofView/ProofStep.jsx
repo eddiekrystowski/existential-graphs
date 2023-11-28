@@ -6,7 +6,9 @@ const ruleMap = {
     'insert_subgraph': 'Insert Subgraph',
     'erase_subgraph': 'Erase Subgraph',
     'copy_subgraph': 'Copy Subgraph',
-    'paste_subgraph': 'Paste Subgraph'
+    'paste_subgraph': 'Paste Subgraph',
+    'iteration': 'Iteration',
+    'deiteration': 'Deiteration'
 }
 
 export default function ProofStep(props) {

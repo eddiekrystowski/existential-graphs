@@ -1,6 +1,8 @@
 import { useState } from "react"
 import ProofStep from "./ProofStep";
 
+
+
 export default function ProofView(props) {
 
     const [expanded, setExpanded] = useState(true);
@@ -8,6 +10,10 @@ export default function ProofView(props) {
     const handleToggleExpand = () => {
         setExpanded(!expanded);
     }
+
+
+
+    
 
     return (
         <div id='proof-view' className="absolute right-10 top-8 w-96 ">

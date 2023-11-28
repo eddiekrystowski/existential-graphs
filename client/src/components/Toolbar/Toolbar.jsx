@@ -179,6 +179,7 @@ export default function Toolbar( props ) {
                     <GraphTool
                         selected={props.graphTool === 'iteration'}
                         onClick={() => props.graphTool === 'iteration' ? props.handleSetProofTool(null) : props.handleSetProofTool('iteration')}
+                        is_auto={true}
                     >
                         Iteration
                     </GraphTool>
@@ -189,6 +190,7 @@ export default function Toolbar( props ) {
                     <GraphTool
                         selected={props.graphTool === 'deiteration'}
                         onClick={() => props.graphTool === 'deiteration' ? props.handleSetProofTool(null) : props.handleSetProofTool('deiteration')}
+                        is_auto={true}
                     >
                         Deiteration
                     </GraphTool>

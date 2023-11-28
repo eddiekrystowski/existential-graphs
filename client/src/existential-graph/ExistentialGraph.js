@@ -434,8 +434,6 @@ export default class ExistentialGraph {
                 if (this.proofMode && this.isProofTool) this.hypergraph.addStep(this.graphController.graph_id, 'paste_subgraph', this.graphController.graph.getCells());
             }
 
-            this.graphTool = null;
-
             this.onGraphToolUse && this.onGraphToolUse();
 
             console.log('hypergraph', this.hypergraph)
