@@ -54,7 +54,7 @@ export default function Toolbar( props ) {
             </div>
             
             {/* Graph tools */}
-            <div className='z-9 h-max bg-slate-200 dark:bg-slate-500 flex flex-row px-2 font-mono'>
+            <div className='z-9 h-max bg-slate-200 dark:bg-slate-500 flex flex-row px-2 font-mono relative'>
                 <GraphTool 
                     selected={props.graphTool === 'cut'}
                     onClick={() => props.graphTool === 'cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('cut')}
@@ -99,11 +99,104 @@ export default function Toolbar( props ) {
                 >
                     Paste Subgraph
                 </GraphTool>
+
+                {
+                    props.inProof && 
+                    <div className='text-xs min-h-full flex flex-col justify-center flex-initial mx-2 font-bold text-slate-700'>
+                        <span>Graph</span>
+                        <span>Tools</span>
+                    </div>
+                }
+                
+                {
+                    props.inProof && 
+                    <div className='border-l-2 border-solid border-slate-500 min-h-full'></div>
+                }
+
+                {
+                    props.inProof && 
+                    <div className='text-xs min-h-full flex flex-col justify-center flex-initial mx-2 font-bold text-slate-700'>
+                        <span>Proof</span>
+                        <span>Steps</span>
+                    </div>
+                }
+
+
+                {/**
+                 * 
+                 * 
+                 * Proof steps
+                 * 
+                 */}
+
+                {
+                    props.inProof && 
+                    <GraphTool 
+                        selected={props.graphTool === 'insert_double_cut'}
+                        onClick={() => props.graphTool === 'insert_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('insert_double_cut')}
+                    >
+                        Insert Double Cut
+                    </GraphTool>
+                }
+
+                {
+                    props.inProof && 
+                    <GraphTool
+                        selected={props.graphTool === 'erase_double_cut'}
+                        onClick={() => props.graphTool === 'erase_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_double_cut')}
+                    >
+                        Erase Double Cut
+                    </GraphTool>
+                }
+                
+                {
+                    props.inProof && 
+                    <GraphTool
+                        selected={props.graphTool === 'insert_subgraph'}
+                        onClick={() => props.graphTool === 'insert_subgraph' 
+                                        ? props.handleSetGraphTool('auto_disable_insert') 
+                                        : props.handleSetGraphTool('insert_subgraph')}
+                    >
+                        Insert Subgraph
+                    </GraphTool>
+                }
+
+                {
+                    props.inProof && 
+                    <GraphTool
+                        selected={props.graphTool === 'erase_subgraph'}
+                        onClick={() => props.graphTool === 'erase_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_subgraph')}
+                    >
+                        Erase Subgraph
+                    </GraphTool>
+                }
+
+
+                {
+                    props.inProof && 
+                    <GraphTool
+                        selected={props.graphTool === 'iteration'}
+                        onClick={() => props.graphTool === 'iteration' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('iteration')}
+                    >
+                        Iteration
+                    </GraphTool>
+                }
+
+                {
+                    props.inProof && 
+                    <GraphTool
+                        selected={props.graphTool === 'deiteration'}
+                        onClick={() => props.graphTool === 'deiteration' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('deiteration')}
+                    >
+                        Deiteration
+                    </GraphTool>
+                }
+                
             </div>
 
 
             <button 
-                className='bg-slate-400 dark:bg-slate-500 px-2 mb-2 font-mono'
+                className='bg-slate-300 dark:bg-slate-500 border-2 border-solid border-slate-700 hover:bg-slate-200 px-2 mb-2 font-mono text-slate-700 font-bold'
                 onClick={handleStartProofClicked}
             >
                 Start Proof

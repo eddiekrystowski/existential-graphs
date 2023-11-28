@@ -22,6 +22,27 @@ export default class ExistentialHypergraph {
         ////}
     }
 
+    toArray() {
+
+        let current = this.root;
+        const result = [{rule: "Start", verified: true}];
+
+        while (current.next.length) {
+            result.push({
+                rule: current.next[0].rule,
+                verified: current.next[0].verified
+            });
+
+            current = current.next[0].destination;
+
+        }
+
+        console.log('TO ARRAY', result)
+
+        return result;
+
+    }
+
     find(graphId) {
         let current = [this.root]
         while(current.length > 0) {

@@ -6,6 +6,8 @@ export default class ExistentialHypergraphNode {
 
         this.parent = null;
         this.next = [];
+
+        this.verified = false;
     }
 
     addTransition(rule, destination) {

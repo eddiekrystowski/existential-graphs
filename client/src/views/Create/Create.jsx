@@ -86,6 +86,7 @@ export default function Create(props) {
             handleSetGraphTool={handleSetGraphTool}
             handleStartProofClicked={handleStartProofClicked}
             graphTool={graphTool}
+            inProof={inProof}
           />
           <div className='w-screen h-max bg-slate-200 dark:bg-slate-500 flex flex-row relative'>
             <CreatePaperComponent
@@ -93,7 +94,7 @@ export default function Create(props) {
               dom_id="main-paper" 
               graph_id={id}
             />
-            <ProofView show={inProof}/>
+            <ProofView show={inProof} hypergraph={existentialHypergraph}/>
           </div>
         </div>
 
