@@ -40,7 +40,8 @@ export default class Atomic extends joint.dia.Element {
             type: "dia.Element.Atomic",
             attrs: {
                 rect: ATOMIC_DEFAULTS.attrs.rect,
-                text: ATOMIC_DEFAULTS.attrs.text
+                text: ATOMIC_DEFAULTS.attrs.text,
+                locked: false
             }
         }
     }
@@ -54,7 +55,7 @@ export default class Atomic extends joint.dia.Element {
     }]
 
     //custom constructor for shape, should more or less always use this over the default constructor
-    create(config, sheet, fast) {
+    create(config, graphController, fast) {
         const options = _.cloneDeep(ATOMIC_DEFAULTS);
 
         if (config) {
@@ -63,7 +64,7 @@ export default class Atomic extends joint.dia.Element {
           options.attrs.rect = Object.assign(options.attrs.rect, config.attrs && config.attrs.rect);
           options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
-        options.sheet = sheet;
+        options.graphController = graphController;
 
         const premise = new Atomic({
           markup: '<g class="rotatable"><rect/><text/></g>',
@@ -86,9 +87,9 @@ export default class Atomic extends joint.dia.Element {
         });
 
         //have to set this out here since we actually do want a reference to this object, not a copy
-        premise.sheet = options.sheet;
+        premise.graphController = options.graphController;
 
-        premise.addTo(premise.sheet.graph)
+        premise.addTo(premise.graphController.graph)
         console.log('added ?')
       
         //add tools (some events events also)
@@ -99,58 +100,88 @@ export default class Atomic extends joint.dia.Element {
 
 
     destroy() {
-        this.remove();
-        //this.sheet.paper.handleDeleteCell();
-      }
-  
-      obliterate() {
-        this.destroy();
-      }
-    
-      active() {
-        return;
-      }
-  
-      inactive(){
-        return;
-      }
-  
-      getBoundingBox() {
-        return  {
-                  width: this.attributes.attrs.rect.width,
-                  height: this.attributes.attrs.rect.height,
-                  x: this.attributes.position.x,
-                  y: this.attributes.position.y
-                }
-      }
-  
-      getArea() {
-        return this.attributes.attrs.rect.width * this.attributes.attrs.rect.height;
-      }
-  
-      //TODO: see Cut.addTools()
-      addTools(element) {
-        //element view is in charge of rendering the elements on the paper
-        let elementView = element.findView(element.sheet.paper.jpaper);
-        //clear any old tools
-        elementView.removeTools();
-        // boundary tool shows boundaries of element
-        let boundaryTool = new joint.elementTools.Boundary();
-    
-        let rect_tools = [boundaryTool];
-    
-        let toolsView = new joint.dia.ToolsView({
-            tools: rect_tools
-        });
-    
-        elementView.addTools(toolsView);
-        //start with tools hidden
-        elementView.hideTools();
-        // element.on("change:position", function (eventView) {
-        //     element.toFront();
-        // });
-        // --- end of paper events -----
+      if (this.isLocked()) return;
+        
+      this.remove();
+      //this.sheet.paper.handleDeleteCell();
     }
+  
+    obliterate() {
+      this.destroy();
+    }
+  
+    active() {
+      return;
+    }
+
+    inactive(){
+      return;
+    }
+
+    getBoundingBox() {
+      return  {
+                width: this.attributes.attrs.rect.width,
+                height: this.attributes.attrs.rect.height,
+                x: this.attributes.position.x,
+                y: this.attributes.position.y
+              }
+    }
+
+    getArea() {
+      return this.attributes.attrs.rect.width * this.attributes.attrs.rect.height;
+    }
+
+    enableTools() {
+        let elementView = this.findView(this.graphController.existential_graph.paper);
+        elementView.showTools();
+    }
+    
+    disableTools() {
+        let elementView = this.findView(this.graphController.existential_graph.paper);
+        elementView.hideTools();
+    }
+
+    lock() {
+      this.attr('locked', true)
+      this.disableTools()
+    }
+
+    unlock () {
+      this.attr('locked', false)
+      this.enableTools()
+    }
+
+    isLocked() {
+      return this.attr("locked")
+    }
+
+    setColor(color) {
+      this.attr("rect/fill", color)
+    }
+  
+    //TODO: see Cut.addTools()
+    addTools(element) {
+      //element view is in charge of rendering the elements on the paper
+      let elementView = element.findView(element.graphController.existential_graph.paper);
+      //clear any old tools
+      elementView.removeTools();
+      // boundary tool shows boundaries of element
+      let boundaryTool = new joint.elementTools.Boundary();
+  
+      let rect_tools = [boundaryTool];
+  
+      let toolsView = new joint.dia.ToolsView({
+          tools: rect_tools
+      });
+  
+      elementView.addTools(toolsView);
+      //start with tools hidden
+      elementView.hideTools();
+      // element.on("change:position", function (eventView) {
+      //     element.toFront();
+      // });
+      // --- end of paper events -----
+  }
 }
 
 

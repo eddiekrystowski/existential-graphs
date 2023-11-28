@@ -1,8 +1,8 @@
 import { getLocalGraphByID, findSmallestCell, color, getCellsBoundingBox, contains, intersects, overlapsCells, 
          cellInArray } from '@util';
 import * as joint from 'jointjs'
-import Atomic from './Atomic';
-import Cut from './Cut';
+import Atomic from './shapes/Atomic';
+import Cut from './shapes/Cut';
 
 const NSAtomic = joint.dia.Element.define('nameSpace.Atomic',Atomic);
 const NSCut = joint.dia.Element.define('nameSpace.Cut',Cut);
@@ -14,10 +14,16 @@ const DEFAULT_BACKGROUND_COLORS = {
     atomic: color.shapes.background.default.color
 }
 
+const DISABLED_BACKGROUND_COLORS = {
+    even: color.shapes.disabled.even.inactive,
+    odd: color.shapes.disabled.odd.inactive,
+    atomic: color.shapes.disabled.default.color
+}
 
-export default class Sheet {
+export default class GraphController {
     constructor(parent_paper, graph_id) {
-        this.paper = parent_paper;
+        this.existential_graph = parent_paper;
+        this.graph_id = graph_id;
 
         const graphData = getLocalGraphByID(graph_id);
         console.log(graphData);
@@ -55,6 +61,31 @@ export default class Sheet {
         return cut;
     }
 
+    // embedInCut(config, collisions=true, selected=null) {
+    //     const cut = this.addCut(config, collisions=false)
+    //     alert("bortnite")
+    //     let parent = null;
+    //     if (selected.get('parent')) {
+    //         parent = selected.getParentCell();
+    //     }
+    //     if (selected !== null)  {   
+    //         if (parent) {
+    //             parent.unembed(selected);
+    //             parent.embed(cut)
+    //         }
+    //         cut.embed(selected)
+    //     }
+
+    //     if (parent) this.pack(parent)
+    //     this.pack(cut)
+
+    //     // Play snip sound
+    //     //let snip = new Audio(Snip); 
+    //     //this.handlePlayAudio(snip);
+    //     //this.paper.onGraphUpdate();
+    //     return cut;
+    // }
+
     handleCollisions(cell, clean=true) {
         //console.log("=================== HANDLE COLLISIONS =========================")
         //This function takes a Cell as input and, using its position
@@ -63,7 +94,6 @@ export default class Sheet {
         // sees on the paper
         let cellbbox = cell.getBoundingBox();
         
-        console.log(this);
         let potential_parents = this.findPotentialParents(cellbbox);
         let parent = findSmallestCell(potential_parents);
     
@@ -83,6 +113,10 @@ export default class Sheet {
         } else {
             let elements_inside = this.findElementsInside(cellbbox)
             for (const element of elements_inside) {
+                //do not add children to locked element
+                if (cell.isLocked()) {
+                    break;
+                }
                 if (element.get("parent") || element.id === cell.id) {
                     continue;
                 }
@@ -286,7 +320,7 @@ export default class Sheet {
     }
 
     subgraphToGraph(node, clone, subgraph, parent=null) {
-        clone.sheet = this;
+        clone.graphController = this;
         clone.addTo(this.graph);
         if (parent != null) {
             parent.embed(clone);
@@ -463,7 +497,7 @@ export default class Sheet {
     // returns cell under mouse with the highest z value;
     getCellAtMouse() {
         //console.log("mouse pos", this.paper.getRelativeMousePos());
-        const mouse_pos = this.paper.getRelativeMousePos()
+        const mouse_pos = this.existential_graph.getRelativeMousePos()
         const cells = this.graph.getCells().filter(cell =>  mouse_pos.x <= cell.attributes.position.x + cell.attributes.attrs.rect.width
                                                         && mouse_pos.x >= cell.attributes.position.x
                                                         && mouse_pos.y <= cell.attributes.position.y + cell.attributes.attrs.rect.height
@@ -473,6 +507,304 @@ export default class Sheet {
         const cell = cells.reduce((max, cell) => max.attributes.z > cell.attributes.z ? max : cell);
         //console.log("HIGHEST CELL: ", cell)
         return cell;
+    }
+
+    /**
+     * Force an array of cells into a Cut (target) even if they do not fit by resizing and moving 
+     * the target and its children / neighbors
+     * @param {Cell[]} cells 
+     * @param {Cut} target
+     */
+    forceParseCells(cells, cellsbbox, target) {
+        console.clear()
+        console.log("forcing cells: ",cells)
+        console.log("to target: ", target)
+        if (cells === null) return;
+        if (target === null || target.attributes.type !== "dia.Element.Cut") return;
+
+        // We have a non empty array of cells to insert into a cut
+        //create a temporary root cut to insert all cells into
+        const config = {
+            size: {
+                width: cellsbbox.width + 10,
+                height: cellsbbox.height + 10
+            },
+            position: {
+                x: cellsbbox.x-10,
+                y: cellsbbox.y-10
+            },
+            attrs: {
+                rect: {
+                    width: cellsbbox.width + 10,
+                    height: cellsbbox.height + 10
+                }
+            }
+        }
+        const cut = (new Cut({
+            markup: '<rect/><text/>',
+            position: {
+                ...config.position
+            },
+            size: {
+                ...config.size
+            },
+            attrs: {
+                rect: {
+                    ...config.attrs.rect
+                },
+                text: {
+                    ...config.attrs.text
+                },
+                level: 0
+            },
+            // set custom attributes here:
+            sheet: this
+        })).create(config, this)
+        // put the cut inside the target 
+        target.embed(cut);
+        const target_bbox = target.getBoundingBox();
+        const cut_bbox = cut.getBoundingBox();
+        const buffer = 10;
+        if (!contains(target_bbox, cut_bbox)) {
+            //check if premise is to the left of parent
+            if (cut_bbox.x <= target_bbox.x) {
+                const diff = target_bbox.x - cut_bbox.x - buffer;
+                target.position(cut_bbox.x - buffer, target_bbox.y);
+                target.attr("rect/width", target.attributes.attrs.rect.width + diff);
+            } 
+            //check if premise is to the right of parent
+            if (cut_bbox.x + cut_bbox.width >= target_bbox.x + target_bbox.width) {
+                const diff = cut_bbox.x + cut_bbox.width - (target_bbox.x + target_bbox.width);
+                target.attr("rect/width", target.attributes.attrs.rect.width + diff + buffer);
+            }
+            // check if premise is above parent
+            if (cut_bbox.y <= target_bbox.y) {
+                const diff = target_bbox.y - cut_bbox.y - buffer;
+                target.position(target_bbox.x, cut_bbox.y - buffer);
+                target.attr("rect/height", target.attributes.attrs.rect.height + diff);
+            }
+            //check if premise is below parent
+            if (cut_bbox.y + cut_bbox.height >= target_bbox.y + target_bbox.height){
+                const diff = cut_bbox.y + cut_bbox.height - (target_bbox.y + target_bbox.height) + 10;
+                target.attr("rect/height", target.attributes.attrs.rect.height + diff + buffer);
+            }
+        }
+        console.log("GHOST CUT: ", cut)
+        this.handleCollisions(cut)
+
+        //update position of cells based on where cut ends up
+        console.log("updating cells",cells);
+
+        for (const cell of cells) {
+            console.log("updating cell position:",cell.position)
+            cell.position = {
+                x: cut.attributes.position.x + (cell.position.x-cellsbbox.x + 5), 
+                y: cut.attributes.position.y + (cell.position.y-cellsbbox.y + 5)
+            }
+        }
+        
+        const ids = {}; 
+        while (cells.length > 0) {
+            const cell = cells.shift();
+            const type = cell.type;
+
+            if (cell.parent && !ids.hasOwnProperty(cell.parent)) {
+                //console.log('has parent, skipping for now...')
+                cells.push(cell);
+                continue;
+            }
+
+            if (type === "dia.Element.Cut") {
+                const new_cut =  this.addCut(cell);
+                ids[cell.id] = true;
+            }
+            else if (type === "dia.Element.Atomic") {
+                const new_atomic = this.addAtomic(cell);
+                ids[cell.id] = true;
+            }
+        }
+
+        cut.destroy()
+
+    }
+
+    lockAllCells() {
+        const cells = this.graph.getCells()
+
+        for (let cell of cells) {
+            cell.lock()
+            console.log('cell', cell)
+        }
+    }
+
+    unlockAllCells() {
+        const cells = this.graph.getCells()
+
+        for (let cell of cells) {
+            cell.unlock()
+        }
+    }
+
+    lockSubgraph(root, includeRoot=true) {
+        if (includeRoot) {
+            root.lock()
+        }
+
+        let children = root.getEmbeddedCells();
+        while (children.length > 0) {
+            let new_children = []
+            for (let child of children) {
+                new_children.push(...child.getEmbeddedCells());
+                child.lock();
+            }
+            children = new_children
+        }  
+    }
+
+    unlockSubgraph(root) {
+        root.unlock()
+        let children = root.getEmbeddedCells();
+        while (children.length > 0) {
+            let new_children = []
+            for (let child of children) {
+                new_children.push(...child.getEmbeddedCells());
+                child.unlock();
+            }
+            children = new_children
+        } 
+    }
+
+    colorCells(color_config, cells=[]) {
+        // if no cells are provided, color all cells
+        if (cells.length === 0) {
+            cells = this.graph.getCells()
+        }
+
+        for (let i = 0; i < cells.length; i++) {
+            const cell = cells[i]
+            const level = cell.attributes.attrs.level
+            const color = (level % 2 === 0) ? color_config.even.color : color_config.odd.color
+            cell.setColor(color)
+        }
+    }
+
+    //insertion mode disables editing all elements except for those on the same level with the target cut
+    enableInsertMode(targetCut) {
+        const type = targetCut.type
+
+        if (type == "dia.Element.Premise") {
+            //error : can not activate insert mode on a premise
+            return null;
+        }
+
+        //start by locking all cells
+        this.lockAllCells()
+
+        //remove joint tools from cells
+        
+        //color all cells with disabled colors
+        this.colorCells(DISABLED_BACKGROUND_COLORS)
+
+        //unlock children of target cut
+        const children = targetCut.getEmbeddedCells()
+        for (const child of children) {
+            child.unlock()
+        }
+
+        //set color to active for target and children
+        this.colorCells(DEFAULT_BACKGROUND_COLORS, [targetCut, ...children])
+    }
+
+    //insertion mode disables editing all elements except for those on the same level with the target cut
+    disableInsertMode() {
+        //unlock all cells
+        const cells = this.graph.getCells();
+
+        for (const cell of cells) {
+            cell.unlock()
+        }
+
+        //color all cells with default colors
+        this.colorCells(DEFAULT_BACKGROUND_COLORS)
+    }
+
+    addCutAsParent(config) {
+        const cut = (new Cut()).create(config, this, false);
+    }
+
+    insertDoubleCut = function(model, mousePosition={}) {
+        let position = {};
+        let size = {}
+        if (!model && mousePosition) {
+            position = mousePosition;
+            size = { width: 80, height: 80 }
+        }
+        else if (model){
+            position = model.get('position');
+            size = { width: model.attr('rect/width'), height: model.attr('rect/height') }
+        }
+        else {
+            throw new Error('Bad arguments');
+        }
+        const multipliers = [0.8, 0.25];
+        let new_cuts = []
+        for(let i = 0; i < multipliers.length; i++) { 
+            new_cuts.push(this.addCut({
+                position:  {
+                x: position.x - (size.width * multipliers[i]/2),
+                y: position.y - (size.height * multipliers[i]/2)
+                },
+                attrs: {
+                    rect: {
+                        width: size.width * (1 + multipliers[i]),
+                        height: size.height * (1 + multipliers[i])
+                    }
+                }
+            }, false));
+        } 
+        new_cuts[0].embed(new_cuts[1])
+        this.colorByLevel(new_cuts[0])
+        let selected_premise = this.existential_graph.selected_premise;
+        if (selected_premise && selected_premise.attributes.type === "dia.Element.Cut") {
+            selected_premise.embed(new_cuts[0]);
+            this.colorByLevel(selected_premise)
+            this.pack(selected_premise)
+        } else 
+         {
+             new_cuts[1].embed(selected_premise)
+             this.pack(selected_premise)
+         }
+        this.handleCollisions(new_cuts[0]) 
+    }
+
+    deleteDoubleCut(model) {
+        console.log("MODEL: ", model);
+        if(model.__proto__.constructor.name === "Cut" && model.attributes.embeds?.length === 1 && 
+            this.graph.getCell(model.attributes.embeds[0]).__proto__.constructor.name === "Cut") {
+            const children = this.graph.getCell(model.attributes.embeds[0]).attributes.embeds;
+            this.graph.getCell(model.attributes.embeds[0]).destroy();
+            model.destroy();
+            if(model.attributes.parent) {
+                this.handleCollisions(this.graph.getCell(model.attributes.parent));
+            }
+            else {
+            children?.forEach(element => {
+                if(this.graph.getCell(element).__proto__.constructor.name === "Cut") {
+                    this.handleCollisions(this.graph.getCell(element))
+                }
+            });
+            }
+        }
+    }
+
+    deleteSubgraph(root, deleteRoot=true) {
+        //destroy recursively, starting at the leaves to not lose reference
+        //to the rest of the tree by deleting the root first
+        let children = root.getEmbeddedCells()
+        for (const child in children) {
+            this.deleteSubgraph(child)
+        }
+        root.destroy()
     }
 
 }

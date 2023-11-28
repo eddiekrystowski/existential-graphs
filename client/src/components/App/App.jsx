@@ -12,12 +12,17 @@ import Login from '../../views/Login/Login';
 import $ from 'jquery';
 import Signup from '../../views/Signup/Signup';
 
+const GRAPH_STATE = {
+    CREATE: 0,
+    PROOF: 1
+}
 
 export default function App(props) {
     const workspace = useRef(null);
 
     const [muted, setMuted] = useState(true);
     const [sound, setSound] = useState(null);
+    const [graphState, setGraphState] = useState(GRAPH_STATE.CREATE);
 
     //initial render
     useEffect(() => {
@@ -54,6 +59,10 @@ export default function App(props) {
         audio.play();
     }
 
+    const handleGraphStateChange = (newGraphState) => {
+        setGraphState(newGraphState);
+    }
+
     /*
     const getGraphForExport = () => {
         return workspace.current.mainPaper.current.sheet.graph; 
@@ -84,17 +93,17 @@ export default function App(props) {
     return (
         <div id="app" className="app text-black dark:text-white bg-white dark:bg-slate-700">
             <BrowserRouter>
-                <Header muted={muted} handleMuteToggle={handleMuteToggle}/>
+                <Header muted={muted} handleMuteToggle={handleMuteToggle} graphState={graphState}/>
                 <Routes>
                     <Route path="/" element={
                         <Dashboard/>
                     } />
                     <Route path="/create/:id" element={
-                        <Create handlePlayAudio={handlePlayAudio}/>
+                        <Create handlePlayAudio={handlePlayAudio} handleGraphStateChange={handleGraphStateChange} />
                     } />
-                    <Route path="/proof" element={
-                        <Create handlePlayAudio={handlePlayAudio}/>
-                    } />
+                    {/* <Route path="/proof" element={
+                        <Create handlePlayAudio={handlePlayAudio} handleGraphStateChange={handleGraphStateChange}/>
+                    } /> */}
                     <Route path="/login" element={
                         <Login/>
                     } />

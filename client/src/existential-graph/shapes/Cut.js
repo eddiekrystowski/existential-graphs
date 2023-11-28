@@ -43,7 +43,8 @@ export default class Cut extends joint.dia.Element {
             type: "dia.Element.Cut",
             attrs: {
                 rect: CUT_DEFAULTS.attrs.rect,
-                text: CUT_DEFAULTS.attrs.text
+                text: CUT_DEFAULTS.attrs.text,
+                locked: false
             }
         }
     }
@@ -57,7 +58,7 @@ export default class Cut extends joint.dia.Element {
     }]
 
     //custom constructor for shape, should more or less always use this over the default constructor
-    create(config, sheet) {
+    create(config, graphController) {
         const options = _.cloneDeep(CUT_DEFAULTS);
         if (config) {
             options.position = Object.assign(options.position, config.position);
@@ -65,7 +66,7 @@ export default class Cut extends joint.dia.Element {
             options.attrs.rect = Object.assign(options.attrs.rect, config.attrs && config.attrs.rect);
             options.attrs.text = Object.assign(options.attrs.text, config.attrs && config.attrs.text);
         }
-        options.sheet = sheet;
+        options.graphController = graphController;
 
         // adjust size / position if cut was created with a child
         // in order for undo/redo to function properly
@@ -97,13 +98,13 @@ export default class Cut extends joint.dia.Element {
                 level: 0
             },
             // set custom attributes here:
-            sheet: options.sheet
+            graphController: options.graphController
         });
 
         //have to set this out here since we actually do want a reference to this object, not a copy
-        cut.sheet = options.sheet;
+        cut.graphController = options.graphController;
 
-        cut.addTo(cut.sheet.graph);
+        cut.addTo(cut.graphController.graph);
         //add tools (some events events also)
         this.addTools(cut);
         //let audio = new Audio(Snip);
@@ -113,7 +114,7 @@ export default class Cut extends joint.dia.Element {
             let child = config.child;
             let hasparent = false;
             if (child.get("parent")) {
-                let parent = cut.sheet.graph.getCell(child.get("parent"));
+                let parent = cut.graphController.graph.getCell(child.get("parent"));
                 parent.unembed(child);
                 parent.embed(cut)
                 parent.toBack()
@@ -121,7 +122,7 @@ export default class Cut extends joint.dia.Element {
             }
             cut.embed(child)
             if (hasparent) {
-                cut.sheet.treeResize(cut, cut.attributes.attrs.rect.width / 2);
+                cut.graphController.treeResize(cut, cut.attributes.attrs.rect.width / 2);
             }
         }
         //console.log(cut);
@@ -129,6 +130,7 @@ export default class Cut extends joint.dia.Element {
     }
 
     destroy() {
+        if (this.isLocked()) return;
         //check if cut has parents or children, if so children become new children of parent;
         let parent = this.getParentCell();
         let children = this.getEmbeddedCells()
@@ -137,7 +139,7 @@ export default class Cut extends joint.dia.Element {
         }
         this.remove();
         if (parent) {
-            this.sheet.handleCollisions(parent);
+            this.graphController.handleCollisions(parent);
         }
 
         //this.sheet.paper.handleDeleteCell();
@@ -146,19 +148,19 @@ export default class Cut extends joint.dia.Element {
     obliterate() {
         //  If non-empty cell, destroy all children
         let children = this.attributes.embeds;
-        if (children) children.forEach(child => {this.sheet.graph.getCell(child).obliterate()});
+        if (children) children.forEach(child => {this.graphController.graph.getCell(child).obliterate()});
         //  Then destroy self
         this.destroy();
   }
 
     active() {
         //cut is being interacted with (ie grabbing, dragging or moving etc)
-        this.sheet.colorByLevel(this, {even:color.shapes.background.even.active, odd:color.shapes.background.odd.active, premise: color.shapes.background.default.color});
+        this.graphController.colorByLevel(this, {even:color.shapes.background.even.active, odd:color.shapes.background.odd.active, premise: color.shapes.background.default.color});
     }
 
     inactive() {
         //cut is not being interacted with (ie grabbing, dragging or moving etc)
-        this.sheet.colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
+        this.graphController.colorByLevel(this, {even:color.shapes.background.even.inactive, odd:color.shapes.background.odd.inactive, premise: color.shapes.background.default.color});
     }
 
     getBoundingBox() {
@@ -172,6 +174,10 @@ export default class Cut extends joint.dia.Element {
 
     getArea() {
         return this.attributes.attrs.rect.width * this.attributes.attrs.rect.height;
+    }
+
+    setColor(color) {
+        this.attr("rect/fill", color)
     }
 
     // move(position, timestep = 1000, frames = 500) {
@@ -198,7 +204,7 @@ export default class Cut extends joint.dia.Element {
     ///     ( i think we can? )
     addTools(element) {
         //element view is in charge of rendering the elements on the paper
-        let elementView = element.findView(element.sheet.paper.jpaper);
+        let elementView = element.findView(element.graphController.existential_graph.paper);
         //clear any old tools
         elementView.removeTools();
         // boundary tool shows boundaries of element
@@ -245,6 +251,33 @@ export default class Cut extends joint.dia.Element {
         // });
         // --- end of paper events -----
     }
+
+    enableTools() {
+        let elementView = this.findView(this.graphController.existential_graph.paper);
+        elementView.showTools();
+    }
+    
+    disableTools() {
+        let elementView = this.findView(this.graphController.existential_graph.paper);
+        elementView.hideTools();
+    }
+
+    lock() {
+        console.log('locked')
+        this.attr('locked', true)
+        this.disableTools()
+    }
+
+    unlock () {
+        console.log('unlocked')
+        this.attr('locked', false)
+        this.enableTools()
+    }
+
+    isLocked() {
+        return this.attr("locked")
+    }
+
 }
 
 
@@ -281,7 +314,7 @@ const MIN_SIZE = {
  * @param {MouseEvent} event
  */
 function resize_mousedown(event) {
-    const target = this.sheet.graph.getCell($(event.target).parent().attr('model-id'));
+    const target = this.graphController.graph.getCell($(event.target).parent().attr('model-id'));
     prev_pos = {
         x: event.clientX,
         y: event.clientY
@@ -292,7 +325,7 @@ function resize_mousedown(event) {
     event.stopPropagation();
 
     if (target.get('parent')) {
-        this.sheet.graph.getCell(target.get('parent')).unembed(target);
+        this.graphController.graph.getCell(target.get('parent')).unembed(target);
     }
 }
 
@@ -388,7 +421,7 @@ function resize_mousemove(event) {
 function resize_mouseup (event) {
     $(document).off('mouseup', resize_mouseup);
     $(document).off('mousemove', resize_mousemove);
-    event.data.target.sheet.handleCollisions(event.data.target);
+    event.data.target.graphController.handleCollisions(event.data.target);
     //event.data.target.sheet.paper.onGraphUpdate();
 }
 

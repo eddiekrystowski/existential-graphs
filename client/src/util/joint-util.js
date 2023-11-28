@@ -10,7 +10,8 @@
     const order = [];
     const ids = {}; 
     console.log(cells)
-    while (cells.length > 0) {
+    while (cells && cells.length > 0) {
+        console.log('cells', cells);
         const cell = cells.shift();
         const type = cell.type;
 
@@ -31,6 +32,8 @@
             ids[cell.id] = true;
         }
     }
+
+    console.log('----------------- DONE ------------------------')
     return order;
 }
 

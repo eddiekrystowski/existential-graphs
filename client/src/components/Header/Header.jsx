@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import Navbar from "@components/Header/Navbar/Navbar";
 import Profile from "@components/Header/Profile/Profile";
 import eg_logo from "@assets/images/eg_logo.png";
+
+const GRAPH_STATE = {
+  CREATE: 0,
+  PROOF: 1
+}
+
 /**
  * Component for Header of Existential Graphs.
  * 
@@ -19,7 +25,13 @@ export default function Header( props ) {
           className=" w-10 flex-item m-2 mr-20"
           />
         </Link>
-        <Navbar />
+        
+        {/* <Navbar /> */}
+        <div className="w-full flex flex-row justify-around items-center">
+          <p className="inline-block text-black hover:text-slate-600 dark:text-white dark:hover:text-slate-400 text-3xl">
+            {props.graphState === GRAPH_STATE.CREATE ? 'Create' : 'Proof'} Mode
+          </p>
+        </div>
       </div>
 
       <Profile />

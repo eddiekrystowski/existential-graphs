@@ -77,6 +77,14 @@
     color: black;
 }
 
+.graph-table-item:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.graph-table-item:nth-child(odd) {
+    background-color: #e8f1ff;
+}
+
 .graph-table-item:hover {
     cursor: pointer;
     background-color: #8792a5;
