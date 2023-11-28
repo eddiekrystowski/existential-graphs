@@ -16,6 +16,8 @@ export default function Toolbar( props ) {
     function handleStartProofClicked() {
         props.handleStartProofClicked();
     }
+
+    
   
     return (
         <div className='z-9 w-screen h-max bg-slate-200 dark:bg-slate-500 flex flex-row justify-between pl-2 pr-12 font-mono pt-2'>
@@ -133,7 +135,7 @@ export default function Toolbar( props ) {
                     props.inProof && 
                     <GraphTool 
                         selected={props.graphTool === 'insert_double_cut'}
-                        onClick={() => props.graphTool === 'insert_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('insert_double_cut')}
+                        onClick={() => props.graphTool === 'insert_double_cut' ? props.handleSetProofTool(null) : props.handleSetProofTool('insert_double_cut')}
                     >
                         Insert Double Cut
                     </GraphTool>
@@ -143,7 +145,7 @@ export default function Toolbar( props ) {
                     props.inProof && 
                     <GraphTool
                         selected={props.graphTool === 'erase_double_cut'}
-                        onClick={() => props.graphTool === 'erase_double_cut' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_double_cut')}
+                        onClick={() => props.graphTool === 'erase_double_cut' ? props.handleSetProofTool(null) : props.handleSetProofTool('erase_double_cut')}
                     >
                         Erase Double Cut
                     </GraphTool>
@@ -154,8 +156,8 @@ export default function Toolbar( props ) {
                     <GraphTool
                         selected={props.graphTool === 'insert_subgraph'}
                         onClick={() => props.graphTool === 'insert_subgraph' 
-                                        ? props.handleSetGraphTool('auto_disable_insert') 
-                                        : props.handleSetGraphTool('insert_subgraph')}
+                                        ? props.handleSetProofTool('auto_disable_insert') 
+                                        : props.handleSetProofTool('insert_subgraph')}
                     >
                         Insert Subgraph
                     </GraphTool>
@@ -165,7 +167,7 @@ export default function Toolbar( props ) {
                     props.inProof && 
                     <GraphTool
                         selected={props.graphTool === 'erase_subgraph'}
-                        onClick={() => props.graphTool === 'erase_subgraph' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('erase_subgraph')}
+                        onClick={() => props.graphTool === 'erase_subgraph' ? props.handleSetProofTool(null) : props.handleSetProofTool('erase_subgraph')}
                     >
                         Erase Subgraph
                     </GraphTool>
@@ -176,7 +178,7 @@ export default function Toolbar( props ) {
                     props.inProof && 
                     <GraphTool
                         selected={props.graphTool === 'iteration'}
-                        onClick={() => props.graphTool === 'iteration' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('iteration')}
+                        onClick={() => props.graphTool === 'iteration' ? props.handleSetProofTool(null) : props.handleSetProofTool('iteration')}
                     >
                         Iteration
                     </GraphTool>
@@ -186,7 +188,7 @@ export default function Toolbar( props ) {
                     props.inProof && 
                     <GraphTool
                         selected={props.graphTool === 'deiteration'}
-                        onClick={() => props.graphTool === 'deiteration' ? props.handleSetGraphTool(null) : props.handleSetGraphTool('deiteration')}
+                        onClick={() => props.graphTool === 'deiteration' ? props.handleSetProofTool(null) : props.handleSetProofTool('deiteration')}
                     >
                         Deiteration
                     </GraphTool>

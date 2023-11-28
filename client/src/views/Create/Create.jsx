@@ -52,7 +52,7 @@ export default function Create(props) {
       setGraphName(newName);
     }
 
-    const handleSetGraphTool = (graphTool) => {
+    const handleSetGraphTool = (graphTool, isProofTool=false) => {
       if (graphTool === 'auto_disable_insert') {
         graphTool = null;
         eg.graphController.disableInsertMode();
@@ -60,10 +60,16 @@ export default function Create(props) {
       }
       console.log('set graph tool:', graphTool);
       eg.graphTool = graphTool;
+      eg.isProofTool = isProofTool;
       setGraphTool(graphTool);
       eg.onGraphToolUse = () => {
         setGraphTool(null);
+        eg.isProofTool = false;
       }
+    }
+
+    const handleSetProofTool = (graphTool) => {
+      handleSetGraphTool(graphTool, true);
     }
 
     const handleStartProofClicked = () => {
@@ -84,6 +90,7 @@ export default function Create(props) {
             handleGraphNameUpdate={handleGraphNameUpdate}
             handleSaveGraph={handleSaveGraph}
             handleSetGraphTool={handleSetGraphTool}
+            handleSetProofTool={handleSetProofTool}
             handleStartProofClicked={handleStartProofClicked}
             graphTool={graphTool}
             inProof={inProof}
