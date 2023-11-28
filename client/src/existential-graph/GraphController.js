@@ -61,6 +61,31 @@ export default class GraphController {
         return cut;
     }
 
+    // embedInCut(config, collisions=true, selected=null) {
+    //     const cut = this.addCut(config, collisions=false)
+    //     alert("bortnite")
+    //     let parent = null;
+    //     if (selected.get('parent')) {
+    //         parent = selected.getParentCell();
+    //     }
+    //     if (selected !== null)  {   
+    //         if (parent) {
+    //             parent.unembed(selected);
+    //             parent.embed(cut)
+    //         }
+    //         cut.embed(selected)
+    //     }
+
+    //     if (parent) this.pack(parent)
+    //     this.pack(cut)
+
+    //     // Play snip sound
+    //     //let snip = new Audio(Snip); 
+    //     //this.handlePlayAudio(snip);
+    //     //this.paper.onGraphUpdate();
+    //     return cut;
+    // }
+
     handleCollisions(cell, clean=true) {
         //console.log("=================== HANDLE COLLISIONS =========================")
         //This function takes a Cell as input and, using its position
@@ -739,12 +764,16 @@ export default class GraphController {
         } 
         new_cuts[0].embed(new_cuts[1])
         this.colorByLevel(new_cuts[0])
-        let selected_premise = this.paper.selected_premise;
+        let selected_premise = this.existential_graph.selected_premise;
         if (selected_premise && selected_premise.attributes.type === "dia.Element.Cut") {
-        selected_premise.embed(new_cuts[0]);
-        this.colorByLevel(selected_premise)
-        this.pack(selected_premise)
-        }
+            selected_premise.embed(new_cuts[0]);
+            this.colorByLevel(selected_premise)
+            this.pack(selected_premise)
+        }// else 
+        // {
+        //     new_cuts[1].embed(selected_premise)
+        //     this.pack(selected_premise)
+        // }
         this.handleCollisions(new_cuts[0]) 
     }
 

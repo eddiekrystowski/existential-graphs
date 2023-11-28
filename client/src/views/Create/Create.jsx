@@ -29,6 +29,12 @@ export default function Create(props) {
       }
     }, [inProof]);
 
+    useEffect(() => {
+      console.log('new hypergraph', existentialHypergraph)
+      console.log('eg', eg)
+      if (eg) eg.hypergraph = existentialHypergraph;
+    }, [existentialHypergraph])
+
     const handleSaveGraph = () => {
       console.log('CREATE VIEW SAVING GRAPH', graphName, id);
       const graphJSON = eg.exportGraphAsJSON();
@@ -49,12 +55,16 @@ export default function Create(props) {
       console.log('set graph tool:', graphTool);
       eg.graphTool = graphTool;
       setGraphTool(graphTool);
+      eg.onGraphToolUse = () => {
+        setGraphTool(null);
+      }
     }
 
     const handleStartProofClicked = () => {
       console.log('starting proof for graph ' + id);
       if (!inProof) {
         setInProof(true);
+        eg.proofMode = true;
       }
     }
 

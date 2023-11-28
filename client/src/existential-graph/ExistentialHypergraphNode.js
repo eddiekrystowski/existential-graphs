@@ -9,10 +9,13 @@ export default class ExistentialHypergraphNode {
     }
 
     addTransition(rule, destination) {
+        const destinationNode = new ExistentialHypergraphNode(destination);
         this.next.push({
             rule, 
-            destination: new ExistentialHypergraphNode(destination)
+            destination: destinationNode
         });
+
+        return destinationNode;
     }
 
     
