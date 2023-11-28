@@ -7,6 +7,12 @@ import ExistentialGraph from '../../existential-graph/ExistentialGraph';
 import ExistentialHypergraph from '../../existential-graph/ExistentialHypergraph';
 
 import { addToLocalGraphData, getLocalGraphByID } from '../../util/util';
+import ProofView from '../../components/Paper/ProofView/ProofView';
+
+const GRAPH_STATE = {
+  CREATE: 0,
+  PROOF: 1
+}
 
 export default function Create(props) {
 
@@ -65,6 +71,7 @@ export default function Create(props) {
       if (!inProof) {
         setInProof(true);
         eg.proofMode = true;
+        props.handleGraphStateChange(GRAPH_STATE.PROOF);
       }
     }
 
@@ -80,11 +87,15 @@ export default function Create(props) {
             handleStartProofClicked={handleStartProofClicked}
             graphTool={graphTool}
           />
-          <CreatePaperComponent
-            paper={eg}
-            dom_id="main-paper" 
-            graph_id={id}
-          />
+          <div className='w-screen h-max bg-slate-200 dark:bg-slate-500 flex flex-row relative'>
+            <CreatePaperComponent
+              paper={eg}
+              dom_id="main-paper" 
+              graph_id={id}
+            />
+            <ProofView show={inProof}/>
+          </div>
         </div>
+
     );
 }

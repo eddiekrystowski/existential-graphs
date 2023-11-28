@@ -132,12 +132,12 @@ export default class Atomic extends joint.dia.Element {
     }
 
     enableTools() {
-        let elementView = this.findView(this.graphController.paper.paper);
+        let elementView = this.findView(this.graphController.existential_graph.paper);
         elementView.showTools();
     }
     
     disableTools() {
-        let elementView = this.findView(this.graphController.paper.paper);
+        let elementView = this.findView(this.graphController.existential_graph.paper);
         elementView.hideTools();
     }
 
